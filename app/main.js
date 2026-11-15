@@ -101,7 +101,7 @@ function topbarHtml() {
       </button>
       <a class="icon-btn only-desktop" href="#/cards" aria-label="Flashcards due" style="position:relative">
         ${icon("layers", 18)}
-        <span class="dot-badge" id="nav-cards-dot"></span>
+        <span class="dot-badge" id="nav-cards-dot" data-due-dot></span>
       </a>
       <a class="icon-btn only-desktop" href="#/settings" aria-label="Settings">${icon("settings", 18)}</a>
     </div>
@@ -113,7 +113,7 @@ function bottomNavHtml() {
     ${MOBILE_NAV.map((it) =>
       it.more
         ? `<button class="nav-item" id="btn-more" style="background:none;border:0;font:inherit;cursor:pointer">${icon(it.icon, 20)}<span>${esc(it.label)}</span></button>`
-        : `<a class="nav-item" href="${it.href}" data-nav="${it.id}">${icon(it.icon, 20)}<span>${esc(it.label)}</span></a>`
+        : `<a class="nav-item" href="${it.href}" data-nav="${it.id}">${icon(it.icon, 20)}${it.id === "cards" ? `<span class="dot-badge" data-due-dot></span>` : ""}<span>${esc(it.label)}</span></a>`
     ).join("")}
   </nav>`;
 }
@@ -469,8 +469,9 @@ function paintCounts() {
     el.textContent = notes || "";
     el.style.display = notes ? "" : "none";
   });
-  const dot = document.getElementById("nav-cards-dot");
-  if (dot) dot.style.display = due ? "block" : "none";
+  document.querySelectorAll("[data-due-dot]").forEach((el) => {
+    el.style.display = due ? "block" : "none";
+  });
   const sidebar = document.getElementById("sidebar");
   if (sidebar) {
     const lvl = levelFor(store.data.profile.xp || 0);
