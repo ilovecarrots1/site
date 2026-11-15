@@ -1,6 +1,6 @@
 /* Ask: local retrieval assistant over the whole database (no network) */
 
-import { esc, icon, fmt, md } from "../core.js";
+import { esc, icon, fmt } from "../core.js";
 import { COMPOUNDS, COMPOUND_BY_ID, getCompound, resolveCompound, searchCompounds, pubmedUrl } from "../data/compounds.js";
 import { SYSTEMS, SYSTEM_BY_ID } from "../data/neuro.js";
 import { COURSES, LESSONS_ALL } from "../data/learn.js";
@@ -69,7 +69,7 @@ function compoundBlock(c) {
     </div>
     <p class="small" style="line-height:1.6;color:var(--text-2)">${esc(c.summary)}</p>
     ${(c.moa || []).length ? `<div class="tiny dim" style="line-height:1.6"><strong class="muted">Mechanism:</strong> ${(c.moa || []).map(esc).join(" · ")}</div>` : ""}
-    <div class="row wrap" style="gap:6px 14px" class="tiny">
+    <div class="row wrap tiny" style="gap:6px 14px">
       ${c.pk.halfLife ? `<span class="tiny dim">t½ <span class="mono" style="color:var(--text-2)">${fmt.duration(c.pk.halfLife)}</span></span>` : ""}
       ${c.pk.onset ? `<span class="tiny dim">onset <span class="mono" style="color:var(--text-2)">${fmt.duration(c.pk.onset)}</span></span>` : ""}
       ${(c.doses || [])[0] ? `<span class="tiny dim">usual ${esc(c.doses[0].low)}${c.doses[0].high !== c.doses[0].low ? `–${esc(c.doses[0].high)}` : ""} ${esc(c.doses[0].unit || "mg")}</span>` : ""}
@@ -172,7 +172,6 @@ export function answer(q) {
     if (inter.length) {
       parts.push(`<div class="tiny" style="color:#ffb9a3;line-height:1.55;margin-top:9px"><strong>Stacking them:</strong> ${esc(inter[0].title)} — ${esc(inter[0].mechanism)}</div>`);
     }
-    const blocked = `${found[0].name} ${found[1].name}`;
     const extra = found.slice(2);
     if (extra.length) parts.push(`<div class="tiny dim" style="margin-top:8px">Also matched: ${extra.map((c) => `<a href="#/compounds/${esc(c.id)}">${esc(c.name)}</a>`).join(", ")}</div>`);
   } else if (found.length === 1) {
