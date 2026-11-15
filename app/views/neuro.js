@@ -17,7 +17,7 @@ function mapHtml() {
     const sys = r.systems.map((id) => SYSTEM_BY_ID.get(id)).filter(Boolean);
     const main = sys[0];
     const dim = state.highlight && !r.systems.includes(state.highlight);
-    return `<g class="hot ${state.region === r.id ? "sel" : ""}" data-region="${esc(r.id)}" style="--dot:${main ? main.color : "var(--accent)"};opacity:${dim ? 0.32 : 1}">
+    return `<g class="hot ${state.region === r.id ? "sel" : ""}" data-region="${esc(r.id)}" tabindex="0" role="button" aria-label="${esc(r.name)}" style="--dot:${main ? main.color : "var(--accent)"};opacity:${dim ? 0.32 : 1}">
       <circle class="hit" cx="${r.x}" cy="${r.y}" r="${rad + 9}"/>
       <circle class="core" cx="${r.x}" cy="${r.y}" r="${rad}"/>
       ${sys.length > 1 ? `<circle cx="${r.x}" cy="${r.y}" r="${rad - 2.6}" fill="none" stroke="var(--dot)" stroke-width="0.7" stroke-opacity="0.55"/>` : ""}
