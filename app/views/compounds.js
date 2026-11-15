@@ -12,12 +12,13 @@ const EV_ORDER = ["strong", "moderate", "limited", "preclinical", "anecdotal"];
 /* List                                                                */
 /* ------------------------------------------------------------------ */
 
-const listState = { q: "", cls: "", ev: "", sort: "name" };
+const listState = { q: "", cls: "", ev: "", sort: "name", tag: "" };
 
 function applyFilters() {
   let items = listState.q ? searchCompounds(listState.q) : COMPOUNDS.slice();
   if (listState.cls) items = items.filter((c) => c.cls === listState.cls);
   if (listState.ev) items = items.filter((c) => c.evidence === listState.ev);
+  if (listState.tag) items = items.filter((c) => (c.tags || []).includes(listState.tag));
 
   if (listState.sort === "name") items.sort((a, b) => a.name.localeCompare(b.name));
   else if (listState.sort === "evidence") items.sort((a, b) => EV_ORDER.indexOf(a.evidence) - EV_ORDER.indexOf(b.evidence) || a.name.localeCompare(b.name));
@@ -40,8 +41,11 @@ function countLabel() {
 }
 
 export const list = {
-  render() {
+  render(ctx) {
     const cls = CLASSES;
+    // Deep links from tag chips: #/compounds?tag=stimulant
+    const tagParam = ctx && ctx.query && ctx.query.tag ? String(ctx.query.tag) : "";
+    if (tagParam) listState.tag = tagParam;
     return `
     ${pageHead(
       "Compounds",
@@ -63,6 +67,7 @@ export const list = {
           </div>
         </div>
         <div class="row wrap" style="gap:8px">
+          ${listState.tag ? `<button class="chip chip-btn on" data-act="clear-tag">${icon("x", 12)} tag: ${esc(listState.tag)}</button>` : ""}
           <div class="btn-group" id="cmp-ev">
             <button class="${!listState.ev ? "on" : ""}" data-ev="">Any evidence</button>
             ${EV_ORDER.map((e) => `<button class="${listState.ev === e ? "on" : ""}" data-ev="${e}">${esc(EVIDENCE[e].short)}</button>`).join("")}
@@ -225,7 +230,7 @@ function panelOverview(c) {
             <div class="stack" style="gap:8px">${findings.slice(0, 4).map(findingRow).join("")}</div>
             <a class="btn ghost sm" style="margin-top:9px" href="#/lab/interactions">Open full checker ${icon("chevronRight", 13)}</a>
           </section>`
-        : (store.data.stack || []).length > 1
+        : stack.length
           ? `<div>${callout("ok", "No known interaction with your current stack", "That is not proof of safety — absence of data is not data. Unlisted combinations are simply unstudied.")}</div>`
           : ""
     }
@@ -506,7 +511,10 @@ export const detail = {
     if (!c) {
       return `<div class="card">${emptyState("search", "Compound not found", `No entry for “${ctx.params.id}”.`, `<a class="btn ghost sm" href="#/compounds">${icon("arrowLeft", 14)} Back to compounds</a>`)}</div>`;
     }
-    detailState.tab = "overview";
+    if (detailState.id !== c.id) {
+      detailState.id = c.id;
+      detailState.tab = "overview";
+    }
     const saved = isSaved(c.id);
 
     return `
