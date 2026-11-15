@@ -134,10 +134,10 @@ export function callout(kind, title, body) {
     info: { ic: "info", color: "var(--ok)", bg: "rgba(111,179,255,.08)", line: "rgba(111,179,255,.26)" },
   };
   const m = map[kind] || map.info;
-  return `<div style="display:flex;gap:10px;padding:11px 13px;border-radius:12px;background:${m.bg};border:1px solid ${m.line};font-size:12.5px;line-height:1.55">
+  return `<div class="callout callout-${esc(kind)}" style="display:flex;gap:10px;padding:11px 13px;border-radius:12px;background:${m.bg};border:1px solid ${m.line};font-size:12.5px;line-height:1.55">
     <span style="color:${m.color};flex:none;margin-top:1px">${icon(m.ic, 16)}</span>
-    <div><strong style="color:${m.color};display:block;font-size:12.5px;margin-bottom:2px">${esc(title)}</strong>
-    <span class="muted">${body}</span></div>
+    <div style="min-width:0"><strong style="color:${m.color};display:block;font-size:12.5px;margin-bottom:2px">${esc(title)}</strong>
+    <span class="muted">${esc(body)}</span></div>
   </div>`;
 }
 
