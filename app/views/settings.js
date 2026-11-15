@@ -277,18 +277,24 @@ export const settings = {
         const text = await f.text();
         if (!confirm("Replace all current data with this backup?")) return;
         store.import(text);
+        applyAppearance();
+        window.dispatchEvent(new CustomEvent("nd:appearance"));
         toast("Backup restored", "success");
         rerender();
       } catch (err) {
-        toast(`Import failed: ${err.message}`, "error");
+        toast(`Import failed: ${err.message}`, "danger");
+      } finally {
+        // Always clear, or picking the same file again fires no change event.
+        file.value = "";
       }
-      file.value = "";
     });
 
     root.querySelector("#set-reset")?.addEventListener("click", () => {
-      if (!confirm("Delete all progress, notes and personal data on this device?")) return;
+      if (!confirm("Delete all progress, notes, stack and preferences on this device?")) return;
       if (!confirm("Last check — this cannot be undone. Reset?")) return;
       store.reset();
+      applyAppearance();
+      window.dispatchEvent(new CustomEvent("nd:appearance"));
       toast("Everything reset", "info");
       location.hash = "#/";
       rerender();
