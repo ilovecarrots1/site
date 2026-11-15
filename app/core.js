@@ -364,6 +364,7 @@ function mergeDefaults(target, defaults) {
 }
 
 const listeners = new Set();
+let saveWarned = false;
 
 export const store = {
   data: defaultState(),
