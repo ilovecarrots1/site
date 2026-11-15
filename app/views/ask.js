@@ -165,7 +165,16 @@ export function answer(q) {
   const lessons = findLessons(text);
   const parts = [];
 
-  if (found.length >= 2) {
+  if (found.length >= 2 && !wantsComparison(text)) {
+    // A broad query can match several summaries; lead with the best single entry.
+    parts.push(compoundBlock(found[0]));
+    parts.push(
+      `<div class="tiny dim" style="margin-top:8px">Also matched: ${found
+        .slice(1, 4)
+        .map((c) => `<a href="#/compounds/${esc(c.id)}">${esc(c.name)}</a>`)
+        .join(", ")} — <a href="#/compounds?q=${encodeURIComponent(found[0].name)}">browse</a></div>`
+    );
+  } else if (found.length >= 2) {
     parts.push(`<p class="small muted" style="margin-bottom:9px">Comparing <strong style="color:var(--text)">${esc(found[0].name)}</strong> with <strong style="color:var(--text)">${esc(found[1].name)}</strong>:</p>`);
     parts.push(compareBlocks(found));
     const inter = checkInteractions(found.slice(0, 2));
@@ -178,8 +187,17 @@ export function answer(q) {
     const c = found[0];
     parts.push(compoundBlock(c));
     if (/\b(interact|combine|mix|stack|safe with)\b/i.test(text)) {
-      const inter = checkInteractions([c, ...(globalThis.__stackSubstances || [])]);
-      parts.push(`<p class="tiny dim" style="margin-top:9px">Add it to the checker to test against your stack: <a href="#/lab/interactions?add=${esc(c.id)}">open the interaction checker</a>.</p>`);
+      const stack = (store.data.stack || []).map((id) => getCompound(id)).filter(Boolean);
+      const inter = checkInteractions([c, ...stack]);
+      if (inter.length) {
+        parts.push(
+          `<div class="stack" style="gap:6px;margin-top:9px">${inter
+            .slice(0, 3)
+            .map((f) => `<div class="tiny" style="line-height:1.55"><strong>${esc(f.title)}</strong> — ${esc(f.mechanism)}</div>`)
+            .join("")}</div>`
+        );
+      }
+      parts.push(`<p class="tiny dim" style="margin-top:9px">Check it against your whole stack: <a href="#/lab/interactions?add=${esc(c.id)}">open the interaction checker</a>.</p>`);
     }
     if (/half.?life|how long|duration|last/i.test(text) && c.pk.halfLife) {
       parts.push(
