@@ -350,9 +350,13 @@ function mergeDefaults(target, defaults) {
   for (const key of Object.keys(defaults)) {
     const dv = defaults[key];
     const tv = target[key];
-    if (tv === undefined) {
-      target[key] = dv;
-    } else if (dv && typeof dv === "object" && !Array.isArray(dv) && tv && typeof tv === "object" && !Array.isArray(tv)) {
+    const dvIsArr = Array.isArray(dv);
+    const tvIsArr = Array.isArray(tv);
+    // Replace anything missing or of the wrong shape, so a malformed backup can
+    // never leave `store.data.profile` null and brick every view.
+    if (tv === undefined || tv === null || typeof tv !== typeof dv || dvIsArr !== tvIsArr) {
+      target[key] = dvIsArr ? dv.slice() : dv && typeof dv === "object" ? JSON.parse(JSON.stringify(dv)) : dv;
+    } else if (dv && typeof dv === "object" && !dvIsArr && tv && typeof tv === "object" && !tvIsArr) {
       mergeDefaults(tv, dv);
     }
   }
@@ -380,11 +384,22 @@ export const store = {
     return this.data;
   },
 
+  /** @returns {boolean} false when the browser refused to persist the state. */
   save() {
+    let ok = true;
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
     } catch (err) {
+      ok = false;
       console.warn("[neurodiff] state save failed", err);
+      if (!saveWarned) {
+        saveWarned = true;
+        try {
+          window.dispatchEvent(new CustomEvent("nd:savefail"));
+        } catch (e) {
+          /* no window during tests */
+        }
+      }
     }
     for (const fn of listeners) {
       try {
@@ -393,6 +408,7 @@ export const store = {
         console.warn("[neurodiff] listener failed", err);
       }
     }
+    return ok;
   },
 
   subscribe(fn) {
@@ -439,9 +455,19 @@ export const store = {
 
   import(json) {
     const parsed = JSON.parse(json);
-    if (!parsed || typeof parsed !== "object") throw new Error("Not a NeuroDifference backup");
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("Not a NeuroDifference backup");
+    }
+    const hasProfile = parsed.profile && typeof parsed.profile === "object" && !Array.isArray(parsed.profile);
+    if (!hasProfile) throw new Error("Backup has no profile — refusing to overwrite your data");
+    if (parsed.v != null && Number(parsed.v) > 2) throw new Error("Backup comes from a newer version of this app");
+    const previous = this.data;
     this.data = mergeDefaults(parsed, defaultState());
-    this.save();
+    if (!this.save()) {
+      this.data = previous;
+      throw new Error("Could not write the backup to storage");
+    }
+    return this.data;
   },
 };
 
@@ -494,6 +520,7 @@ export function levelFor(xp) {
 let toastHost = null;
 
 export function toast(message, kind = "info", timeout = 2600) {
+  if (!toastHost || !toastHost.isConnected) toastHost = document.getElementById("toast-host");
   if (!toastHost) {
     toastHost = document.createElement("div");
     toastHost.className = "toast-host";
