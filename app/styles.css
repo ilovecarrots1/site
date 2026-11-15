@@ -243,6 +243,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
   padding-bottom: env(safe-area-inset-bottom, 0px);
   display: grid;
   grid-template-columns: repeat(5, 1fr);
+  background: var(--bg-1);
   background: color-mix(in srgb, var(--bg-1) 92%, transparent);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -829,12 +830,11 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
   position: fixed;
   inset: 0;
   z-index: 120;
-  padding-top: env(safe-area-inset-top, 0px);
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px);
   background: rgba(6, 8, 11, 0.72);
   backdrop-filter: blur(6px);
   display: flex;
   flex-direction: column;
-  padding: 0;
   animation: fadeIn 0.16s ease;
 }
 @keyframes fadeIn { from { opacity: 0; } }
