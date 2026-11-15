@@ -86,6 +86,10 @@ body {
 img, svg { max-width: 100%; }
 svg.ic { flex: none; display: inline-block; vertical-align: -0.15em; }
 
+/* Scroll lock while a drawer, sheet or search overlay is open. */
+html.layer-open, html.layer-open body { overflow: hidden; }
+html.layer-open { overscroll-behavior: none; }
+
 a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
