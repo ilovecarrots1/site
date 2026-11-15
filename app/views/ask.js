@@ -155,6 +155,11 @@ function lessonsBlock(list) {
   </div>`;
 }
 
+/** Does the question actually ask for a comparison? */
+function wantsComparison(text) {
+  return /\b(vs\.?|versus|compare|comparison|compared|difference|differences|better|worse|instead of)\b/i.test(text);
+}
+
 /** Build an answer for a free-text question. */
 export function answer(q) {
   const text = String(q || "").trim();
