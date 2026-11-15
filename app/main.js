@@ -456,6 +456,11 @@ function paintNav(navId) {
   document.querySelectorAll("[data-nav]").forEach((el) => {
     el.classList.toggle("active", el.dataset.nav === navId);
   });
+  // The bottom bar has no Flashcards cell — light up Learn while browsing cards.
+  if (navId === "cards") {
+    const learn = document.querySelector('#bottom-nav [data-nav="learn"]');
+    if (learn) learn.classList.add("active");
+  }
 }
 
 function paintCounts() {
