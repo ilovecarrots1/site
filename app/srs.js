@@ -91,11 +91,9 @@ export function gradeCard(cardId, grade) {
       seen: new Date().toISOString(),
     };
     s.srs[cardId] = next;
-    if (grade === "again") {
-      if (!Array.isArray(s.history)) s.history = [];
-      s.history.unshift({ id: uid("h"), kind: "card", label: `Reviewed card (again)`, at: new Date().toISOString() });
-      s.history = s.history.slice(0, 60);
-    }
+    if (!Array.isArray(s.history)) s.history = [];
+    s.history.unshift({ id: uid("h"), kind: "card", label: `Reviewed card (${grade})`, at: new Date().toISOString() });
+    s.history = s.history.slice(0, 60);
     return { interval, due: next.due, ease: next.ease };
   });
 }
