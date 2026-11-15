@@ -119,6 +119,7 @@ export function nextIntervalPreview(grade, cardId) {
   const g = GRADES.find((x) => x.key === grade);
   const q = g ? g.quality : 4;
   const st = cardId ? cardState(cardId) : blank();
-  const ease = q === 3 ? Math.max(1.3, st.ease - 0.15) : q === 5 ? Math.min(3, st.ease + 0.1) : st.ease;
-  return humanDays(scheduleInterval(st.interval, ease, q));
+  // gradeCard schedules with the *current* ease and only then nudges it, so the
+  // preview must use the same order or the shown interval drifts from reality.
+  return humanDays(scheduleInterval(st.interval, st.ease, q));
 }
