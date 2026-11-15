@@ -965,7 +965,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
   .side-xp .lv b { font-family: var(--mono); font-size: 15px; }
   .side-xp .lv span { font-size: 11px; color: var(--text-3); }
 
-  .topbar { padding: 0 24px; }
+  .topbar { padding: 0 24px; padding-top: env(safe-area-inset-top, 0px); }
   .topbar .brand { display: none; }
   .topbar-title { display: block; }
   .menu-btn { display: none !important; }
@@ -1033,7 +1033,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
 #root .app,
 #root .main { min-height: calc(100dvh / var(--scale)); }
 @media (min-width: 900px) {
-  #root .sidebar { height: calc(100dvh / var(--scale)); }
+  #root .sidebar { height: calc((100dvh - env(safe-area-inset-top, 0px)) / var(--scale)); }
 }
 
 [data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after {
