@@ -94,8 +94,24 @@ function openSheet(note, rerender) {
   document.body.insertAdjacentHTML("beforeend", sheetHtml(note));
   const host = document.querySelector("#note-sheet");
   const form = host.querySelector("#note-form");
-  host.querySelector(".sheet-scrim").addEventListener("click", () => host.remove());
-  host.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", () => host.remove()));
+  const opener = document.activeElement;
+  document.documentElement.classList.add("layer-open");
+  const close = () => {
+    host.remove();
+    document.documentElement.classList.remove("layer-open");
+    if (opener && document.contains(opener)) {
+      try {
+        opener.focus({ preventScroll: true });
+      } catch (err) {
+        /* ignore */
+      }
+    }
+  };
+  host.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", (ev) => {
+    ev.preventDefault();
+    if (ev.target.closest("button[type=\"submit\"]")) return;
+    close();
+  }));
   form.querySelector('[name="title"]').focus();
 
   form.addEventListener("submit", (ev) => {
@@ -135,6 +151,7 @@ function openSheet(note, rerender) {
       }
     });
     host.remove();
+    document.documentElement.classList.remove("layer-open");
     toast(id ? "Note updated" : "Note saved", "success");
     rerender();
   });
