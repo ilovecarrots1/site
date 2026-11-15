@@ -280,6 +280,20 @@ export const lesson = {
 /* Flashcards                                                          */
 /* ------------------------------------------------------------------ */
 
+const DECK_META = {
+  pharmacokinetics: { name: "Pharmacokinetics", color: "#f2b23e" },
+  pharmacodynamics: { name: "Pharmacodynamics", color: "#6fb3ff" },
+  interactions: { name: "Interactions", color: "#f85149" },
+  withdrawal: { name: "Withdrawal", color: "#d29922" },
+  evidence: { name: "Evidence", color: "#3fb950" },
+};
+
+function deckMeta(id) {
+  const sys = SYSTEM_BY_ID.get(id);
+  if (sys) return { name: sys.name, color: sys.color, abbr: sys.abbr };
+  return { ...(DECK_META[id] || { name: id, color: "var(--accent)" }), abbr: "" };
+}
+
 const session = { queue: [], idx: 0, flipped: false, reviewed: 0, started: false, filter: "" };
 
 function startSession(filter = "") {
@@ -294,12 +308,12 @@ function startSession(filter = "") {
 }
 
 function cardFaceHtml(card, flipped) {
-  const sys = SYSTEM_BY_ID.get(card.system);
+  const m = deckMeta(card.system);
   return `<div class="flashcard ${flipped ? "flipped" : ""}" id="fc" role="button" tabindex="0" aria-label="Flashcard — tap to flip">
     <div class="fc-inner">
       <div class="fc-face">
         <div class="row" style="justify-content:center;gap:6px">
-          ${sys ? `<span class="chip" style="--dot:${sys.color}"><span class="dot" style="background:${sys.color}"></span>${esc(sys.abbr)}</span>` : ""}
+          <span class="chip" style="--dot:${m.color}"><span class="dot" style="background:${m.color}"></span>${esc(m.abbr || m.name)}</span>
         </div>
         <div class="fc-q">${esc(card.front)}</div>
         <div class="fc-hint">Tap to reveal</div>
@@ -378,8 +392,8 @@ export const cards = {
       <button class="chip chip-btn ${!session.filter ? "on" : ""}" data-sys="">All decks</button>
       ${systems
         .map((id) => {
-          const s = SYSTEM_BY_ID.get(id);
-          return `<button class="chip chip-btn ${session.filter === id ? "on" : ""}" data-sys="${esc(id)}" style="--dot:${s?.color || "var(--accent)"}"><span class="dot" style="background:${s?.color || "var(--accent)"}"></span>${esc(s?.name || id)} (${systemCardCount(id)})</button>`;
+          const m = deckMeta(id);
+          return `<button class="chip chip-btn ${session.filter === id ? "on" : ""}" data-sys="${esc(id)}" style="--dot:${m.color}"><span class="dot" style="background:${m.color}"></span>${esc(m.name)} (${systemCardCount(id)})</button>`;
         })
         .join("")}
     </div>
