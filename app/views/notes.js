@@ -1,8 +1,8 @@
 /* Notebook: private notes attached to compounds, tags and questions */
 
-import { esc, icon, store, toast, uid, fmt } from "../core.js";
+import { esc, icon, store, toast, uid, fmt, emptyState } from "../core.js";
 import { COMPOUND_BY_ID, getCompound, resolveCompound, searchCompounds } from "../data/compounds.js";
-import { pageHead, emptyState, callout, classColor } from "./ui.js";
+import { pageHead, callout, classColor } from "./ui.js";
 
 const state = { q: "", tag: "" };
 
