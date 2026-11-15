@@ -10,8 +10,6 @@ export const GRADES = [
   { key: "easy", label: "Easy", hint: "Instant", quality: 5, cls: "primary" },
 ];
 
-const DAY = 1;
-
 function blank() {
   return { ease: 2.5, interval: 0, reps: 0, lapses: 0, due: null, seen: null };
 }
@@ -33,7 +31,12 @@ export function dueCards(deck = FLASHCARDS) {
       return { card, st, isDue, overdue: due ? overdue : 0 };
     })
     .filter((x) => x.isDue)
-    .sort((a, b) => (b.overdue || 0) - (a.overdue || 0) || a.card.id.localeCompare(b.card.id));
+    .sort(
+      (a, b) =>
+        Number(!!a.st.seen) - Number(!!b.st.seen) ||
+        (b.overdue || 0) - (a.overdue || 0) ||
+        a.card.id.localeCompare(b.card.id)
+    );
 }
 
 export function deckStats(deck = FLASHCARDS) {
@@ -73,12 +76,7 @@ export function gradeCard(cardId, grade) {
       reps = 0;
     } else {
       reps += 1;
-      if (prev.interval === 0) {
-        interval = q === 5 ? 3 : q === 4 ? 1 : 1;
-      } else {
-        const factor = q === 3 ? 1.2 : q === 4 ? ease : ease * 1.3;
-        interval = Math.max(1, Math.round(prev.interval * factor));
-      }
+      interval = scheduleInterval(prev.interval, ease, q);
       ease = Math.min(3.0, Math.max(1.3, ease + (q === 5 ? 0.1 : q === 3 ? -0.15 : 0)));
     }
 
@@ -94,6 +92,7 @@ export function gradeCard(cardId, grade) {
     };
     s.srs[cardId] = next;
     if (grade === "again") {
+      if (!Array.isArray(s.history)) s.history = [];
       s.history.unshift({ id: uid("h"), kind: "card", label: `Reviewed card (again)`, at: new Date().toISOString() });
       s.history = s.history.slice(0, 60);
     }
@@ -101,7 +100,27 @@ export function gradeCard(cardId, grade) {
   });
 }
 
-export function nextIntervalPreview(grade) {
-  const map = { again: "now", hard: "1 day", good: "2 days", easy: "4 days" };
-  return map[grade] || "";
+/** Interval (in days) the scheduler produces for this grade and previous interval. */
+function scheduleInterval(prevInterval, ease, q) {
+  if (q < 3) return 0;
+  if (!prevInterval) return q === 5 ? 6 : q === 4 ? 3 : 1;
+  const factor = q === 5 ? ease * 1.3 : q === 4 ? ease : 1.2;
+  return Math.max(1, Math.round(prevInterval * factor));
+}
+
+function humanDays(days) {
+  if (!days) return "now";
+  if (days === 1) return "tomorrow";
+  if (days < 30) return days + " days";
+  if (days < 365) return Math.round(days / 30) + " mo";
+  return (days / 365).toFixed(1) + " yr";
+}
+
+/** Preview matching exactly what gradeCard would schedule for this card. */
+export function nextIntervalPreview(grade, cardId) {
+  const g = GRADES.find((x) => x.key === grade);
+  const q = g ? g.quality : 4;
+  const st = cardId ? cardState(cardId) : blank();
+  const ease = q === 3 ? Math.max(1.3, st.ease - 0.15) : q === 5 ? Math.min(3, st.ease + 0.1) : st.ease;
+  return humanDays(scheduleInterval(st.interval, ease, q));
 }
