@@ -399,13 +399,15 @@ function matchRoute(segs) {
   if (!a) return { nav: "home", title: "Home", view: homeView };
   if (a === "compounds") {
     if (!b) return { nav: "compounds", title: "Compounds", view: compoundsView.list };
-    const cmp = COMPOUND_BY_ID.get(b);
-    return { nav: "compounds", title: cmp ? cmp.name : "Compound", view: compoundsView.detail, params: { id: b } };
+    const key = String(b).toLowerCase();
+    const cmp = COMPOUND_BY_ID.get(key);
+    return { nav: "compounds", title: cmp ? cmp.name : "Compound", view: compoundsView.detail, params: { id: key } };
   }
   if (a === "brain" || a === "systems") {
     if (!b) return { nav: "brain", title: "Brain map", view: neuroView.map };
-    const sys = SYSTEM_BY_ID.get(b);
-    return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: b } };
+    const key = String(b).toLowerCase();
+    const sys = SYSTEM_BY_ID.get(key);
+    return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
   }
   if (a === "lab") {
     if (b === "interactions") return { nav: "interactions", title: "Interactions", view: labView.interactions };
@@ -427,10 +429,21 @@ function matchRoute(segs) {
 
 function parseHash() {
   const raw = location.hash.replace(/^#/, "");
-  const [pathPart, queryPart] = raw.split("?");
-  const segs = pathPart.split("/").filter(Boolean).map((s) => decodeURIComponent(s));
+  const qi = raw.indexOf("?");
+  const pathPart = qi === -1 ? raw : raw.slice(0, qi);
+  const queryPart = qi === -1 ? "" : raw.slice(qi + 1);
+  const segs = pathPart
+    .split("/")
+    .filter(Boolean)
+    .map((s) => {
+      try {
+        return decodeURIComponent(s);
+      } catch (err) {
+        return s;
+      }
+    });
   const query = {};
-  new URLSearchParams(queryPart || "").forEach((v, k) => {
+  new URLSearchParams(queryPart).forEach((v, k) => {
     query[k] = v;
   });
   return { segs, query };
@@ -471,15 +484,27 @@ function paintCounts() {
 }
 
 function renderRoute() {
-  const { segs, query } = parseHash();
+  let parsed;
+  try {
+    parsed = parseHash();
+  } catch (err) {
+    parsed = { segs: [], query: {} };
+  }
+  const { segs, query } = parsed;
   const match = matchRoute(segs);
-  const path = segs.join("/");
+  const hashKey = location.hash || "#/";
 
   // clear transient layers from the previous view
-  document.querySelectorAll(".sheet-host, .drawer-host, .overlay").forEach((el) => el.remove());
+  closeLayers(false);
 
-  const host = document.getElementById("view");
-  if (!host) return;
+  const oldHost = document.getElementById("view");
+  if (!oldHost) return;
+  // A brand new host each render: view listeners can never pile up on a
+  // recycled container (duplicate grading, double-toggled switches, etc.).
+  const host = document.createElement("div");
+  host.id = "view";
+  host.className = oldHost.className;
+  oldHost.replaceWith(host);
 
   const ctx = {
     params: match.params || {},
@@ -510,8 +535,8 @@ function renderRoute() {
   if (titleEl) titleEl.textContent = match.title;
   document.title = match.title === "Home" ? "NeuroDifference — evidence · compounds · pathways" : `${match.title} · NeuroDifference`;
 
-  if (lastPath !== path) {
-    lastPath = path;
+  if (lastPath !== hashKey) {
+    lastPath = hashKey;
     window.scrollTo(0, 0);
   }
   document.documentElement.setAttribute("data-scrolled", String(window.scrollY > 8));
@@ -533,9 +558,14 @@ function wireKeys() {
       return;
     }
     if (ev.key === "Escape") {
-      document.querySelectorAll(".overlay, .drawer-host").forEach((el) => el.remove());
+      if (document.querySelector(".overlay, .drawer-host, .sheet-host")) {
+        ev.preventDefault();
+        closeLayers();
+      }
       return;
     }
+    // Every remaining shortcut is bare-key only.
+    if (ev.ctrlKey || ev.metaKey || ev.altKey) return;
     if (typing) return;
 
     if (ev.key === "/") {
@@ -565,12 +595,19 @@ function wireKeys() {
 /* ------------------------------------------------------------------ */
 
 function boot() {
-  store.load();
-  if (!store.data.profile.lastActive) {
-    store.update((s) => {
-      s.profile.lastActive = new Date().toISOString().slice(0, 10);
-    });
+  try {
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  } catch (err) {
+    /* ignore */
   }
+  store.load();
+  // Counts today as day 1 of the streak instead of leaving the profile
+  // marked active with a streak of 0.
+  touchStreak();
+
+  window.addEventListener("nd:savefail", () =>
+    toast("This browser refused to save your progress — export a backup before closing", "danger", 7000)
+  );
 
   settingsView.applyAppearance();
   window.addEventListener("nd:appearance", () => settingsView.applyAppearance());
@@ -583,8 +620,19 @@ function boot() {
   if (!location.hash) history.replaceState(null, "", "#/");
   renderRoute();
 
-  if ("serviceWorker" in navigator && location.protocol === "https:") {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  if ("serviceWorker" in navigator) {
+    const isSecure =
+      location.protocol === "https:" || ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
+    if (isSecure) {
+      try {
+        // Resolve against the document base so a subfolder deployment
+        // (/site/main/) still registers the right worker.
+        const swUrl = new URL("sw.js", document.baseURI);
+        navigator.serviceWorker.register(swUrl, { scope: "./" }).catch(() => {});
+      } catch (err) {
+        /* ignore */
+      }
+    }
   }
 
   document.addEventListener("click", (ev) => {
