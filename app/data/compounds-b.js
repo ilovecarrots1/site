@@ -27,7 +27,7 @@ export const COMPOUNDS_B = [
     warnings: [
       "Documented idiosyncratic hepatotoxicity — stop if fatigue, dark urine or jaundice appear",
       "Can raise T4/T3; avoid in hyperthyroidism and use caution with levothyroxine",
-      "May reduce效果 of immunosuppressants; theoretical additive sedation with CNS depressants",
+      "May blunt the effect of immunosuppressants; theoretical additive sedation with CNS depressants",
     ],
     tags: ["stress", "cortisol", "sleep"],
     pubmed: "ashwagandha cortisol stress randomized",
