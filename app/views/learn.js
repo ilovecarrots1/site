@@ -115,7 +115,7 @@ export const course = {
                 <span style="width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:12px;font-family:var(--mono);flex:none;${ok ? "background:rgba(63,185,80,.15);color:var(--good);border:1px solid rgba(63,185,80,.3)" : "background:var(--bg-3);color:var(--text-2);border:1px solid var(--line)"}">${ok ? icon("check", 13) : i + 1}</span>
                 <div style="min-width:0">
                   <div style="font-size:14.5px;font-weight:620">${esc(l.title)}</div>
-                  <div class="tiny dim" style="margin-top:2px">${l.minutes} min · ${(l.quiz || []).length} questions · +${l.xp} XP${rec?.score != null ? ` · scored ${rec.score}/${(l.quiz || []).length}` : ""}</div>
+                  <div class="tiny dim" style="margin-top:2px">${l.minutes} min · ${(l.quiz || []).length} questions · +${l.xp} XP${rec?.score != null ? ` · scored ${rec.score}/${rec.total ?? (l.quiz || []).length}` : ""}</div>
                 </div>
               </div>
               ${icon("chevronRight", 16)}
@@ -140,6 +140,14 @@ export const lesson = {
     }
     const l = found.lesson || found;
     const idx = c.lessons.findIndex((x) => x.id === l.id);
+    if (idx < 0) {
+      return `<div class="card">${emptyState(
+        "book",
+        "Lesson not in this course",
+        "That lesson exists, but not inside " + esc(c.title) + ".",
+        `<a class="btn ghost sm" href="#/learn/${esc(c.id)}">${icon("arrowLeft", 14)} Open ${esc(c.title)}</a>`
+      )}</div>`;
+    }
     const prev = c.lessons[idx - 1];
     const next = c.lessons[idx + 1];
     const done = lessonDone(l.id);
@@ -205,7 +213,8 @@ export const lesson = {
     const l = found.lesson || found;
     const quizEl = root.querySelector("#quiz");
     const scoreEl = root.querySelector("#quiz-score");
-    const answers = new Map();
+    const storedAnswers = store.data.lessons?.[l.id]?.answers || {};
+    const answers = new Map(Object.entries(storedAnswers).map(([k, v]) => [Number(k), v]));
 
     const scored = () => Array.from(answers.values()).filter((v) => v.correct).length;
 
@@ -244,12 +253,21 @@ export const lesson = {
       if (answers.has(qi)) return;
       const q = l.quiz[qi];
       const correct = oi === q.correctIndex;
+      const isNew = !answers.has(qi);
       answers.set(qi, { choice: oi, correct });
       store.update((s) => {
-        s.profile.quizzes = (s.profile.quizzes || 0) + 1;
-        if (correct) s.profile.correct = (s.profile.correct || 0) + 1;
+        if (!s.lessons) s.lessons = {};
+        const rec = s.lessons[l.id] || { completed: false, at: null, score: 0 };
+        rec.answers = Object.assign({}, rec.answers, { [qi]: { choice: oi, correct } });
+        s.lessons[l.id] = rec;
+        if (!Array.isArray(s.history)) s.history = [];
+        // Only the first answer to a question counts towards accuracy and XP.
+        if (isNew) {
+          s.profile.quizzes = (s.profile.quizzes || 0) + 1;
+          if (correct) s.profile.correct = (s.profile.correct || 0) + 1;
+        }
       });
-      if (correct) awardXP(4);
+      if (isNew && correct) awardXP(4);
       renderQuiz();
       const answeredAll = answers.size === l.quiz.length;
       if (answeredAll && scored() === l.quiz.length) toast("Clean sweep — every question right", "success");
@@ -257,11 +275,20 @@ export const lesson = {
 
     root.querySelector('[data-act="complete"]')?.addEventListener("click", () => {
       const already = lessonDone(l.id);
-      const score = answers.size ? scored() : 0;
+      const prevScore = store.data.lessons?.[l.id]?.score ?? 0;
+      // Never let a fresh mount with an empty answer map wipe a recorded score.
+      const score = answers.size ? scored() : prevScore;
       store.update((s) => {
         if (!s.lessons) s.lessons = {};
-        s.lessons[l.id] = { completed: true, at: new Date().toISOString(), score, total: (l.quiz || []).length };
-        s.history.unshift({ id: `h-${Date.now()}`, kind: "lesson", label: l.title, at: new Date().toISOString() });
+        if (!Array.isArray(s.history)) s.history = [];
+        const rec = s.lessons[l.id] || {};
+        s.lessons[l.id] = Object.assign({}, rec, {
+          completed: true,
+          at: new Date().toISOString(),
+          score,
+          total: (l.quiz || []).length,
+        });
+        if (!already) s.history.unshift({ id: `h-${Date.now()}`, kind: "lesson", label: l.title, at: new Date().toISOString() });
         s.history = s.history.slice(0, 60);
       });
       if (!already) {
@@ -359,7 +386,7 @@ function sessionBody() {
       session.flipped
         ? `<div class="grid grid-4" style="gap:6px">
             ${GRADES.map((g) => `<button class="btn ${g.cls === "danger" ? "danger" : g.cls === "soft" ? "soft" : g.cls === "primary" ? "primary" : "ghost"} sm" data-grade="${g.key}" style="flex-direction:column;gap:1px;height:auto;padding:8px 4px">
-              <span>${esc(g.label)}</span><span class="tiny" style="opacity:.7;font-weight:400">${esc(nextIntervalPreview(g.key))}</span>
+              <span>${esc(g.label)}</span><span class="tiny" style="opacity:.7;font-weight:400">${esc(nextIntervalPreview(g.key, card.id))}</span>
             </button>`).join("")}
           </div>`
         : `<div class="row" style="gap:8px">
@@ -410,6 +437,10 @@ export const cards = {
       out.innerHTML = sessionBody();
     };
 
+    // Always rebuild the queue on entry — due dates change between visits.
+    startSession(session.filter);
+    paint();
+
     root.querySelector("#fc-filter")?.addEventListener("click", (ev) => {
       const btn = ev.target.closest("[data-sys]");
       if (!btn) return;
@@ -448,6 +479,9 @@ export const cards = {
         session.reviewed += 1;
         session.idx += 1;
         session.flipped = false;
+        // "Again" means the card must come back before the session ends.
+        const failed = grade.dataset.grade === "again";
+        if (failed) session.queue.push(card);
         paint();
         const nextIn = res.interval ? `next in ${res.interval}d` : "back in this session";
         toast(`${nextIn}`, grade.dataset.grade === "again" ? "warn" : "success", 1600);
