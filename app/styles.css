@@ -992,6 +992,21 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
 
 .hl { background: var(--accent-soft); color: var(--accent); border-radius: 3px; padding: 0 2px; }
 
+/* ------------------------------------------------------------------ */
+/* Text scale (Settings → Text size). zoom keeps every px-based size    */
+/* proportional, and the min-heights compensate for the shrunken        */
+/* layout viewport so there is no phantom scroll area.                  */
+/* ------------------------------------------------------------------ */
+
+:root { --scale: 1; }
+#root { zoom: var(--scale); }
+#root,
+#root .app,
+#root .main { min-height: calc(100dvh / var(--scale)); }
+@media (min-width: 900px) {
+  #root .sidebar { height: calc(100dvh / var(--scale)); }
+}
+
 [data-motion="off"] *, [data-motion="off"] *::before, [data-motion="off"] *::after {
   animation-duration: 0.001s !important;
   transition-duration: 0.001s !important;
