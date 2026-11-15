@@ -161,6 +161,8 @@ export const notesView = {
   render() {
     const total = notes().length;
     const tags = allTags();
+    // A filter can outlive the note that carried the tag.
+    if (state.tag && !tags.includes(state.tag)) state.tag = "";
     return `
     ${pageHead(
       "Notebook",
