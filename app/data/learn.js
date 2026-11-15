@@ -805,6 +805,9 @@ for (const course of COURSES) {
 
 export const TOTAL_LESSONS = COURSES.reduce((n, c) => n + c.lessons.length, 0);
 
+/** Flat list of { course, lesson } pairs, in teaching order. */
+export const LESSONS_ALL = COURSES.flatMap((course) => course.lessons.map((lesson) => ({ course, lesson })));
+
 /* ------------------------------------------------------------------ */
 /* Flashcards                                                          */
 /* ------------------------------------------------------------------ */
