@@ -329,7 +329,7 @@ function openSearch() {
     let lastKind = "";
     current.forEach((item, i) => {
       if (item.kind !== lastKind) {
-        html += `<div class="sr-group">${esc(item.kind)}${item.kind === "Compound" ? "s" : item.kind === "Lesson" ? "s" : item.kind === "System" ? "s" : "s"}</div>`;
+        html += `<div class="sr-group">${esc(item.kind)}s</div>`;
         lastKind = item.kind;
       }
       html += `<a class="sr-item ${i === active ? "active" : ""}" href="${item.href}" data-i="${i}">
