@@ -1021,6 +1021,9 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
   display: none;
 }
 
+/* Bottom nav: sit the due-dot right above the icon, not on the cell edge. */
+.nav-item .dot-badge { top: 8px; right: calc(50% - 18px); }
+
 /* ------------------------------------------------------------------ */
 /* Text scale (Settings → Text size). zoom keeps every px-based size    */
 /* proportional, and the min-heights compensate for the shrunken        */
