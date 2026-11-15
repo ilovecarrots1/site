@@ -647,7 +647,7 @@ function boot() {
     if (a.getAttribute("target") === "_blank") return;
     const href = a.getAttribute("href");
     // let the router handle it; just close transient layers
-    document.querySelectorAll(".drawer-host, .overlay").forEach((el) => el.remove());
+    closeLayers(false);
     if (location.hash === href) {
       ev.preventDefault();
       renderRoute();
