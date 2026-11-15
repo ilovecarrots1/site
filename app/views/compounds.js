@@ -440,7 +440,7 @@ function panelSafety(c) {
     ${
       (c.warnings || []).length
         ? `<div class="stack" style="gap:8px">
-            ${c.warnings.map((w, i) => callout(i === 0 ? "danger" : "warn", i === 0 ? "Important" : "Caution", esc(w))).join("")}
+            ${c.warnings.map((w, i) => callout(i === 0 ? "danger" : "warn", i === 0 ? "Important" : "Caution", w)).join("")}
           </div>`
         : `<div>${callout("ok", "No specific warnings recorded", "Absence of recorded warnings is not evidence of safety. Unlisted risks are unstudied risks.")}</div>`
     }
