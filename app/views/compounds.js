@@ -46,6 +46,7 @@ export const list = {
     // Deep links from tag chips: #/compounds?tag=stimulant
     const tagParam = ctx && ctx.query && ctx.query.tag ? String(ctx.query.tag) : "";
     if (tagParam) listState.tag = tagParam;
+    if (ctx && ctx.query && ctx.query.q) listState.q = String(ctx.query.q);
     return `
     ${pageHead(
       "Compounds",
