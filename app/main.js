@@ -180,7 +180,7 @@ function openDrawer() {
     <div class="drawer">
       <a class="brand" href="#/" data-close>${BRAND}</a>
       ${NAV.map(
-        (group) => `${group.section ? `<h4>${esc(group.section)}</h4>` : `<h4>Tuning</h4>`}
+        (group) => `${group.section ? `<h4>${esc(group.section)}</h4>` : `<h4>App</h4>`}
           ${group.items
             .map(
               (it) => `<a class="d-item" href="${it.href}" data-nav="${it.id}" data-close>
