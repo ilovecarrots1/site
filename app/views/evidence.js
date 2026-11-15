@@ -235,7 +235,18 @@ function savedHtml() {
 
 export const evidence = {
   render() {
-    const savedCount = (store.data.saved || []).length;
+    const savedCount = (store.data.saved || []).map((id) => getCompound(id)).filter(Boolean).length;
+    const tab = state.tab === "ladder" || state.tab === "saved" ? state.tab : "topics";
+    const bodyHtml =
+      tab === "ladder"
+        ? ladderHtml()
+        : tab === "saved"
+          ? savedHtml()
+          : `<div style="margin-bottom:12px" class="search-input">
+        ${icon("search", 16)}
+        <input class="input" id="ev-q" type="search" placeholder="Filter topics…" value="${esc(state.q)}">
+      </div>
+      <div id="ev-topics">${topicsHtml()}</div>`;
     return `
     ${pageHead(
       "Evidence",
@@ -244,23 +255,17 @@ export const evidence = {
     )}
 
     <div class="tabs" id="ev-tabs">
-      <button class="on" data-tab="topics">Topics</button>
-      <button data-tab="ladder">Reading evidence</button>
-      <button data-tab="saved">Saved${savedCount ? ` (${savedCount})` : ""}</button>
+      <button class="${tab === "topics" ? "on" : ""}" data-tab="topics">Topics</button>
+      <button class="${tab === "ladder" ? "on" : ""}" data-tab="ladder">Reading evidence</button>
+      <button class="${tab === "saved" ? "on" : ""}" data-tab="saved">Saved${savedCount ? ` (${savedCount})` : ""}</button>
     </div>
 
-    <div id="ev-body">
-      <div style="margin-bottom:12px" class="search-input" id="ev-search-wrap">
-        ${icon("search", 16)}
-        <input class="input" id="ev-q" type="search" placeholder="Filter topics…" value="${esc(state.q)}">
-      </div>
-      <div id="ev-topics">${topicsHtml()}</div>
-    </div>`;
+    <div id="ev-body">${bodyHtml}</div>`;
   },
 
   mount(root) {
     const body = root.querySelector("#ev-body");
-    const searchWrap = root.querySelector("#ev-search-wrap");
+    if (!body) return;
 
     const paintTab = (tab) => {
       state.tab = tab;
