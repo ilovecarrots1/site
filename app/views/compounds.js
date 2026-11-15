@@ -133,11 +133,18 @@ export const list = {
     });
 
     root.addEventListener("click", (ev) => {
+      if (ev.target.closest('[data-act="clear-tag"]')) {
+        listState.tag = "";
+        if (ctx.navigate) ctx.navigate("#/compounds");
+        else location.hash = "#/compounds";
+        return;
+      }
       const reset = ev.target.closest('[data-act="reset"]');
       if (reset) {
         listState.q = "";
         listState.cls = "";
         listState.ev = "";
+        listState.tag = "";
         ctx.rerender();
       }
       if (ev.target.closest('[data-act="random"]')) {
