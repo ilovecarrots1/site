@@ -99,11 +99,11 @@ function topbarHtml() {
       <button class="icon-btn" id="btn-search" aria-label="Search">
         ${icon("search", 18)}
       </button>
-      <a class="icon-btn" href="#/cards" aria-label="Flashcards due" style="position:relative">
+      <a class="icon-btn only-desktop" href="#/cards" aria-label="Flashcards due" style="position:relative">
         ${icon("layers", 18)}
         <span class="dot-badge" id="nav-cards-dot"></span>
       </a>
-      <a class="icon-btn" href="#/settings" aria-label="Settings">${icon("settings", 18)}</a>
+      <a class="icon-btn only-desktop" href="#/settings" aria-label="Settings">${icon("settings", 18)}</a>
     </div>
   </header>`;
 }
