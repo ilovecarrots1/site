@@ -2,8 +2,8 @@
  * Vanilla ES modules, no build step. Every view exports { render(ctx), mount(root, ctx) }.
  */
 
-import { esc, icon, store, levelFor, toast, debounce, fmt } from "./core.js";
-import { COMPOUNDS, COMPOUND_BY_ID, searchCompounds } from "./data/compounds.js";
+import { esc, icon, store, levelFor, debounce } from "./core.js";
+import { COMPOUNDS, COMPOUND_BY_ID } from "./data/compounds.js";
 import { SYSTEMS, SYSTEM_BY_ID } from "./data/neuro.js";
 import { COURSES, LESSONS_ALL, FLASHCARDS } from "./data/learn.js";
 import { deckStats } from "./srs.js";
@@ -93,7 +93,7 @@ function sidebarHtml() {
 function topbarHtml() {
   return `<header class="topbar">
     <button class="icon-btn menu-btn" id="btn-menu" aria-label="Open menu">${icon("menu", 20)}</button>
-    <a class="brand only-mobile" href="#/">${BRAND}</a>
+    <a class="brand" href="#/" style="display:none">${BRAND}</a>
     <div class="topbar-title" id="topbar-title">Home</div>
     <div class="topbar-actions">
       <button class="icon-btn" id="btn-search" aria-label="Search">
@@ -391,7 +391,7 @@ function parseHash() {
 }
 
 let currentCtx = null;
-let currentKey = "";
+let lastPath = null;
 
 function paintNav(navId) {
   document.querySelectorAll("[data-nav]").forEach((el) => {
@@ -427,7 +427,7 @@ function paintCounts() {
 function renderRoute() {
   const { segs, query } = parseHash();
   const match = matchRoute(segs);
-  const key = segs.join("/") + JSON.stringify(query);
+  const path = segs.join("/");
 
   // clear transient layers from the previous view
   document.querySelectorAll(".sheet-host, .drawer-host, .overlay").forEach((el) => el.remove());
@@ -445,7 +445,6 @@ function renderRoute() {
     },
   };
   currentCtx = ctx;
-  currentKey = key;
 
   try {
     host.innerHTML = match.view.render(ctx);
@@ -465,7 +464,10 @@ function renderRoute() {
   if (titleEl) titleEl.textContent = match.title;
   document.title = match.title === "Home" ? "NeuroDifference — evidence · compounds · pathways" : `${match.title} · NeuroDifference`;
 
-  if (segs.join("/") !== currentKey.split("{")[0]) window.scrollTo(0, 0);
+  if (lastPath !== path) {
+    lastPath = path;
+    window.scrollTo(0, 0);
+  }
   document.documentElement.setAttribute("data-scrolled", String(window.scrollY > 8));
 }
 
@@ -532,7 +534,7 @@ function boot() {
   wireKeys();
 
   window.addEventListener("hashchange", renderRoute);
-  if (!location.hash) location.hash = "#/";
+  if (!location.hash) history.replaceState(null, "", "#/");
   renderRoute();
 
   if ("serviceWorker" in navigator && location.protocol === "https:") {
