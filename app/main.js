@@ -113,7 +113,7 @@ function bottomNavHtml() {
     ${MOBILE_NAV.map((it) =>
       it.more
         ? `<button class="nav-item" id="btn-more" style="background:none;border:0;font:inherit;cursor:pointer">${icon(it.icon, 20)}<span>${esc(it.label)}</span></button>`
-        : `<a class="nav-item" href="${it.href}" data-nav="${it.id}">${icon(it.icon, 20)}${it.id === "cards" ? `<span class="dot-badge" data-due-dot></span>` : ""}<span>${esc(it.label)}</span></a>`
+        : `<a class="nav-item" href="${it.href}" data-nav="${it.id}">${icon(it.icon, 20)}${it.id === "learn" ? `<span class="dot-badge" data-due-dot aria-hidden="true"></span>` : ""}<span>${esc(it.label)}</span></a>`
     ).join("")}
   </nav>`;
 }
