@@ -719,7 +719,9 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
 
 .brain-svg .outline { fill: rgba(255, 255, 255, 0.022); stroke: #303a47; stroke-width: 1.4; }
 .brain-svg .sulcus { fill: none; stroke: #2a333f; stroke-width: 1.1; stroke-linecap: round; }
-.brain-svg .hot { cursor: pointer; }
+.brain-svg .hot { cursor: pointer; outline: none; }
+.brain-svg .hot:focus-visible circle.core { fill-opacity: 0.34; stroke-width: 2.4; }
+.brain-svg .hot:focus-visible text { fill: #fff; }
 .brain-svg .hot circle.hit { fill: transparent; }
 .brain-svg .hot circle.core { fill: var(--dot, var(--accent)); fill-opacity: 0.16; stroke: var(--dot, var(--accent)); stroke-width: 1.3; transition: fill-opacity 0.2s; }
 .brain-svg .hot:hover circle.core { fill-opacity: 0.32; }
