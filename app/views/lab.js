@@ -415,10 +415,11 @@ function summaryHtml() {
 
 export const interactions = {
   render(ctx) {
-    if (ctx.query.add && !check.loaded) {
-      addSubstance(String(ctx.query.add).toLowerCase());
+    const add = ctx.query.add ? String(ctx.query.add).toLowerCase() : "";
+    if (add && check.lastAdd !== add) {
+      addSubstance(add);
+      check.lastAdd = add;
     }
-    check.loaded = true;
 
     return `
     <div class="row" style="margin-bottom:12px">${backLink("#/lab", "Lab")}</div>
