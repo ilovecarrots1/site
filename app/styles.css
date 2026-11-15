@@ -812,6 +812,8 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
   gap: 9px;
   padding: 22px;
   text-align: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .flashcard .fc-back { transform: rotateY(180deg); background: linear-gradient(160deg, #1d1a33, var(--bg-1)); border-color: var(--accent-line); }
 .flashcard .fc-q { font-size: 16px; font-weight: 640; line-height: 1.4; }
