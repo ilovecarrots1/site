@@ -555,7 +555,7 @@ export const BRAIN_REGIONS = [
     systems: ["glutamate", "gaba", "serotonin", "noradrenaline"],
     functions: ["Respiration", "Heart rate", "Autonomic control", "Cough and swallow"],
     note: "The respiratory centre is where opioid and sedative overdose becomes fatal — hence naloxone.",
-    drugs: ["naloxone", "clonidine", "opioids"],
+    drugs: ["naloxone", "clonidine", "pregabalin"],
   },
   {
     id: "pineal",
