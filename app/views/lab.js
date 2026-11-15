@@ -71,16 +71,18 @@ function simulateCurve({ dose, interval, count, halfLife, vd, steps = 180 }) {
   }
   const acc = 1 / (1 - Math.exp(-ke * interval));
   const last = pts[pts.length - 1]?.y || 0;
-  // trough right before the final dose
+  // Trough right before the final dose. Sampling must land exactly on
+  // (count-1)*interval and skip the final dose itself (td <= 0), otherwise the
+  // in-progress absorption of the last tablet inflates the trough.
   const trough = (() => {
-    const t = (count - 1) * interval + interval * 0.999;
+    const t = (count - 1) * interval;
     let c = 0;
     for (let d = 0; d < count; d++) {
       const td = t - d * interval;
       if (td <= 0) continue;
       c += scale * (ka / (ka - ke)) * (Math.exp(-ke * td) - Math.exp(-ka * td));
     }
-    return c;
+    return Math.max(0, c);
   })();
   return { pts, cmax, tmax, acc, trough, total, ke, halfLife };
 }
