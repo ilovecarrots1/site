@@ -48,6 +48,15 @@ export const EXTRA_SUBSTANCES = [
     summary: "Direct and indirect sympathomimetic found in cold medicines.",
     pk: { halfLife: 5 },
   },
+  {
+    id: "valerian",
+    name: "Valerian root",
+    cls: "Herb",
+    evidence: "limited",
+    flags: ["sedative", "gabaergic"],
+    summary: "Valerian extracts weakly modulate GABA-A tone and GABA transaminase; sleep benefit is small, product standardisation is poor.",
+    pk: { halfLife: 1.5 },
+  },
 ];
 
 /* Pair-specific rules: keyed by sorted id pair. */
