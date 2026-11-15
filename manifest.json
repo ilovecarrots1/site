@@ -1,22 +1,36 @@
 {
-  "name": "NeuroDifference",
+  "name": "NeuroDifference — evidence · compounds · pathways",
   "short_name": "NeuroDiff",
-  "description": "Evidence-based pharmacology and neuroscience encyclopedia.",
-  "start_url": "/",
+  "description": "Evidence-graded neuropharmacology: compound monographs, transmitter systems, a brain atlas, kinetic curves, interaction checks and spaced-repetition lessons.",
+  "id": "/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0B0D10",
-  "theme_color": "#0B0D10",
-  "orientation": "portrait-primary",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#0b0d10",
+  "theme_color": "#0b0d10",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "medical", "productivity"],
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3774/3774504.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3774/3774504.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "./icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
+  ],
+  "shortcuts": [
+    { "name": "Compounds", "url": "./index.html#/compounds" },
+    { "name": "Brain map", "url": "./index.html#/brain" },
+    { "name": "Interaction checker", "url": "./index.html#/lab/interactions" },
+    { "name": "Flashcards", "url": "./index.html#/cards" }
   ]
 }
