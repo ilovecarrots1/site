@@ -992,6 +992,18 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
 
 .hl { background: var(--accent-soft); color: var(--accent); border-radius: 3px; padding: 0 2px; }
 
+.dot-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--warn, #f0a95c);
+  box-shadow: 0 0 0 2px var(--bg-elev, #12151a);
+  display: none;
+}
+
 /* ------------------------------------------------------------------ */
 /* Text scale (Settings → Text size). zoom keeps every px-based size    */
 /* proportional, and the min-heights compensate for the shrunken        */
