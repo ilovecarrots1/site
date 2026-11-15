@@ -93,7 +93,7 @@ function sidebarHtml() {
 function topbarHtml() {
   return `<header class="topbar">
     <button class="icon-btn menu-btn" id="btn-menu" aria-label="Open menu">${icon("menu", 20)}</button>
-    <a class="brand" href="#/" style="display:none">${BRAND}</a>
+    <a class="brand" href="#/">${BRAND}</a>
     <div class="topbar-title" id="topbar-title">Home</div>
     <div class="topbar-actions">
       <button class="icon-btn" id="btn-search" aria-label="Search">
