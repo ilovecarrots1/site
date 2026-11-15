@@ -292,7 +292,7 @@ export const COMPOUNDS_D = [
     pubmed: "naloxone overdose reversal community",
   },
   {
-    id: "memantine-adjunct",
+    id: "sarcosine",
     name: "Sarcosine",
     aliases: ["N-methylglycine"],
     cls: "Nootropic",
