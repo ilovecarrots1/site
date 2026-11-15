@@ -220,8 +220,15 @@ export function render() {
 }
 
 function actionCard(iconName, title, sub, href, accent) {
+  const tones = {
+    violet: ["#8b7bff", "#5b8cff"],
+    green: ["#3fb950", "#2f9e6b"],
+    amber: ["#e3b341", "#f0883e"],
+    blue: ["#6fb3ff", "#8b7bff"],
+  };
+  const tone = tones[accent] || tones.violet;
   return `<a class="card hoverable" href="${href}" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:7px">
-    <span class="brand-mark" style="background:linear-gradient(150deg, var(--accent), var(--accent-2));box-shadow:none">${icon(iconName, 16)}</span>
+    <span class="brand-mark" style="background:linear-gradient(150deg, ${tone[0]}, ${tone[1]});box-shadow:none">${icon(iconName, 16)}</span>
     <div><div style="font-size:14px;font-weight:640">${esc(title)}</div>
     <div class="tiny dim" style="margin-top:2px;line-height:1.4">${esc(sub)}</div></div>
   </a>`;
