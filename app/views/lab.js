@@ -14,6 +14,7 @@ const DOSE_COMPOUNDS = COMPOUNDS.filter((c) => Number(c.pk?.halfLife) > 0).sort(
 const sim = {
   id: "",
   dose: 100,
+  unit: "mg",
   interval: 24,
   doses: 7,
   halfLife: 0,
@@ -34,6 +35,8 @@ function loadCompound(id, { keepDose = false } = {}) {
   if (!c || !(Number(c.pk?.halfLife) > 0)) return false;
   sim.id = c.id;
   sim.halfLife = Number(c.pk.halfLife);
+  const first = (c.doses || [])[0];
+  sim.unit = (first && first.unit) || "mg";
   if (!keepDose) sim.dose = defaultDoseFor(c);
   const hl = Number(c.pk.halfLife);
   sim.interval = hl <= 8 ? 8 : hl <= 18 ? 12 : hl <= 40 ? 24 : Math.round(hl / 24) * 24 || 24;
@@ -125,16 +128,16 @@ function simChartHtml() {
     <div class="legend">
       <span><i style="background:var(--accent)"></i>${esc(a.c.name)}</span>
       ${b ? `<span><i style="background:var(--good)"></i>${esc(b.c.name)}</span>` : ""}
-      <span class="dim">arbitrary units · Vd ${Math.round(sim.vd)} L</span>
+      <span class="dim">schematic units · Vd ${Math.round(sim.vd)} L</span>
     </div>`;
 
   return `<div class="card">
     <div class="card-head">
       <h3 style="font-size:14px">Plasma concentration</h3>
       <span class="spacer"></span>
-      <span class="tiny mono dim">${sim.doses} × ${esc(sim.dose)} mg q${Math.round(sim.interval)}h</span>
+      <span class="tiny mono dim">${sim.doses} × ${esc(sim.dose)} ${esc(sim.unit)} q${Math.round(sim.interval)}h</span>
     </div>
-    ${lineChart(series, { height: 190, xTicks: ticks, yLabel: "mg/L" })}
+    ${lineChart(series, { height: 190, xTicks: ticks, yLabel: `${sim.unit}/L` })}
     ${legend}
   </div>`;
 }
@@ -145,8 +148,8 @@ function simMetricsHtml() {
   const r = a.result;
   return `
   <div class="grid grid-4" style="gap:10px">
-    ${statTile({ label: "C-max", value: `${r.cmax.toFixed(2)}`, sub: "mg/L" })}
-    ${statTile({ label: "T-max", value: fmtH(r.tmax), sub: `dose ${sim.doses}` })}
+    ${statTile({ label: "C-max", value: `${r.cmax.toFixed(2)}`, sub: `${sim.unit}/L` })}
+    ${statTile({ label: "T-max", value: fmtH(r.tmax), sub: "model, not reference" })}
     ${statTile({ label: "Accumulation", value: `${r.acc.toFixed(2)}×`, sub: `q${Math.round(sim.interval)}h` })}
     ${statTile({ label: "Steady state", value: fmtH(a.halfLife * 5), sub: "≈5 half-lives" })}
   </div>`;
@@ -159,7 +162,7 @@ function simBody() {
 
 export const lab = {
   render(ctx) {
-    if (ctx.query.compound && !sim.id) loadCompound(ctx.query.compound);
+    if (ctx.query.compound && ctx.query.compound !== sim.id) loadCompound(ctx.query.compound);
     if (!sim.id) loadCompound(sim.id || store.data.stack?.[0] || "caffeine");
 
     const c = getCompound(sim.id);
@@ -183,8 +186,8 @@ export const lab = {
             </label>
 
             <div class="grid grid-2" style="gap:10px">
-              <label class="field">Dose (mg)
-                <input class="input" id="sim-dose" type="number" inputmode="decimal" min="1" max="2000" step="1" value="${sim.dose}">
+              <label class="field">Dose (${esc(sim.unit)})
+                <input class="input" id="sim-dose" type="number" inputmode="decimal" min="1" max="20000" step="any" value="${sim.dose}">
               </label>
               <label class="field">Interval (h)
                 <input class="input" id="sim-int" type="number" inputmode="numeric" min="0.5" max="168" step="0.5" value="${sim.interval}">
@@ -259,8 +262,12 @@ export const lab = {
 
   mount(root) {
     const out = root.querySelector("#sim-out");
+    const setVal = (sel, v) => {
+      const el = root.querySelector(sel);
+      if (el) el.value = String(v);
+    };
     const repaint = () => {
-      out.innerHTML = simBody();
+      if (out) out.innerHTML = simBody();
       root.querySelectorAll("[data-int]").forEach((b) => b.classList.toggle("on", Number(b.dataset.int) === sim.interval));
     };
 
@@ -307,11 +314,11 @@ export const lab = {
       if (ev.target.closest('[data-act="reset"]')) {
         sim.compare = "";
         loadCompound(sim.id || "caffeine");
-        root.querySelector("#sim-cmp").value = "";
-        root.querySelector("#sim-dose").value = String(sim.dose);
-        root.querySelector("#sim-int").value = String(sim.interval);
-        root.querySelector("#sim-n").value = String(sim.doses);
-        root.querySelector("#sim-hl").value = String(Math.round(sim.halfLife * 10) / 10);
+        setVal("#sim-cmp", "");
+        setVal("#sim-dose", sim.dose);
+        setVal("#sim-int", sim.interval);
+        setVal("#sim-n", sim.doses);
+        setVal("#sim-hl", Math.round(sim.halfLife * 10) / 10);
         repaint();
         toast("Simulator reset", "info");
       }
