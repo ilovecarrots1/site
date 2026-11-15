@@ -2,7 +2,7 @@
  * Vanilla ES modules, no build step. Every view exports { render(ctx), mount(root, ctx) }.
  */
 
-import { esc, icon, store, levelFor, debounce } from "./core.js";
+import { esc, icon, store, levelFor, debounce, toast, touchStreak } from "./core.js";
 import { COMPOUNDS, COMPOUND_BY_ID } from "./data/compounds.js";
 import { SYSTEMS, SYSTEM_BY_ID } from "./data/neuro.js";
 import { COURSES, LESSONS_ALL, FLASHCARDS } from "./data/learn.js";
@@ -143,8 +143,37 @@ function mountShell(root) {
 /* Drawer (mobile menu)                                                */
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/* Layers (drawer / search overlay) — one open at a time                */
+/* ------------------------------------------------------------------ */
+
+let lastFocus = null;
+
+function lockScroll(on) {
+  document.documentElement.classList.toggle("layer-open", !!on);
+}
+
+/**
+ * Remove transient layers. Restores scroll + focus when nothing is left.
+ * @param {boolean} restoreFocus
+ */
+function closeLayers(restoreFocus = true) {
+  document.querySelectorAll(".overlay, .drawer-host, .sheet-host").forEach((el) => el.remove());
+  lockScroll(false);
+  if (restoreFocus && lastFocus && document.contains(lastFocus)) {
+    try {
+      lastFocus.focus({ preventScroll: true });
+    } catch (err) {
+      /* ignore */
+    }
+  }
+  lastFocus = null;
+}
+
 function openDrawer() {
-  document.querySelectorAll(".drawer-host").forEach((el) => el.remove());
+  if (document.querySelector(".drawer-host")) return;
+  closeLayers(false);
+  lastFocus = document.activeElement;
   const host = document.createElement("div");
   host.className = "drawer-host";
   host.innerHTML = `<div class="drawer-scrim" data-close></div>
@@ -166,14 +195,18 @@ function openDrawer() {
       </div>
     </div>`;
   document.body.appendChild(host);
+  lockScroll(true);
+  const close = () => closeLayers();
   host.addEventListener("click", (ev) => {
     if (ev.target.closest("[data-search]")) {
-      host.remove();
+      close();
       openSearch();
       return;
     }
-    if (ev.target.closest("[data-close]") || ev.target.classList.contains("drawer-scrim")) host.remove();
+    if (ev.target.closest("[data-close]") || ev.target.classList.contains("drawer-scrim")) close();
   });
+  const first = host.querySelector(".d-item");
+  if (first) setTimeout(() => first.focus({ preventScroll: true }), 30);
 }
 
 /* ------------------------------------------------------------------ */
@@ -255,9 +288,19 @@ function searchAll(q) {
 }
 
 function openSearch() {
-  document.querySelectorAll(".overlay").forEach((el) => el.remove());
+  const existing = document.querySelector(".overlay");
+  if (existing) {
+    const box = existing.querySelector("#ov-input");
+    if (box) box.focus();
+    return;
+  }
+  closeLayers(false);
+  lastFocus = document.activeElement;
   const overlay = document.createElement("div");
   overlay.className = "overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", "Search everything");
   overlay.innerHTML = `<div class="overlay-panel">
     <div class="overlay-search">
       ${icon("search", 17)}
@@ -267,6 +310,8 @@ function openSearch() {
     <div class="overlay-results" id="ov-results"></div>
   </div>`;
   document.body.appendChild(overlay);
+  lockScroll(true);
+  const close = () => closeLayers();
 
   const input = overlay.querySelector("#ov-input");
   const results = overlay.querySelector("#ov-results");
@@ -275,6 +320,7 @@ function openSearch() {
 
   const paint = () => {
     current = searchAll(input.value);
+    active = 0;
     if (!current.length) {
       results.innerHTML = `<div class="sr-empty">No match. Try a compound name, a transmitter, or “interactions”.</div>`;
       return;
@@ -304,13 +350,13 @@ function openSearch() {
   });
 
   overlay.addEventListener("click", (ev) => {
-    if (ev.target.closest("[data-close]") || ev.target.classList.contains("overlay")) overlay.remove();
+    if (ev.target.closest("[data-close]") || ev.target.classList.contains("overlay")) close();
   });
 
   input.addEventListener("keydown", (ev) => {
     if (ev.key === "ArrowDown") {
       ev.preventDefault();
-      active = Math.min(active + 1, current.length - 1);
+      active = Math.min(active + 1, Math.max(current.length - 1, 0));
       results.querySelectorAll(".sr-item").forEach((el, i) => el.classList.toggle("active", i === active));
       results.querySelectorAll(".sr-item")[active]?.scrollIntoView({ block: "nearest" });
     } else if (ev.key === "ArrowUp") {
@@ -321,11 +367,11 @@ function openSearch() {
     } else if (ev.key === "Enter") {
       const item = current[active];
       if (item) {
-        overlay.remove();
+        closeLayers(false);
         location.hash = item.href.replace(/^#/, "");
       }
     } else if (ev.key === "Escape") {
-      overlay.remove();
+      close();
     }
   });
 }
