@@ -2,8 +2,8 @@
   "name": "NeuroDifference — evidence · compounds · pathways",
   "short_name": "NeuroDiff",
   "description": "Evidence-graded neuropharmacology: compound monographs, transmitter systems, a brain atlas, kinetic curves, interaction checks and spaced-repetition lessons.",
-  "id": "/",
-  "start_url": "./index.html",
+  "id": "./",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
@@ -28,9 +28,9 @@
     }
   ],
   "shortcuts": [
-    { "name": "Compounds", "url": "./index.html#/compounds" },
-    { "name": "Brain map", "url": "./index.html#/brain" },
-    { "name": "Interaction checker", "url": "./index.html#/lab/interactions" },
-    { "name": "Flashcards", "url": "./index.html#/cards" }
+    { "name": "Compounds", "url": "./#/compounds" },
+    { "name": "Brain map", "url": "./#/brain" },
+    { "name": "Interaction checker", "url": "./#/lab/interactions" },
+    { "name": "Flashcards", "url": "./#/cards" }
   ]
 }
