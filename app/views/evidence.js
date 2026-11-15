@@ -1,9 +1,8 @@
 /* Evidence: research topics, hierarchy of evidence, saved shelf */
 
-import { esc, icon, store, toast, copyText, evidenceChip, emptyState, pubmedNote } from "../core.js";
-import { COMPOUND_BY_ID, getCompound, COMPOUNDS, pubmedUrl, searchCompounds } from "../data/compounds.js";
-import { SYSTEMS, SYSTEM_BY_ID } from "../data/neuro.js";
-import { pageHead, callout, compoundCard, classColor, metric } from "./ui.js";
+import { esc, icon, store, copyText, evidenceChip, emptyState } from "../core.js";
+import { COMPOUND_BY_ID, getCompound, pubmedUrl } from "../data/compounds.js";
+import { pageHead, callout, compoundCard } from "./ui.js";
 
 const TOPICS = [
   {
