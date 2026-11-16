@@ -140,7 +140,7 @@ export const CONDITIONS_B = [
     risk: ["prior trauma", "childhood adversity", "low social support", "peritraumatic dissociation"],
     redFlags: ["suicidal ideation", "self-harm", "severe dissociation while driving"],
     systems: ["noradrenaline", "serotonin", "glutamate", "endocannabinoid"],
-    compounds: ["sertraline", "fluoxetine", "propranolol", "mdma", "ketamine", "clonidine", "prazosin", "cbd"],
+    compounds: ["sertraline", "fluoxetine", "propranolol", "mdma", "ketamine", "clonidine", "cbd"],
   },
   {
     id: "acute-stress",
@@ -234,7 +234,7 @@ export const CONDITIONS_B = [
     risk: ["childhood abuse", "neglect"],
     redFlags: ["self-harm", "suicidal ideation", "dangerous switching while driving"],
     systems: ["noradrenaline", "serotonin", "endocannabinoid"],
-    compounds: ["sertraline", "naltrexone", "clonidine"],
+    compounds: ["sertraline", "clonidine", "lamotrigine"],
   },
   {
     id: "depersonalisation",
@@ -256,7 +256,7 @@ export const CONDITIONS_B = [
     risk: ["panic disorder", "cannabis use", "trauma history"],
     redFlags: ["self-harm to 'feel real'"],
     systems: ["glutamate", "endocannabinoid", "noradrenaline"],
-    compounds: ["lamotrigine", "naltrexone", "cbd", "sertraline"],
+    compounds: ["lamotrigine", "cbd", "sertraline"],
   },
   {
     id: "somatic-symptom",
