@@ -209,7 +209,7 @@ export const CONDITIONS_C = [
     risk: ["age", "dementia", "polypharmacy", "surgery", "sensory impairment"],
     redFlags: ["delirium tremens", "hypoglycaemia", "meningitis", "hypoxia"],
     systems: ["acetylcholine", "dopamine", "gaba", "glutamate"],
-    compounds: ["melatonin", "quetiapine", "naloxone", "thiamine"],
+    compounds: ["melatonin", "quetiapine", "naloxone"],
   },
   {
     id: "tbi",
