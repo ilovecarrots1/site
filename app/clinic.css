@@ -1120,6 +1120,21 @@ html[data-motion="off"] .bm-tract { animation: none !important; }
   .sy-row-meter { display: none; }
 }
 
+/* ========================================================================
+   Compare — up to six columns, horizontally scrollable on narrow screens
+   ======================================================================== */
+
+.cmp { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; }
+@media (min-width: 720px) {
+  .cmp .cmp-row { min-width: calc(112px + var(--cmp-n, 2) * 152px); }
+  .cmp .cmp-head .cmp-cell a { font-size: 13px; }
+}
+.cmp::-webkit-scrollbar { height: 6px; }
+/* end compare */
+@media (max-width: 620px) {
+  .sy-row { grid-template-columns: minmax(0, 1fr) 46px; }
+}
+
 
 
 
