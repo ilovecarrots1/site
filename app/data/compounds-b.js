@@ -572,7 +572,7 @@ export const COMPOUNDS_B = [
       { route: "oral (higher)", low: 1, high: 5, unit: "mg", note: "still mostly a phase effect, not sedation" },
     ],
     effects: { good: ["Faster sleep onset", "Jet-lag mitigation", "Delayed-sleep-phase correction"], bad: ["Morning grogginess", "Vivid dreams", "Headache", "Next-day fatigue at high doses"] },
-    flags: ["sedative-weak", "chronobiotic", "cyp1a2-substrate"],
+    flags: ["sedative-weak", "chronobiotic", "melatonergic", "cyp1a2-substrate"],
     warnings: [
       "CYP1A2 inhibitors (caffeine at high doses, fluvoxamine) can spike melatonin levels dramatically",
       "Timing matters more than dose: taken too early it advances phase, too late it does nothing useful",
