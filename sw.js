@@ -1,6 +1,6 @@
 /* NeuroDifference service worker — app-shell cache, offline-first reads. */
 
-const VERSION = "nd-v2.1.6";
+const VERSION = "nd-v2.2.0";
 const SHELL = [
   "./",
   "./index.html",
@@ -11,6 +11,7 @@ const SHELL = [
   "./app/main.js",
   "./app/core.js",
   "./app/srs.js",
+  "./app/lib/pubmed.js",
   "./app/data/compounds.js",
   "./app/data/compounds-a.js",
   "./app/data/compounds-b.js",
@@ -19,6 +20,7 @@ const SHELL = [
   "./app/data/neuro.js",
   "./app/data/interactions.js",
   "./app/data/learn.js",
+  "./app/data/card-queries.js",
   "./app/views/ui.js",
   "./app/views/home.js",
   "./app/views/compounds.js",
@@ -28,6 +30,7 @@ const SHELL = [
   "./app/views/compare.js",
   "./app/views/learn.js",
   "./app/views/evidence.js",
+  "./app/views/research.js",
   "./app/views/ask.js",
   "./app/views/notes.js",
   "./app/views/settings.js",
