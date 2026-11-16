@@ -240,7 +240,10 @@ export function barList(rows, { max = null } = {}) {
 
 export function orb(size = 54) {
   return `<span class="orb ${size <= 40 ? "sm" : ""}" aria-hidden="true"></span>`;
-}  const map = {
+}
+
+export function callout(kind, title, body) {
+  const map = {
     danger: { ic: "alert", color: "var(--critical)", bg: "rgba(248,81,73,.08)", line: "rgba(248,81,73,.28)" },
     warn: { ic: "alert", color: "var(--warn)", bg: "rgba(210,153,34,.08)", line: "rgba(210,153,34,.26)" },
     ok: { ic: "check", color: "var(--good)", bg: "rgba(63,185,80,.08)", line: "rgba(63,185,80,.26)" },
