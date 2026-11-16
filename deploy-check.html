@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>NeuroDifference — deploy check</title>
+<style>
+  :root { color-scheme: dark; --bg:#0b0d10; --bg2:#14181e; --line:#232a34; --text:#e6e8eb; --text2:#a9b2bf; --text3:#78828f; --good:#3fb950; --bad:#f85149; --warn:#d29922; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:18px 14px 60px; background:var(--bg); color:var(--text); font:14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  h1 { font-size:18px; margin:0 0 4px; }
+  h2 { font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--text3); margin:26px 0 8px; }
+  p { color:var(--text2); margin:0 0 10px; max-width:70ch; }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; }
+  .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; font-weight:600; }
+  .ok { background:rgba(63,185,80,.16); color:var(--good); }
+  .err { background:rgba(248,81,73,.16); color:var(--bad); }
+  .warn { background:rgba(210,153,34,.16); color:var(--warn); }
+  .summary { border:1px solid var(--line); background:var(--bg2); border-radius:12px; padding:12px 14px; margin:12px 0 0; }
+  table { width:100%; border-collapse:collapse; font-size:12.5px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--text3); font-weight:600; font-size:11px; letter-spacing:.06em; text-transform:uppercase; }
+  td.st { white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .tree { border:1px solid var(--line); background:var(--bg2); border-radius:12px; padding:12px 14px; overflow-x:auto; }
+  pre { margin:0; color:var(--text2); font-size:12px; line-height:1.65; }
+  ul { color:var(--text2); padding-left:20px; }
+  li { margin-bottom:6px; }
+  #base { color:var(--text3); font-size:12px; word-break:break-all; }
+</style>
+</head>
+<body>
+  <h1>NeuroDifference — deploy check</h1>
+  <p>Opens every file the app needs and reports what the server actually answers. Nothing is uploaded, nothing is stored.</p>
+  <div id="base" class="mono"></div>
+  <div class="summary" id="summary">Checking…</div>
+
+  <h2>Files</h2>
+  <table><thead><tr><th>File</th><th>Status</th><th>Type</th><th>Size</th><th>Note</th></tr></thead><tbody id="rows"></tbody></table>
+
+  <h2>What the tree must look like</h2>
+  <div class="tree"><pre>public_html/            <span style="color:#78828f">← site root, index.html lives here</span>
+  index.html
+  manifest.json
+  sw.js
+  icon.svg
+  icon-maskable.svg
+  .htaccess            <span style="color:#78828f">optional — delete it first if the site 500s</span>
+  app/
+    styles.css
+    skin.css
+    clinic.css
+    main.js
+    core.js
+    srs.js
+    lib/      pubmed.js  pk.js
+    data/     compounds.js compounds-a..f.js neuro.js atlas.js organs.js
+              interactions.js learn.js card-queries.js brainmap.js
+              conditions.js conditions-a..c.js bloodwork.js bloodwork-a..b.js
+    views/    ask atlas audit bloodwork brain calculator compare compounds
+              conditions emergency evidence home lab learn map neuro notes
+              organs pk research settings stack symptoms taper ui  (.js)</pre></div>
+
+  <h2>Three classic causes of a blank page</h2>
+  <ul>
+    <li><b>Files landed outside the web root.</b> On most shared hosting the served folder is <code>public_html</code> (or <code>www/&lt;domain&gt;/public_html</code>), not the FTP home directory. If every row below is 404, nothing is inside the served folder.</li>
+    <li><b><code>.htaccess</code> breaks Apache.</b> A 500 error on every request is almost always <code>mod_rewrite</code> / <code>mod_headers</code> missing. Rename it to <code>.htaccess.bak</code> and reload — the app works without it.</li>
+    <li><b>JavaScript served as <code>text/plain</code>.</b> ES modules refuse to run then. Look for a red MIME note in the table below.</li>
+  </ul>
+
+  <p style="margin-top:18px">Fastest way to prove the build itself is fine: upload <code>preview.html</code> (one self-contained file, CSS and JS inline) and open <code>…/preview.html</code>. If that renders, the code is good and only the file layout is wrong.</p>
+
+<script>
+(function () {
+  var FILES = [
+    "index.html", "manifest.json", "sw.js", "icon.svg", "icon-maskable.svg",
+    "app/styles.css", "app/skin.css", "app/clinic.css",
+    "app/main.js", "app/core.js", "app/srs.js",
+    "app/lib/pubmed.js", "app/lib/pk.js",
+    "app/data/compounds.js", "app/data/compounds-a.js", "app/data/compounds-b.js",
+    "app/data/compounds-c.js", "app/data/compounds-d.js", "app/data/compounds-e.js",
+    "app/data/compounds-f.js", "app/data/neuro.js", "app/data/atlas.js",
+    "app/data/organs.js", "app/data/interactions.js", "app/data/learn.js",
+    "app/data/card-queries.js", "app/data/brainmap.js", "app/data/conditions.js",
+    "app/data/conditions-a.js", "app/data/conditions-b.js", "app/data/conditions-c.js",
+    "app/data/bloodwork.js", "app/data/bloodwork-a.js", "app/data/bloodwork-b.js",
+    "app/views/home.js", "app/views/compounds.js", "app/views/brain.js",
+    "app/views/learn.js", "app/views/cards.js", "app/views/lab.js", "app/views/taper.js",
+    "app/views/compare.js", "app/views/evidence.js", "app/views/research.js",
+    "app/views/ask.js", "app/views/notes.js", "app/views/settings.js",
+    "app/views/atlas.js", "app/views/organs.js", "app/views/map.js",
+    "app/views/calculator.js", "app/views/neuro.js", "app/views/conditions.js",
+    "app/views/bloodwork.js", "app/views/pk.js", "app/views/stack.js",
+    "app/views/symptoms.js", "app/views/emergency.js", "app/views/audit.js",
+    "app/views/ui.js", "preview.html"
+  ];
+  var rows = document.getElementById("rows");
+  var summary = document.getElementById("summary");
+  var base = new URL("./", location.href);
+  document.getElementById("base").textContent = "base: " + base.href;
+
+  var ok = 0, missing = 0, mimes = 0, done = 0;
+
+  function note(row, text, cls) {
+    var td = document.createElement("td");
+    td.className = cls || "";
+    td.textContent = text || "";
+    row.appendChild(td);
+  }
+
+  function makeRow(name) {
+    var tr = document.createElement("tr");
+    var c1 = document.createElement("td");
+    c1.className = "mono";
+    c1.textContent = name;
+    tr.appendChild(c1);
+    rows.appendChild(tr);
+    return tr;
+  }
+
+  function finish() {
+    done++;
+    if (done < FILES.length) return;
+    var parts = [];
+    parts.push('<span class="pill ok">' + ok + " ok</span>");
+    if (missing) parts.push('<span class="pill err">' + missing + " missing</span>");
+    if (mimes) parts.push('<span class="pill warn">' + mimes + " wrong type</span>");
+    var verdict = missing === 0 && mimes === 0
+      ? "All files are reachable and typed correctly — the build should run."
+      : missing > FILES.length / 2
+        ? "Most files are missing: the upload did not land in the served folder, or it went to a subfolder."
+        : "Some files are missing or mistyped — see the notes on the right.";
+    summary.innerHTML = parts.join(" ") + '<div style="margin-top:8px;color:#a9b2bf">' + verdict + "</div>";
+  }
+
+  FILES.forEach(function (name) {
+    var tr = makeRow(name);
+    fetch(base.href + name, { cache: "no-store", method: "GET" })
+      .then(function (r) {
+        var type = (r.headers.get("content-type") || "").split(";")[0].trim();
+        var len = r.headers.get("content-length");
+        var bad = false, nt = "";
+        var st = document.createElement("td");
+        st.className = "st";
+        st.innerHTML = r.ok
+          ? '<span class="pill ok">' + r.status + "</span>"
+          : '<span class="pill err">' + r.status + "</span>";
+        tr.appendChild(st);
+
+        if (!r.ok) { missing++; nt = "not served"; bad = true; note(tr, type || "—"); note(tr, len || "—"); note(tr, nt, "err"); }
+        else {
+          ok++;
+          var wantJs = /\.js$/i.test(name);
+          var wantCss = /\.css$/i.test(name);
+          if (wantJs && !/javascript|ecmascript/i.test(type)) { mimes++; bad = true; nt = "ES modules will refuse to run — fix the MIME type"; }
+          if (wantCss && !/css/i.test(type)) { mimes++; bad = true; nt = "not served as CSS"; }
+          note(tr, type || "—");
+          note(tr, len || "—");
+          note(tr, nt, bad ? "err" : "");
+        }
+        finish();
+      })
+      .catch(function (e) {
+        var st = document.createElement("td");
+        st.className = "st";
+        st.innerHTML = '<span class="pill err">ERR</span>';
+        tr.appendChild(st);
+        note(tr, "—");
+        note(tr, "—");
+        note(tr, String(e.message || e), "err");
+        missing++;
+        finish();
+      });
+  });
+})();
+</script>
+</body>
+</html>
