@@ -524,6 +524,7 @@ export const detail = {
       detailState.tab = "overview";
     }
     const saved = isSaved(c.id);
+    const partner = COMPOUNDS.find((x) => x.id !== c.id && x.cls === c.cls) || COMPOUNDS.find((x) => x.id !== c.id);
 
     return `
     <div class="row" style="margin-bottom:14px">
@@ -546,6 +547,7 @@ export const detail = {
         <button class="btn ${inStack(c.id) ? "soft" : "primary"} sm" data-act="stack">${icon(inStack(c.id) ? "check" : "plus", 14)} ${inStack(c.id) ? "In stack" : "Add to stack"}</button>
         <a class="btn ghost sm" href="#/lab?compound=${esc(c.id)}">${icon("flask", 14)} Lab</a>
         <a class="btn ghost sm" href="#/lab/interactions?add=${esc(c.id)}">${icon("shield", 14)} Interactions</a>
+        ${partner ? `<a class="btn ghost sm" href="#/compare?ids=${esc(c.id)},${esc(partner.id)}">${icon("grid", 14)} Compare</a>` : ""}
       </div>
     </header>
 
