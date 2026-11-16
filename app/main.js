@@ -13,6 +13,7 @@ import * as compoundsView from "./views/compounds.js";
 import * as neuroView from "./views/neuro.js";
 import * as labView from "./views/lab.js";
 import * as taperView from "./views/taper.js";
+import * as compareView from "./views/compare.js";
 import * as learnView from "./views/learn.js";
 import * as evidenceView from "./views/evidence.js";
 import * as askView from "./views/ask.js";
@@ -39,6 +40,7 @@ const NAV = [
     items: [
       { id: "lab", label: "Dose lab", href: "#/lab", icon: "flask" },
       { id: "taper", label: "Taper planner", href: "#/lab/taper", icon: "scale" },
+      { id: "compare", label: "Compare", href: "#/compare", icon: "grid" },
       { id: "interactions", label: "Interactions", href: "#/lab/interactions", icon: "shield" },
       { id: "evidence", label: "Evidence", href: "#/evidence", icon: "file" },
       { id: "ask", label: "Ask the index", href: "#/ask", icon: "sparkles" },
@@ -411,6 +413,8 @@ function matchRoute(segs) {
     const sys = SYSTEM_BY_ID.get(key);
     return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
   }
+  if (a === "compare") return { nav: "compare", title: "Compare", view: compareView.compare };
+
   if (a === "lab") {
     if (b === "interactions") return { nav: "interactions", title: "Interactions", view: labView.interactions };
     if (b === "taper") return { nav: "taper", title: "Taper planner", view: taperView.taper };
