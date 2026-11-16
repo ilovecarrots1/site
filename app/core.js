@@ -267,6 +267,7 @@ const ICON_PATHS = {
   chevronRight: "m9 6 6 6-6 6",
   chevronLeft: "m15 6-6 6 6 6",
   chevronDown: "m6 9 6 6 6-6",
+  chevronUp: "m6 15 6-6 6 6",
   star: "m12 3.5 2.7 5.6 6.1.9-4.4 4.3 1 6.1-5.4-2.9-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3.5Z",
   check: "m4 12.5 5 5L20 6.5",
   x: "M6 6l12 12M18 6 6 18",
@@ -355,6 +356,7 @@ function defaultState() {
       motion: true,
       evidence: "all",
       caffeineHalfLife: 5,
+      subHidden: false,
     },
   };
 }
