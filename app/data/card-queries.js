@@ -86,7 +86,7 @@ export function queryForCard(card) {
 
 const STOP = new Set([
   "what", "which", "does", "why", "how", "the", "and", "for", "with", "that", "this",
-  "from", "into", "than", "does", "when", "most", "main", "time", "对",
+  "from", "into", "than", "when", "most", "main", "time",
 ]);
 
 export default CARD_QUERIES;
