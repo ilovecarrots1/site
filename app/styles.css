@@ -978,6 +978,21 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
   .detail-title { font-size: 31px; }
 }
 
+/* Two-column shells. Defined here so the phone layout still gets a gap   */
+/* between the stacked halves; the desktop rules below only change widths. */
+.split,
+.split-wide {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (min-width: 1000px) {
+  .split { grid-template-columns: minmax(0, 1fr) 280px; gap: 18px; }
+  .split-wide { grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; }
+}
+
 @media (min-width: 1180px) {
   .view { padding: 28px 32px 52px; }
   .split { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
