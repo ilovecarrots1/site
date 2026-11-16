@@ -1658,3 +1658,161 @@ body::after {
 }
 [data-motion="off"] .orb, [data-motion="off"] .orb::before, [data-motion="off"] .gtext,
 [data-motion="off"] .ticker-track, [data-motion="off"] body::before { animation: none !important; }
+
+/* ==================================================================
+   v2.3 — Atlas · organ map · convergence map · peptide calculator
+   ================================================================== */
+
+/* --- Shared small pieces ------------------------------------------- */
+ul.clean { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 7px; }
+ul.clean > li { position: relative; padding-left: 15px; font-size: 13px; line-height: 1.55; color: var(--text-2); overflow-wrap: anywhere; }
+ul.clean > li::before { content: ""; position: absolute; left: 2px; top: .58em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .5; }
+ul.clean.tiny > li { font-size: 12px; }
+.stat-label { font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--text-3); font-weight: 600; }
+
+/* --- Biochemical atlas -------------------------------------------- */
+.atlas-grid { align-items: start; }
+.path-card { display: flex; flex-direction: column; gap: 7px; min-width: 0; transition: transform .18s var(--ease), border-color .18s; }
+.path-card:hover { transform: translateY(-2px); border-color: var(--accent-line); }
+.pc-title { font-size: 15px; font-weight: 650; margin: 0; overflow-wrap: anywhere; }
+.pc-sum { font-size: 12.5px; line-height: 1.55; color: var(--text-2); margin: 0; overflow-wrap: anywhere; }
+.pc-foot { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--text-3); min-width: 0; }
+.pc-enzyme { display: inline-flex; align-items: center; gap: 4px; font-family: var(--mono); font-size: 10.5px; padding: 2px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--text-2); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.target-list { display: flex; flex-direction: column; gap: 2px; }
+.target-row { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 9px; align-items: start; padding: 8px 6px; border-radius: 10px; text-decoration: none; color: inherit; transition: background .15s; }
+.target-row:hover { background: rgba(255, 255, 255, .035); }
+.tr-ic { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 8px; background: rgba(255, 255, 255, .05); color: var(--accent); border: 1px solid var(--line-soft); flex: none; }
+.tr-body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.tr-name { font-size: 12.5px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+.tr-meta { font-size: 11px; color: var(--text-3); overflow-wrap: anywhere; }
+.step-card { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line-soft); background: rgba(255, 255, 255, .018); }
+.step-num { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-family: var(--mono); font-size: 11px; color: var(--accent); border: 1px solid var(--accent-line); }
+.step-label { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.step-enzyme { font-family: var(--mono); font-size: 10.5px; color: var(--text-3); overflow-wrap: anywhere; }
+.step-detail { font-size: 12px; line-height: 1.5; color: var(--text-2); margin-top: 3px; overflow-wrap: anywhere; }
+.step-cof { display: inline-flex; margin-top: 5px; font-size: 10.5px; padding: 1px 7px; border-radius: 999px; background: rgba(255, 255, 255, .05); color: var(--text-3); }
+.ghost-link { display: flex; flex-direction: column; gap: 1px; padding: 7px 9px; border-radius: 10px; border: 1px solid var(--line-soft); text-decoration: none; color: inherit; transition: border-color .15s, background .15s; min-width: 0; }
+.ghost-link:hover { border-color: var(--accent-line); background: rgba(255, 255, 255, .03); }
+.gl-t { font-size: 12.5px; font-weight: 600; overflow-wrap: anywhere; }
+.gl-s { font-size: 11px; color: var(--text-3); overflow-wrap: anywhere; }
+
+/* --- Organ map ----------------------------------------------------- */
+.organ-layout { align-items: start; }
+.organ-map-wrap { display: flex; justify-content: center; padding: 2px 0 6px; }
+.body-svg { width: 100%; max-width: 250px; height: auto; display: block; overflow: visible; }
+.body-svg .body-shape ellipse,
+.body-svg .body-shape rect,
+.body-svg .body-shape path { fill: rgba(255, 255, 255, .028); stroke: rgba(255, 255, 255, .085); stroke-width: 1; }
+.body-svg .body-limb path { fill: none; stroke: rgba(255, 255, 255, .055); stroke-width: 15; stroke-linecap: round; }
+.organ-node { cursor: pointer; outline: none; }
+.organ-node .organ-hit { fill: transparent; }
+.organ-node .organ-dot { fill: var(--g, var(--accent)); fill-opacity: .32; stroke: var(--g, var(--accent)); stroke-width: 1.1; transition: fill-opacity .2s, filter .2s; }
+.organ-node:hover .organ-dot { fill-opacity: .62; }
+.organ-node.sel .organ-dot { fill-opacity: .8; stroke-width: 1.6; filter: drop-shadow(0 0 6px var(--g, var(--accent))); }
+.organ-node.dim { opacity: .26; }
+.organ-node.dim:hover { opacity: .5; }
+.organ-node:focus-visible .organ-dot { stroke: #fff; stroke-width: 2; }
+.organ-ring { fill: none; stroke: var(--g, var(--accent)); stroke-width: .9; opacity: .5; transform-box: fill-box; transform-origin: center; animation: organRing 3s ease-out infinite; }
+@keyframes organRing { 0% { transform: scale(.85); opacity: .5; } 70% { transform: scale(1.16); opacity: 0; } 100% { opacity: 0; } }
+.organ-label { font-size: 7.5px; fill: var(--text-2); font-weight: 600; paint-order: stroke; stroke: rgba(8, 10, 13, .92); stroke-width: 2.2px; pointer-events: none; }
+.organ-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.organ-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 9px; border-radius: 999px; border: 1px solid var(--line); text-decoration: none; color: var(--text-2); font-size: 12px; max-width: 100%; }
+.organ-chip:hover { border-color: var(--accent-line); color: var(--text); }
+.organ-chip.on { background: rgba(255, 255, 255, .06); color: var(--text); border-color: var(--accent-line); }
+.oc-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--g, var(--accent)); flex: none; }
+.oc-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.organ-detail { display: flex; flex-direction: column; gap: 11px; }
+.od-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.od-title { font-size: 19px; margin: 2px 0 0; overflow-wrap: anywhere; }
+.od-sum { font-size: 13px; line-height: 1.6; color: var(--text-2); margin: 0; overflow-wrap: anywhere; }
+.od-note { font-size: 11.5px; line-height: 1.55; color: var(--text-3); margin: 0; padding-top: 8px; border-top: 1px solid var(--line-soft); overflow-wrap: anywhere; }
+.dis-row { padding: 7px 10px; border-radius: 10px; background: rgba(255, 255, 255, .022); border-left: 2px solid rgba(242, 178, 62, .38); min-width: 0; }
+.dis-name { font-size: 12.5px; font-weight: 600; overflow-wrap: anywhere; }
+.dis-note { font-size: 11.5px; line-height: 1.5; color: var(--text-3); overflow-wrap: anywhere; }
+
+/* --- Convergence network map -------------------------------------- */
+.netmap { position: relative; display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 16px; align-items: start; }
+.nm-threads { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; overflow: visible; }
+.nm-thread { fill: none; stroke-width: 1; opacity: .1; stroke-dasharray: 3 5; transition: opacity .18s, stroke-width .18s; }
+.nm-thread.dim { opacity: .045; }
+.nm-thread.hl { opacity: .95; stroke-width: 1.6; stroke-dasharray: none; animation: nmPulse 2.4s ease-in-out infinite; }
+@keyframes nmPulse { 0%, 100% { opacity: .95; } 50% { opacity: .5; } }
+.nm-canvas { position: sticky; top: calc(var(--top-h, 56px) + 10px); display: flex; flex-direction: column; gap: 10px; min-width: 0; z-index: 4; }
+.nm-canvas-card { position: relative; }
+.nm-brain { width: 100%; height: auto; display: block; }
+.nm-brain-shape path { fill: rgba(255, 255, 255, .03); stroke: rgba(255, 255, 255, .1); stroke-width: 1.2; }
+.nm-brain-shape .nm-cb { fill: rgba(255, 255, 255, .045); }
+.nm-region { cursor: pointer; outline: none; }
+.nm-region .nm-region-hit { fill: transparent; }
+.nm-region .nm-region-dot { fill: rgba(255, 255, 255, .5); stroke: rgba(8, 10, 13, .85); stroke-width: 1; transition: fill .18s; }
+.nm-region:hover .nm-region-dot, .nm-region.on .nm-region-dot { fill: var(--accent); }
+.nm-region.empty .nm-region-dot { fill: rgba(255, 255, 255, .2); }
+.nm-region-t { font-size: 9px; fill: var(--text-2); font-weight: 600; paint-order: stroke; stroke: rgba(8, 10, 13, .92); stroke-width: 2.4px; pointer-events: none; }
+.nm-region.on .nm-region-t { fill: var(--text); }
+.nm-region-n { font-size: 8px; fill: var(--accent); font-family: var(--mono); pointer-events: none; }
+.nm-organ-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.nm-body { width: 100%; max-width: 200px; height: auto; display: block; margin: 0 auto; }
+.nm-body-shape ellipse, .nm-body-shape rect, .nm-body-shape path { fill: rgba(255, 255, 255, .03); stroke: rgba(255, 255, 255, .085); stroke-width: 1; }
+.nm-body-limb path { fill: none; stroke: rgba(255, 255, 255, .055); stroke-width: 15; stroke-linecap: round; }
+.nm-organ .nm-organ-hit { fill: transparent; }
+.nm-organ .nm-organ-dot { fill: rgba(111, 179, 255, .35); stroke: #6fb3ff; stroke-width: 1; transition: fill .18s; }
+.nm-organ:hover .nm-organ-dot { fill: rgba(111, 179, 255, .75); }
+.nm-organ-t { font-size: 7px; fill: var(--text-3); paint-order: stroke; stroke: rgba(8, 10, 13, .9); stroke-width: 2px; pointer-events: none; }
+.nm-list-wrap { min-width: 0; }
+.nm-list-card { position: relative; z-index: 4; }
+.nm-search { display: flex; align-items: center; gap: 7px; flex: 1 1 200px; min-width: 0; color: var(--text-3); }
+.nm-search .input { width: 100%; }
+.nm-groups { display: flex; flex-direction: column; gap: 13px; margin-top: 12px; }
+.nm-group { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.nm-group-head { display: flex; align-items: center; gap: 7px; padding: 4px 2px 6px; }
+.nm-group-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.nm-group-name { font-size: 12px; font-weight: 650; color: var(--text); overflow-wrap: anywhere; }
+.nm-group-count { font-size: 10.5px; font-family: var(--mono); color: var(--text-3); border: 1px solid var(--line); border-radius: 999px; padding: 0 6px; flex: none; }
+.nm-row { position: relative; display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 7px 8px; border-radius: 9px; text-decoration: none; color: inherit; transition: background .14s; }
+.nm-row:hover, .nm-row.hl { background: rgba(255, 255, 255, .05); }
+.nm-thread-anchor { width: 5px; height: 5px; border-radius: 50%; background: var(--line); justify-self: center; }
+.nm-row.hl .nm-thread-anchor { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.nm-row-body { display: flex; flex-direction: column; min-width: 0; }
+.nm-row-name { font-size: 12.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nm-row-meta { font-size: 10.5px; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nm-badges { display: flex; gap: 3px; flex-wrap: wrap; justify-content: flex-end; max-width: 152px; }
+.nm-badge { font-size: 9.5px; font-family: var(--mono); padding: 1px 5px; border-radius: 999px; border: 1px solid var(--line-soft); background: rgba(255, 255, 255, .04); color: var(--bc, var(--text-3)); white-space: nowrap; }
+.nm-badge.none { color: var(--text-3); opacity: .65; }
+
+/* --- Peptide calculator ------------------------------------------- */
+.calc-layout { align-items: start; }
+.calc-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 132px); gap: 12px; align-items: center; padding: 12px; border-radius: 14px; background: radial-gradient(120% 120% at 8% 0%, rgba(242, 178, 62, .13), transparent 62%), rgba(255, 255, 255, .02); border: 1px solid var(--line-soft); }
+.calc-hero-l { min-width: 0; }
+.calc-units { display: flex; align-items: baseline; gap: 5px; font-family: var(--mono); font-size: 32px; font-weight: 600; color: var(--text); line-height: 1.05; overflow-wrap: anywhere; }
+.cu-suffix { font-size: 12px; color: var(--text-3); font-family: var(--sans); }
+.calc-syringe { min-width: 0; }
+.cs-bar { position: relative; height: 10px; border-radius: 999px; background: rgba(255, 255, 255, .07); overflow: hidden; border: 1px solid var(--line-soft); }
+.cs-bar > i { position: absolute; inset: 0 auto 0 0; width: 4%; background: linear-gradient(90deg, rgba(242, 178, 62, .45), var(--accent)); border-radius: 999px; transition: width .3s var(--ease); box-shadow: 0 0 12px -2px var(--accent); }
+.cs-bar > i.over { background: linear-gradient(90deg, var(--warn), var(--bad)); }
+.cs-ticks { display: flex; justify-content: space-between; font-size: 9px; font-family: var(--mono); color: var(--text-3); margin-top: 3px; }
+.calc-rows { display: flex; flex-direction: column; margin-top: 12px; }
+.calc-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--line-soft); font-size: 12.5px; color: var(--text-2); }
+.calc-row:last-child { border-bottom: 0; }
+.calc-row b { font-family: var(--mono); font-weight: 600; color: var(--text); text-align: right; overflow-wrap: anywhere; }
+
+/* --- Responsive ---------------------------------------------------- */
+@media (max-width: 1000px) {
+  .netmap { grid-template-columns: minmax(0, 1fr); }
+  .nm-threads { display: none; }
+  .nm-canvas { position: static; }
+  .nm-badges { max-width: 118px; }
+}
+@media (max-width: 620px) {
+  .calc-hero { grid-template-columns: minmax(0, 1fr); }
+  .calc-units { font-size: 28px; }
+  .nm-row { grid-template-columns: 10px minmax(0, 1fr); }
+  .nm-badges { grid-column: 2; justify-content: flex-start; max-width: 100%; }
+  .organ-list { gap: 4px; }
+  .body-svg { max-width: 210px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .organ-ring, .nm-thread.hl { animation: none !important; }
+  .cs-bar > i, .path-card, .nm-thread, .organ-node .organ-dot { transition: none !important; }
+}
+[data-motion="off"] .organ-ring, [data-motion="off"] .nm-thread.hl { animation: none !important; }
