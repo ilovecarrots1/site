@@ -222,6 +222,20 @@ html,body{height:100%;margin:0;background:#05070a;color:var(--text);font-family:
 .endMeta span{color:var(--text-3);margin:0 14px}
 .disclaimer{margin-top:60px;font-size:24px;color:var(--text-3)}
 
+/* ---------- scene entrances ---------- */
+.on .mark{animation:pop .9s var(--e-spring) both}
+.on .word{animation:cardIn .9s var(--e-out) .1s both}
+.on .vchip{animation:cardIn .8s var(--e-out) .28s both}
+.on .tagline{animation:cardIn .8s var(--e-out) .44s both}
+.on .r1,.on .r2{animation:ringIn 1.3s var(--e-out) both}
+.on .chart{animation:cardIn .9s var(--e-out) both}
+.on .endUrl{animation:cardIn .9s var(--e-out) .15s both}
+.on .endMeta{animation:cardIn .8s var(--e-out) .3s both}
+.on .disclaimer{animation:cardIn .8s var(--e-out) .46s both}
+.on .eyebrow{animation:cardIn .7s var(--e-out) both}
+@keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+@keyframes ringIn{from{opacity:0;transform:scale(.78)}to{opacity:1;transform:none}}
+
 /* ---------- HUD ---------- */
 #hud{position:fixed;left:0;right:0;bottom:0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));display:flex;gap:12px;align-items:center;
   background:linear-gradient(0deg,rgba(5,7,10,.95),transparent);font-size:13px;color:#9aa4b2;z-index:20}
