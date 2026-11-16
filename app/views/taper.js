@@ -90,7 +90,7 @@ function defaultDose(c) {
  * Build the reduction ladder.
  * @returns {{steps:Array, totalDays:number, finalDose:number, floor:number, overshoot:boolean}}
  */
-function buildPlan({ startDose, freq, stepPct, holdDays, finalPct, halfLife }) {
+export function buildPlan({ startDose, freq, stepPct, holdDays, finalPct, halfLife }) {
   const floor = Number(((startDose * finalPct) / 100).toFixed(4));
   const steps = [];
   let current = startDose;
