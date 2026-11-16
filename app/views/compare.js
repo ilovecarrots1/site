@@ -5,7 +5,7 @@
  * prefixed with the compound it belongs to.
  */
 
-import { esc, icon, fmt, copyText, evidenceChip, toast } from "../core.js";
+import { esc, icon, fmt, copyText, evidenceChip } from "../core.js";
 import { COMPOUNDS, getCompound } from "../data/compounds.js";
 import { pageHead, classColor, backLink, callout } from "./ui.js";
 
@@ -51,7 +51,7 @@ const val = (n) => (Number(n) > 0 ? fmt.duration(Number(n)) : "—");
 const ROWS = [
   {
     label: "Class",
-    get: (c) => `<span class="chip" style="border-color:transparent;background:${classColor(c.cls)}1f;color:${classColor(c.cls)}">${esc(c.cls)}</span>
+    get: (c) => `<span class="chip" style="border-color:var(--line);color:var(--text-2)"><span class="dot" style="background:${classColor(c.cls)}"></span>${esc(c.cls)}</span>
       ${c.subcls ? `<div class="tiny dim" style="margin-top:5px">${esc(c.subcls)}</div>` : ""}`,
   },
   { label: "Status", get: (c) => `<span class="small">${esc(c.status || "—")}</span>` },
@@ -65,7 +65,7 @@ const ROWS = [
   { label: "Duration", mono: true, get: (c) => val(c.pk?.duration) },
   { label: "Metabolism", get: (c) => `<span class="small muted">${esc(c.pk?.metabolism || "—")}</span>` },
   {
-    label: "Cleanance route",
+    label: "Clearance route",
     get: (c) => `<span class="small muted">${esc(c.pk?.excretion || "—")}</span>`,
   },
   {
@@ -199,7 +199,7 @@ export const compare = {
               <select class="select" data-slot="${i}" style="flex:1;min-width:0">
                 ${COMPOUNDS.map((x) => `<option value="${esc(x.id)}" ${x.id === c.id ? "selected" : ""}>${esc(x.name)}</option>`).join("")}
               </select>
-              <a class="icon-btn" href="#/compounds/${esc(c.id)}" aria-label="Open monologue" style="flex:none">${icon("file", 16)}</a>
+              <a class="icon-btn" href="#/compounds/${esc(c.id)}" aria-label="Open monograph" style="flex:none">${icon("file", 16)}</a>
               ${
                 list.length > 2
                   ? `<button class="icon-btn" data-remove="${i}" aria-label="Remove ${esc(c.name)}" style="flex:none">${icon("x", 16)}</button>`
@@ -297,9 +297,6 @@ export const compare = {
       if (act === "link") {
         copyText(compareUrl(state.ids), "Comparison link copied");
         return;
-      }
-      if (act === "share") {
-        toast("Link copied", "ok");
       }
     });
   },
