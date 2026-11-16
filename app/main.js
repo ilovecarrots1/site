@@ -28,6 +28,7 @@ import * as brainView from "./views/brain.js";
 import * as conditionsView from "./views/conditions.js";
 import * as bloodworkView from "./views/bloodwork.js";
 import * as pkView from "./views/pk.js";
+import * as stackView from "./views/stack.js";
 import { PATHWAYS } from "./data/atlas.js";
 import { ORGANS } from "./data/organs.js";
 import { CONDITIONS } from "./data/conditions.js";
@@ -54,6 +55,7 @@ const NAV = [
       { id: "conditions", label: "Conditions", href: "#/conditions", icon: "shield", count: () => CONDITIONS.length },
       { id: "bloodwork", label: "Bloodwork", href: "#/bloodwork", icon: "trend" },
       { id: "pk", label: "PK timeline", href: "#/pk", icon: "activity" },
+      { id: "stack", label: "Stack builder", href: "#/stack", icon: "layers" },
     ],
   },
   {
@@ -451,6 +453,9 @@ function matchRoute(segs) {
     const key = String(b).toLowerCase();
     const sys = SYSTEM_BY_ID.get(key);
     return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
+  }
+  if (a === "stack") {
+    return { nav: "stack", title: "Stack builder", view: { render: stackView.render, mount: stackView.mount } };
   }
   if (a === "pk" || a === "timeline") {
     return { nav: "pk", title: "PK timeline", view: { render: pkView.render, mount: pkView.mount } };
