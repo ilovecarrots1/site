@@ -236,6 +236,53 @@ function savedHtml() {
   return `<div class="grid grid-auto" style="gap:10px">${saved.map(compoundCard).join("")}</div>`;
 }
 
+/* Live lookup inside a topic card. Fetched on demand, never stored. */
+const liveCache = new Map();
+
+async function toggleTopicLive(box, query, btn) {
+  if (box.dataset.open === "1") {
+    box.innerHTML = "";
+    box.dataset.open = "0";
+    btn.innerHTML = `${icon("microscope", 13)} Live papers`;
+    return;
+  }
+  box.dataset.open = "1";
+  btn.innerHTML = `${icon("refresh", 13)} Fetching…`;
+  box.innerHTML = `<div class="stack" style="gap:8px;margin-top:11px">
+      <div class="skeleton" style="height:13px;width:86%"></div>
+      <div class="skeleton" style="height:11px;width:52%"></div>
+      <div class="skeleton" style="height:11px;width:74%"></div>
+    </div>`;
+  const token = String(Math.random()).slice(2);
+  box.dataset.token = token;
+
+  try {
+    let res = liveCache.get(query);
+    if (!res) {
+      res = await searchPapers(query, { retmax: 3 });
+      liveCache.set(query, res);
+    }
+    if (box.dataset.token !== token) return;
+    btn.innerHTML = `${icon("microscope", 13)} Hide papers`;
+    if (!res.papers.length) {
+      box.innerHTML = `<p class="tiny dim" style="margin-top:11px;line-height:1.6">No records for this exact query. Try a shorter version on <a href="${PM_LINK.search(query)}" target="_blank" rel="noopener noreferrer">PubMed</a>.</p>`;
+      return;
+    }
+    box.innerHTML = `<div class="stack" style="gap:9px;margin-top:11px">
+        ${res.papers.map((p, i) => paperCard(p, i)).join("")}
+      </div>
+      <div class="row between wrap" style="gap:8px;margin-top:8px">
+        <span class="tiny dim">${res.total.toLocaleString()} records · ${res.ms} ms · live</span>
+        <a class="btn ghost xs" href="#/research?compound=${encodeURIComponent(query)}">All results ${icon("arrowRight", 12)}</a>
+      </div>`;
+  } catch (err) {
+    if (box.dataset.token !== token) return;
+    btn.innerHTML = `${icon("microscope", 13)} Live papers`;
+    box.dataset.open = "0";
+    box.innerHTML = `<p class="tiny" style="color:var(--warn);margin-top:11px;line-height:1.6">${icon("wifiOff", 12)} Could not reach NCBI. The direct link still works.</p>`;
+  }
+}
+
 export const evidence = {
   render() {
     const savedCount = (store.data.saved || []).map((id) => getCompound(id)).filter(Boolean).length;
