@@ -168,7 +168,7 @@ export const TARGETS = [
   { id: "d1-receptor", name: "Dopamine D1", short: "D1", system: "dopamine",
     regions: [["prefrontal-cortex", 0.9], ["striatum", 1], ["nucleus-accumbens", 0.7]] },
   { id: "d2-receptor", name: "Dopamine D2", short: "D2", system: "dopamine",
-    regions: [["striatum", 1], ["nucleus-accumbens", 1], ["vta", 0.8], ["substantia-nigra", 0.7], ["pituitary", 0.4]] },
+    regions: [["striatum", 1], ["nucleus-accumbens", 1], ["vta", 0.8], ["substantia-nigra", 0.7], ["hypothalamus", 0.4]] },
   { id: "dat", name: "Dopamine transporter", short: "DAT", system: "dopamine",
     regions: [["striatum", 1], ["nucleus-accumbens", 0.9], ["prefrontal-cortex", 0.7], ["substantia-nigra", 0.6]] },
   { id: "sert", name: "Serotonin transporter", short: "SERT", system: "serotonin",
