@@ -50,7 +50,7 @@ export const REGIONS = [
     note: "Conflict monitoring, pain affect, error signalling." },
   { id: "motor-cortex", name: "Motor cortex", short: "M1", x: 132, y: 66, rx: 26, ry: 16, layer: "shell",
     systems: ["glutamate", "gaba"],
-    drugs: ["baclofen", "gabapentin", "pregabalin"],
+    drugs: ["phenibut", "gabapentin", "pregabalin"],
     note: "Voluntary movement output." },
   { id: "parietal-cortex", name: "Parietal cortex", short: "PAR", x: 176, y: 52, rx: 30, ry: 18, layer: "shell",
     systems: ["glutamate", "acetylcholine", "noradrenaline"],
