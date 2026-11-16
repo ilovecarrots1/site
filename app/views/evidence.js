@@ -2,7 +2,9 @@
 
 import { esc, icon, store, copyText, evidenceChip, emptyState } from "../core.js";
 import { COMPOUND_BY_ID, getCompound, pubmedUrl } from "../data/compounds.js";
-import { pageHead, callout, compoundCard } from "./ui.js";
+import { pageHead, callout, compoundCard, liveBadge } from "./ui.js";
+import { searchPapers, LINK as PM_LINK } from "../lib/pubmed.js";
+import { paperCard } from "./research.js";
 
 const TOPICS = [
   {
@@ -171,17 +173,18 @@ function topicsHtml() {
             ${t.compounds.map((id) => (COMPOUND_BY_ID.get(id) ? `<a class="chip chip-btn" href="#/compounds/${esc(id)}">${esc(COMPOUND_BY_ID.get(id).name)}</a>` : "")).join("")}
           </div>
           <div class="row wrap" style="gap:7px">
+            <button class="btn soft sm" data-live="${esc(t.query)}">${icon("microscope", 13)} Live papers</button>
             <a class="btn ghost sm" href="${pubmedUrl(t.query)}" target="_blank" rel="noopener noreferrer">${icon("external", 13)} PubMed</a>
             <button class="btn ghost sm" data-copy="${esc(t.query)}">${icon("copy", 13)} Query</button>
           </div>
+          <div data-live-out="${esc(t.id)}"></div>
         </article>`
       )
       .join("")}
   </div>`;
 }
 
-function ladderHtml() {
-  return `<div class="stack" style="gap:14px">
+function ladderHtml() {  return `<div class="stack" style="gap:14px">
     ${callout("info", "Read evidence, not verdicts", "Every compound in this app carries a grade. The grade is a shorthand for the quality of human data behind the claim — not for how strongly people believe it.")}
 
     <div class="card">
@@ -251,7 +254,7 @@ export const evidence = {
     ${pageHead(
       "Evidence",
       "Curated research questions with the honest version of each answer — plus the rules for reading a trial yourself.",
-      ""
+      `<a class="btn soft sm" href="#/research">${icon("microscope", 14)} Live PubMed</a>`
     )}
 
     <div class="tabs" id="ev-tabs">
@@ -301,6 +304,13 @@ export const evidence = {
     body.addEventListener("click", (ev) => {
       const copyBtn = ev.target.closest("[data-copy]");
       if (copyBtn) copyText(copyBtn.dataset.copy, "Search query copied");
+
+      const liveBtn = ev.target.closest("[data-live]");
+      if (liveBtn) {
+        const card = liveBtn.closest("article");
+        const out = card && card.querySelector("[data-live-out]");
+        if (out) toggleTopicLive(out, liveBtn.dataset.live, liveBtn);
+      }
     });
   },
 };
