@@ -106,8 +106,6 @@ export function resolveCompound(input) {
   return null;
 }
 
-export const COMPOUND_COUNT = COMPOUNDS.length;
-
 export function pubmedUrl(query) {
   return `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query || "")}`;
 }
