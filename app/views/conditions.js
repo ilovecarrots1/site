@@ -81,7 +81,7 @@ function row(c) {
     </a>`;
 }
 
-export function render(ctx) {
+function indexHtml(ctx) {
   const q = (ctx && ctx.query) || {};
   const chapter = q.chapter ? String(q.chapter) : "";
 
@@ -127,6 +127,12 @@ export function render(ctx) {
 
     <div class="cd-empty hide" id="cd-empty">Nothing matched. Try a symptom word like “tremor” or a code like “F31”.</div>
   </div>`;
+}
+
+export function render(ctx) {
+  const id = ctx && ctx.params && ctx.params.id;
+  if (id) return detail(String(id));
+  return indexHtml(ctx);
 }
 
 export function mount(root, ctx) {
