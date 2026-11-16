@@ -32,8 +32,9 @@ so you can see accumulation instead of guessing.
 taper planner, symptom → hypothesis, spaced-repetition cards with XP,
 streaks and levels.
 
-**Research** — live PubMed search. Results live in memory for 30 minutes and
-are never written to disk.
+**Research** — live PubMed search across 40+ million citations (MEDLINE,
+life-science journals, books). Results live in memory for 30 minutes and are
+never written to disk.
 
 **Notes** — page-level notes and history, stored locally.
 
