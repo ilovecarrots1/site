@@ -30,6 +30,7 @@ import * as bloodworkView from "./views/bloodwork.js";
 import * as pkView from "./views/pk.js";
 import * as stackView from "./views/stack.js";
 import * as symptomsView from "./views/symptoms.js";
+import * as emergencyView from "./views/emergency.js";
 import { PATHWAYS } from "./data/atlas.js";
 import { ORGANS } from "./data/organs.js";
 import { CONDITIONS } from "./data/conditions.js";
@@ -58,6 +59,7 @@ const NAV = [
       { id: "pk", label: "PK timeline", href: "#/pk", icon: "activity" },
       { id: "stack", label: "Stack builder", href: "#/stack", icon: "layers" },
       { id: "symptoms", label: "Symptom finder", href: "#/symptoms", icon: "search" },
+      { id: "emergency", label: "Red flags", href: "#/emergency", icon: "alert" },
     ],
   },
   {
@@ -455,6 +457,9 @@ function matchRoute(segs) {
     const key = String(b).toLowerCase();
     const sys = SYSTEM_BY_ID.get(key);
     return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
+  }
+  if (a === "emergency" || a === "redflags") {
+    return { nav: "emergency", title: "Red flags", view: { render: emergencyView.render, mount: emergencyView.mount } };
   }
   if (a === "symptoms" || a === "symptom") {
     return { nav: "symptoms", title: "Symptom finder", view: { render: symptomsView.render, mount: symptomsView.mount } };
