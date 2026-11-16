@@ -1079,6 +1079,94 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
 .taper-stop { border-top-style: dashed; }
 .taper-stop .taper-n { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
 
+/* ------------------------------------------------------------------ */
+/* Compare matrix                                                      */
+/* ------------------------------------------------------------------ */
+
+.cmp {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-1);
+  overflow: hidden;
+}
+
+.cmp-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 11px 13px;
+  border-top: 1px solid var(--line-soft);
+  align-items: start;
+}
+.cmp-row:first-child { border-top: 0; }
+
+.cmp-head { background: var(--bg-2); }
+
+.cmp-label {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+  font-weight: 600;
+}
+
+.cmp-cell { min-width: 0; font-size: 13px; line-height: 1.5; }
+
+/* On a phone each cell carries its own compound name. */
+.cmp-who {
+  display: inline;
+  font-size: 11.5px;
+  color: var(--text-3);
+  margin-right: 5px;
+}
+.cmp-who::after { content: ":"; }
+.cmp-head .cmp-cell { font-size: 13.5px; }
+.cmp-head .cmp-who { display: none; }
+
+.cmp-wide { background: var(--bg-1); }
+.cmp-wide .cmp-cell .cmp-who { display: block; margin: 0 0 2px; }
+
+.cmp-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cmp-list li { position: relative; padding-left: 11px; }
+.cmp-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--text-3);
+}
+.cmp-list.good li::before { background: var(--ok); }
+.cmp-list.bad li::before { background: var(--danger); }
+
+@media (min-width: 720px) {
+  .cmp-row {
+    grid-template-columns: 118px repeat(var(--cmp-n, 2), minmax(0, 1fr));
+    gap: 14px;
+    padding: 12px 16px;
+  }
+  .cmp-who { display: none; }
+  .cmp-wide { grid-template-columns: 118px minmax(0, 1fr); }
+  .cmp-wide .cmp-cell { display: grid; grid-template-columns: repeat(var(--cmp-n, 2), minmax(0, 1fr)); gap: 14px; }
+  .cmp-wide .cmp-cell .cmp-who {
+    display: block;
+    margin: 0 0 3px;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .cmp-wide .cmp-cell .cmp-who::after { content: ""; }
+}
+
 @media print {
   .sidebar, .bottom-nav, .topbar, .toast-host { display: none !important; }
   body { background: #fff; color: #000; }
