@@ -12,7 +12,8 @@ import { VERSION } from "../core.js";
 import { REGIONS, TARGETS } from "../data/brainmap.js";
 
 const ICD10 = /^[A-Z]\d{2}(\.\d+)?$/;
-const ICD11 = /^[1-9][A-Z]\d{2}(\.\w+)?$/;
+// ICD-11 stems start with a numeric chapter (6A70) or a letter chapter (MG30, NA07).
+const ICD11 = /^(?:[1-9]\d?|[A-Z])[A-Z]\d{2}(\.\w+)?$/;
 const ICD9 = /^\d{3}(\.\d+)?$/;
 
 function splitCodes(list) {
