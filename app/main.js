@@ -434,6 +434,7 @@ function matchRoute(segs) {
   }
   if (a === "cards" || a === "flashcards") return { nav: "cards", title: "Flashcards", view: learnView.cards };
   if (a === "evidence" || a === "studies") return { nav: "evidence", title: "Evidence", view: evidenceView.evidence };
+  if (a === "research" || a === "pubmed") return { nav: "research", title: "Research", view: researchView.research };
   if (a === "ask") return { nav: "ask", title: "Ask", view: askView.ask };
   if (a === "notes") return { nav: "notes", title: "Notebook", view: notesView.notesView };
   if (a === "settings") return { nav: "settings", title: "Settings", view: settingsView.settings };
