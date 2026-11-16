@@ -78,7 +78,7 @@ export const CONDITIONS_A = [
     risk: ["family history", "early onset", "antidepressant monotherapy", "substance use"],
     redFlags: ["mania with psychosis", "dangerous impulsivity", "mixed state with suicidal ideation"],
     systems: ["dopamine", "glutamate", "gaba", "serotonin"],
-    compounds: ["lithium", "lamotrigine", "quetiapine", "quetiapine", "valproate"],
+    compounds: ["lithium", "lamotrigine", "quetiapine"],
   },
   {
     id: "bipolar-2",
@@ -144,7 +144,7 @@ export const CONDITIONS_A = [
     risk: ["prior mood disorder", "family history"],
     redFlags: ["suicidal ideation in the luteal phase"],
     systems: ["serotonin", "gaba"],
-    compounds: ["sertraline", "fluoxetine", "escitalopram", "calcium-carbonate"],
+    compounds: ["sertraline", "fluoxetine", "escitalopram"],
   },
   {
     id: "dmdd",
@@ -188,7 +188,7 @@ export const CONDITIONS_A = [
     risk: ["family history", "childhood adversity", "stimulant use"],
     redFlags: ["suicidal ideation", "severe functional collapse"],
     systems: ["gaba", "serotonin", "noradrenaline"],
-    compounds: ["sertraline", "escitalopram", "venlafaxine", "buspirone", "pregabalin", "hydroxyzine"],
+    compounds: ["sertraline", "escitalopram", "venlafaxine", "pregabalin", "propranolol"],
   },
   {
     id: "panic-disorder",
@@ -210,7 +210,7 @@ export const CONDITIONS_A = [
     risk: ["family history", "anxiety sensitivity", "stimulant use"],
     redFlags: ["new panic after age 40 — rule out cardiac and endocrine causes", "concurrent depression with suicidal ideation"],
     systems: ["noradrenaline", "serotonin", "gaba"],
-    compounds: ["sertraline", "escitalopram", "alprazolam", "clonazepam", "propranolol"],
+    compounds: ["sertraline", "escitalopram", "alprazolam", "diazepam", "propranolol"],
   },
   {
     id: "agoraphobia",
@@ -300,7 +300,7 @@ export const CONDITIONS_A = [
     risk: ["family history", "childhood infection (PANDAS)", "perinatal complications"],
     redFlags: ["skin damage from washing", "severe functional impairment"],
     systems: ["serotonin", "glutamate", "dopamine"],
-    compounds: ["sertraline", "fluoxetine", "fluvoxamine", "clomipramine", "n-acetylcysteine", "memantine"],
+    compounds: ["sertraline", "fluoxetine", "venlafaxine", "n-acetylcysteine", "memantine"],
   },
   {
     id: "bdd",
@@ -322,7 +322,7 @@ export const CONDITIONS_A = [
     risk: ["anabolic steroid use", "childhood teasing"],
     redFlags: ["suicidal ideation — highest suicide risk in the OCD spectrum", "self-surgery"],
     systems: ["serotonin", "dopamine"],
-    compounds: ["fluoxetine", "escitalopram", "clomipramine"],
+    compounds: ["fluoxetine", "escitalopram", "sertraline"],
   },
   {
     id: "hoarding",
@@ -366,7 +366,7 @@ export const CONDITIONS_A = [
     risk: ["family history", "adolescence"],
     redFlags: ["trichobezoar", "skin infection"],
     systems: ["serotonin", "glutamate", "dopamine"],
-    compounds: ["n-acetylcysteine", "fluoxetine", "olanzapine"],
+    compounds: ["n-acetylcysteine", "fluoxetine", "quetiapine"],
   },
   {
     id: "excoriation",
