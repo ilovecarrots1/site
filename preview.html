@@ -8689,12 +8689,12 @@ __DEF("./app/data/compounds.js", function(exports, require){
 "use strict";
 /* Compound database — merged index plus derived lookup helpers. */
 
-const {  COMPOUNDS_A  } = require("./compounds-a.js");
-const {  COMPOUNDS_B  } = require("./compounds-b.js");
-const {  COMPOUNDS_C  } = require("./compounds-c.js");
-const {  COMPOUNDS_D  } = require("./compounds-d.js");
-const {  COMPOUNDS_E  } = require("./compounds-e.js");
-const {  COMPOUNDS_F  } = require("./compounds-f.js");
+const { COMPOUNDS_A } = require("./compounds-a.js");
+const { COMPOUNDS_B } = require("./compounds-b.js");
+const { COMPOUNDS_C } = require("./compounds-c.js");
+const { COMPOUNDS_D } = require("./compounds-d.js");
+const { COMPOUNDS_E } = require("./compounds-e.js");
+const { COMPOUNDS_F } = require("./compounds-f.js");
 
 const COMPOUNDS = Array.from(
   [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COMPOUNDS_D, ...COMPOUNDS_E, ...COMPOUNDS_F].reduce((map, c) => {
@@ -8795,8 +8795,6 @@ function resolveCompound(input) {
   return null;
 }
 
-const COMPOUND_COUNT = COMPOUNDS.length;
-
 function pubmedUrl(query) {
   return `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query || "")}`;
 }
@@ -8814,7 +8812,6 @@ exports.CLASSES = CLASSES;
 exports.EVIDENCE_ORDER = EVIDENCE_ORDER;
 exports.ALL_FLAGS = ALL_FLAGS;
 exports.ALL_TAGS = ALL_TAGS;
-exports.COMPOUND_COUNT = COMPOUND_COUNT;
 
 });
 __DEF("./app/data/interactions.js", function(exports, require){
@@ -12188,11 +12185,11 @@ __DEF("./app/main.js", function(exports, require){
  * Vanilla ES modules, no build step. Every view exports { render(ctx), mount(root, ctx) }.
  */
 
-const {  esc, icon, store, levelFor, debounce, toast, touchStreak  } = require("./core.js");
-const {  COMPOUNDS, COMPOUND_BY_ID  } = require("./data/compounds.js");
-const {  SYSTEMS, SYSTEM_BY_ID  } = require("./data/neuro.js");
-const {  COURSES, LESSONS_ALL, FLASHCARDS  } = require("./data/learn.js");
-const {  deckStats  } = require("./srs.js");
+const { esc, icon, store, levelFor, debounce, toast, touchStreak } = require("./core.js");
+const { COMPOUNDS, COMPOUND_BY_ID } = require("./data/compounds.js");
+const { SYSTEMS, SYSTEM_BY_ID } = require("./data/neuro.js");
+const { COURSES, LESSONS_ALL, FLASHCARDS } = require("./data/learn.js");
+const { deckStats } = require("./srs.js");
 
 const homeView = require("./views/home.js");
 const compoundsView = require("./views/compounds.js");
@@ -12210,9 +12207,9 @@ const atlasView = require("./views/atlas.js");
 const organsView = require("./views/organs.js");
 const mapView = require("./views/map.js");
 const calculatorView = require("./views/calculator.js");
-const {  PATHWAYS  } = require("./data/atlas.js");
-const {  ORGANS  } = require("./data/organs.js");
-const {  subscribePlate, wireSubscribe  } = require("./views/ui.js");
+const { PATHWAYS } = require("./data/atlas.js");
+const { ORGANS } = require("./data/organs.js");
+const { subscribePlate, wireSubscribe } = require("./views/ui.js");
 
 /* ------------------------------------------------------------------ */
 /* Navigation model                                                    */
@@ -12918,8 +12915,8 @@ __DEF("./app/srs.js", function(exports, require){
 "use strict";
 /* Spaced repetition scheduler (SM-2 style, simplified for single-session use). */
 
-const {  store, dayKey, daysBetween, uid  } = require("./core.js");
-const {  FLASHCARDS  } = require("./data/learn.js");
+const { store, dayKey, daysBetween, uid } = require("./core.js");
+const { FLASHCARDS } = require("./data/learn.js");
 
 const GRADES = [
   { key: "again", label: "Again", hint: "Forgot", quality: 1, cls: "danger" },
@@ -13053,12 +13050,12 @@ __DEF("./app/views/ask.js", function(exports, require){
 "use strict";
 /* Ask: local retrieval assistant over the whole database (no network) */
 
-const {  esc, icon, fmt  } = require("../core.js");
-const {  COMPOUNDS, COMPOUND_BY_ID, getCompound, resolveCompound, searchCompounds, pubmedUrl  } = require("../data/compounds.js");
-const {  SYSTEMS, SYSTEM_BY_ID  } = require("../data/neuro.js");
-const {  COURSES, LESSONS_ALL  } = require("../data/learn.js");
-const {  checkInteractions  } = require("../data/interactions.js");
-const {  pageHead, callout, classColor  } = require("./ui.js");
+const { esc, icon, fmt } = require("../core.js");
+const { COMPOUNDS, COMPOUND_BY_ID, getCompound, resolveCompound, searchCompounds, pubmedUrl } = require("../data/compounds.js");
+const { SYSTEMS, SYSTEM_BY_ID } = require("../data/neuro.js");
+const { COURSES, LESSONS_ALL } = require("../data/learn.js");
+const { checkInteractions } = require("../data/interactions.js");
+const { pageHead, callout, classColor } = require("./ui.js");
 
 /* ------------------------------------------------------------------ */
 /* Retrieval                                                           */
@@ -13394,12 +13391,12 @@ __DEF("./app/views/atlas.js", function(exports, require){
  * Pathway cards → pathway detail (step by step cascade) → compound cross-links.
  */
 
-const {  esc, icon, emptyState, copyText, toast  } = require("../core.js");
-const {  PATHWAYS, PATHWAY_BY_ID, TARGETS, TARGET_BY_ID, ATLAS_GROUPS, TARGET_KINDS, pathwaysForSystem, pathwaysForCompound, targetsForCompound } = require("../data/atlas.js");
-const {  SYSTEM_BY_ID, SYSTEMS  } = require("../data/neuro.js");
-const {  COMPOUND_BY_ID  } = require("../data/compounds.js");
-const {  ORGAN_BY_ID  } = require("../data/organs.js");
-const {  pageHead, backLink, chipRow, callout, mechFlow, liveBadge  } = require("./ui.js");
+const { esc, icon, emptyState, copyText, toast } = require("../core.js");
+const { PATHWAYS, PATHWAY_BY_ID, TARGETS, TARGET_BY_ID, ATLAS_GROUPS, TARGET_KINDS, pathwaysForSystem, pathwaysForCompound, targetsForCompound } = require("../data/atlas.js");
+const { SYSTEM_BY_ID, SYSTEMS } = require("../data/neuro.js");
+const { COMPOUND_BY_ID } = require("../data/compounds.js");
+const { ORGAN_BY_ID } = require("../data/organs.js");
+const { pageHead, backLink, chipRow, callout, mechFlow, liveBadge } = require("./ui.js");
 
 const KIND_ICON = {
   GPCR: "target",
@@ -13773,9 +13770,9 @@ __DEF("./app/views/calculator.js", function(exports, require){
  * Pure arithmetic on vial strength and diluent volume — no recommendation is implied.
  */
 
-const {  esc, icon, toast, copyText  } = require("../core.js");
-const {  COMPOUND_BY_ID  } = require("../data/compounds.js");
-const {  pageHead, sectionCard, callout  } = require("./ui.js");
+const { esc, icon, toast, copyText } = require("../core.js");
+const { COMPOUND_BY_ID } = require("../data/compounds.js");
+const { pageHead, sectionCard, callout } = require("./ui.js");
 
 /* Popular peptides with the vial size that is normally sold. */
 const PRESETS = [
@@ -14062,9 +14059,9 @@ __DEF("./app/views/compare.js", function(exports, require){
  * prefixed with the compound it belongs to.
  */
 
-const {  esc, icon, fmt, copyText, evidenceChip  } = require("../core.js");
-const {  COMPOUNDS, getCompound  } = require("../data/compounds.js");
-const {  pageHead, classColor, backLink, callout  } = require("./ui.js");
+const { esc, icon, fmt, copyText, evidenceChip } = require("../core.js");
+const { COMPOUNDS, getCompound } = require("../data/compounds.js");
+const { pageHead, classColor, backLink, callout } = require("./ui.js");
 
 const MAX = 3;
 
@@ -14367,13 +14364,13 @@ __DEF("./app/views/compounds.js", function(exports, require){
 "use strict";
 /* Compound browser + detail */
 
-const {  esc, icon, store, fmt, toast, copyText, evidenceChip, EVIDENCE, emptyState, disclaimer, awardXP  } = require("../core.js");
-const {  COMPOUNDS, COMPOUND_BY_ID, CLASSES, searchCompounds, getCompound, pubmedUrl, ALL_TAGS  } = require("../data/compounds.js");
-const {  SYSTEMS  } = require("../data/neuro.js");
-const {  checkInteractions, worstSeverity, SEVERITY  } = require("../data/interactions.js");
-const {  pageHead, compoundCard, classColor, backLink, callout, lineChart, liveBadge, mechFlow  } = require("./ui.js");
-const {  searchPapers, LINK as PM_LINK  } = require("../lib/pubmed.js");
-const {  paperCard  } = require("./research.js");
+const { esc, icon, store, fmt, toast, copyText, evidenceChip, EVIDENCE, emptyState, disclaimer, awardXP } = require("../core.js");
+const { COMPOUNDS, COMPOUND_BY_ID, CLASSES, searchCompounds, getCompound, pubmedUrl, ALL_TAGS } = require("../data/compounds.js");
+const { SYSTEMS } = require("../data/neuro.js");
+const { checkInteractions, worstSeverity, SEVERITY } = require("../data/interactions.js");
+const { pageHead, compoundCard, classColor, backLink, callout, lineChart, liveBadge, mechFlow } = require("./ui.js");
+const { searchPapers, LINK: PM_LINK } = require("../lib/pubmed.js");
+const { paperCard } = require("./research.js");
 
 const EV_ORDER = ["strong", "moderate", "limited", "preclinical", "anecdotal"];
 
@@ -15051,11 +15048,11 @@ __DEF("./app/views/evidence.js", function(exports, require){
 "use strict";
 /* Evidence: research topics, hierarchy of evidence, saved shelf */
 
-const {  esc, icon, store, copyText, evidenceChip, emptyState  } = require("../core.js");
-const {  COMPOUND_BY_ID, getCompound, pubmedUrl  } = require("../data/compounds.js");
-const {  pageHead, callout, compoundCard, liveBadge  } = require("./ui.js");
-const {  searchPapers, LINK as PM_LINK  } = require("../lib/pubmed.js");
-const {  paperCard  } = require("./research.js");
+const { esc, icon, store, copyText, evidenceChip, emptyState } = require("../core.js");
+const { COMPOUND_BY_ID, getCompound, pubmedUrl } = require("../data/compounds.js");
+const { pageHead, callout, compoundCard, liveBadge } = require("./ui.js");
+const { searchPapers, LINK: PM_LINK } = require("../lib/pubmed.js");
+const { paperCard } = require("./research.js");
 
 const TOPICS = [
   {
@@ -15422,13 +15419,13 @@ __DEF("./app/views/home.js", function(exports, require){
 "use strict";
 /* Home / dashboard */
 
-const {  esc, icon, store, levelFor, fmt, EVIDENCE, evidenceChip, emptyState  } = require("../core.js");
-const {  COMPOUNDS, COMPOUND_BY_ID  } = require("../data/compounds.js");
-const {  SYSTEMS, SYSTEM_BY_ID  } = require("../data/neuro.js");
-const {  COURSES, TOTAL_LESSONS, LESSON_INDEX, FLASHCARDS  } = require("../data/learn.js");
-const {  checkInteractions, worstSeverity  } = require("../data/interactions.js");
-const {  deckStats  } = require("../srs.js");
-const {  pageHead, statTile, compoundCard, classColor, metric, callout, subscribePlate, orb  } = require("./ui.js");
+const { esc, icon, store, levelFor, fmt, EVIDENCE, evidenceChip, emptyState } = require("../core.js");
+const { COMPOUNDS, COMPOUND_BY_ID } = require("../data/compounds.js");
+const { SYSTEMS, SYSTEM_BY_ID } = require("../data/neuro.js");
+const { COURSES, TOTAL_LESSONS, LESSON_INDEX, FLASHCARDS } = require("../data/learn.js");
+const { checkInteractions, worstSeverity } = require("../data/interactions.js");
+const { deckStats } = require("../srs.js");
+const { pageHead, statTile, compoundCard, classColor, metric, callout, subscribePlate, orb } = require("./ui.js");
 
 function greeting() {
   const h = new Date().getHours();
@@ -15692,10 +15689,10 @@ __DEF("./app/views/lab.js", function(exports, require){
 "use strict";
 /* Lab: pharmacokinetic simulator + interaction checker */
 
-const {  esc, icon, store, fmt, toast, emptyState, evidenceChip, clamp  } = require("../core.js");
-const {  COMPOUNDS, COMPOUND_BY_ID, getCompound, resolveCompound, searchCompounds, CLASSES  } = require("../data/compounds.js");
-const {  EXTRA_SUBSTANCES, SEVERITY, checkInteractions, worstSeverity  } = require("../data/interactions.js");
-const {  pageHead, callout, backLink, lineChart, classColor, statTile  } = require("./ui.js");
+const { esc, icon, store, fmt, toast, emptyState, evidenceChip, clamp } = require("../core.js");
+const { COMPOUNDS, COMPOUND_BY_ID, getCompound, resolveCompound, searchCompounds, CLASSES } = require("../data/compounds.js");
+const { EXTRA_SUBSTANCES, SEVERITY, checkInteractions, worstSeverity } = require("../data/interactions.js");
+const { pageHead, callout, backLink, lineChart, classColor, statTile } = require("./ui.js");
 
 /* ------------------------------------------------------------------ */
 /* PK simulator                                                        */
@@ -16262,14 +16259,14 @@ __DEF("./app/views/learn.js", function(exports, require){
 "use strict";
 /* Learn: courses, lessons, quizzes, flashcards */
 
-const {  esc, icon, md, store, toast, awardXP, touchStreak, levelFor, emptyState, fmt, copyText  } = require("../core.js");
-const {  COURSES, LESSON_INDEX, TOTAL_LESSONS, FLASHCARDS, systemCardCount  } = require("../data/learn.js");
-const {  SYSTEM_BY_ID  } = require("../data/neuro.js");
-const {  deckStats, dueCards, gradeCard, GRADES, cardState, nextIntervalPreview  } = require("../srs.js");
-const {  pageHead, backLink, callout, metric, statTile, liveBadge  } = require("./ui.js");
-const {  queryForCard  } = require("../data/card-queries.js");
-const {  searchPapers, LINK as PM_LINK  } = require("../lib/pubmed.js");
-const {  paperCard  } = require("./research.js");
+const { esc, icon, md, store, toast, awardXP, touchStreak, levelFor, emptyState, fmt, copyText } = require("../core.js");
+const { COURSES, LESSON_INDEX, TOTAL_LESSONS, FLASHCARDS, systemCardCount } = require("../data/learn.js");
+const { SYSTEM_BY_ID } = require("../data/neuro.js");
+const { deckStats, dueCards, gradeCard, GRADES, cardState, nextIntervalPreview } = require("../srs.js");
+const { pageHead, backLink, callout, metric, statTile, liveBadge } = require("./ui.js");
+const { queryForCard } = require("../data/card-queries.js");
+const { searchPapers, LINK: PM_LINK } = require("../lib/pubmed.js");
+const { paperCard } = require("./research.js");
 
 function lessonDone(id) {
   return !!store.data.lessons?.[id]?.completed;
@@ -16841,12 +16838,12 @@ __DEF("./app/views/map.js", function(exports, require){
  * Several compounds may converge on one region; nothing is capped.
  */
 
-const {  esc, icon, debounce  } = require("../core.js");
-const {  COMPOUNDS, COMPOUND_BY_ID  } = require("../data/compounds.js");
-const {  BRAIN_REGIONS, REGION_BY_ID, SYSTEM_BY_ID, SYSTEMS  } = require("../data/neuro.js");
-const {  ORGANS, ORGAN_BY_ID  } = require("../data/organs.js");
+const { esc, icon, debounce } = require("../core.js");
+const { COMPOUNDS, COMPOUND_BY_ID } = require("../data/compounds.js");
+const { BRAIN_REGIONS, REGION_BY_ID, SYSTEM_BY_ID, SYSTEMS } = require("../data/neuro.js");
+const { ORGANS, ORGAN_BY_ID } = require("../data/organs.js");
 
-const {  pageHead, chipRow, callout  } = require("./ui.js");
+const { pageHead, chipRow, callout } = require("./ui.js");
 
 /* ------------------------------------------------------------------ */
 /* Build the target graph once                                         */
@@ -17218,10 +17215,10 @@ __DEF("./app/views/neuro.js", function(exports, require){
 "use strict";
 /* Brain map + neurotransmitter systems */
 
-const {  esc, icon, fmt, emptyState, evidenceChip  } = require("../core.js");
-const {  SYSTEMS, SYSTEM_BY_ID, BRAIN_REGIONS, REGION_BY_ID  } = require("../data/neuro.js");
-const {  COMPOUNDS, COMPOUND_BY_ID, getCompound, pubmedUrl  } = require("../data/compounds.js");
-const {  pageHead, backLink, classColor, callout, mechFlow, barList, liveBadge  } = require("./ui.js");
+const { esc, icon, fmt, emptyState, evidenceChip } = require("../core.js");
+const { SYSTEMS, SYSTEM_BY_ID, BRAIN_REGIONS, REGION_BY_ID } = require("../data/neuro.js");
+const { COMPOUNDS, COMPOUND_BY_ID, getCompound, pubmedUrl } = require("../data/compounds.js");
+const { pageHead, backLink, classColor, callout, mechFlow, barList, liveBadge } = require("./ui.js");
 
 const state = { region: "prefrontal-cortex", highlight: "" };
 
@@ -17662,9 +17659,9 @@ __DEF("./app/views/notes.js", function(exports, require){
 "use strict";
 /* Notebook: private notes attached to compounds, tags and questions */
 
-const {  esc, icon, store, toast, uid, fmt, emptyState  } = require("../core.js");
-const {  COMPOUND_BY_ID, getCompound, resolveCompound, searchCompounds  } = require("../data/compounds.js");
-const {  pageHead, callout, classColor  } = require("./ui.js");
+const { esc, icon, store, toast, uid, fmt, emptyState } = require("../core.js");
+const { COMPOUND_BY_ID, getCompound, resolveCompound, searchCompounds } = require("../data/compounds.js");
+const { pageHead, callout, classColor } = require("./ui.js");
 
 const state = { q: "", tag: "" };
 
@@ -17927,12 +17924,12 @@ __DEF("./app/views/organs.js", function(exports, require){
  * which diseases live there and which compounds in the library act on it.
  */
 
-const {  esc, icon, emptyState  } = require("../core.js");
-const {  ORGANS, ORGAN_BY_ID, ORGAN_GROUPS  } = require("../data/organs.js");
-const {  pathwaysForOrgan, TARGETS  } = require("../data/atlas.js");
-const {  COMPOUND_BY_ID  } = require("../data/compounds.js");
-const {  SYSTEM_BY_ID  } = require("../data/neuro.js");
-const {  pageHead, backLink, chipRow, callout  } = require("./ui.js");
+const { esc, icon, emptyState } = require("../core.js");
+const { ORGANS, ORGAN_BY_ID, ORGAN_GROUPS } = require("../data/organs.js");
+const { pathwaysForOrgan, TARGETS } = require("../data/atlas.js");
+const { COMPOUND_BY_ID } = require("../data/compounds.js");
+const { SYSTEM_BY_ID } = require("../data/neuro.js");
+const { pageHead, backLink, chipRow, callout } = require("./ui.js");
 
 const SEX_OF = { prostate: "male", testes: "male", ovaries: "female", uterus: "female", breast: "female" };
 
@@ -18232,9 +18229,9 @@ __DEF("./app/views/research.js", function(exports, require){
 "use strict";
 /* Research — live PubMed search. Papers are fetched per request and never stored. */
 
-const {  esc, icon, toast, copyText, fmt  } = require("../core.js");
-const {  searchPapers, buildTerm, TOPICS, LINK, PubmedError  } = require("../lib/pubmed.js");
-const {  pageHead, callout  } = require("./ui.js");
+const { esc, icon, toast, copyText, fmt } = require("../core.js");
+const { searchPapers, buildTerm, TOPICS, LINK, PubmedError } = require("../lib/pubmed.js");
+const { pageHead, callout } = require("./ui.js");
 
 const state = {
   q: "",
@@ -18592,13 +18589,13 @@ __DEF("./app/views/settings.js", function(exports, require){
 "use strict";
 /* Settings: appearance, study preferences, data ownership, about */
 
-const {  esc, icon, store, toast, fmt, clamp, copyText, levelFor  } = require("../core.js");
-const {  COMPOUNDS, getCompound, COMPOUND_BY_ID  } = require("../data/compounds.js");
-const {  SYSTEMS  } = require("../data/neuro.js");
-const {  TOTAL_LESSONS, FLASHCARDS  } = require("../data/learn.js");
-const {  PAIR_RULES, FLAG_RULES  } = require("../data/interactions.js");
-const {  deckStats  } = require("../srs.js");
-const {  pageHead, callout, subscribePlate  } = require("./ui.js");
+const { esc, icon, store, toast, fmt, clamp, copyText, levelFor } = require("../core.js");
+const { COMPOUNDS, getCompound, COMPOUND_BY_ID } = require("../data/compounds.js");
+const { SYSTEMS } = require("../data/neuro.js");
+const { TOTAL_LESSONS, FLASHCARDS } = require("../data/learn.js");
+const { PAIR_RULES, FLAG_RULES } = require("../data/interactions.js");
+const { deckStats } = require("../srs.js");
+const { pageHead, callout, subscribePlate } = require("./ui.js");
 
 const ACCENTS = [
   ["violet", "Violet", "#8b7bff"],
@@ -18936,9 +18933,9 @@ __DEF("./app/views/taper.js", function(exports, require){
  *     granule you can actually measure (whole tablet, half, quarter, eighth).
  */
 
-const {  esc, icon, store, fmt, toast, uid, copyText, awardXP, emptyState  } = require("../core.js");
-const {  COMPOUNDS, getCompound  } = require("../data/compounds.js");
-const {  pageHead, callout, statTile, classColor  } = require("./ui.js");
+const { esc, icon, store, fmt, toast, uid, copyText, awardXP, emptyState } = require("../core.js");
+const { COMPOUNDS, getCompound } = require("../data/compounds.js");
+const { pageHead, callout, statTile, classColor } = require("./ui.js");
 
 /* ------------------------------------------------------------------ */
 /* Which compounds actually need a taper                               */
@@ -19453,8 +19450,8 @@ __DEF("./app/views/ui.js", function(exports, require){
 "use strict";
 /* Shared view helpers: page headers, cards, tiles, chips. */
 
-const {  esc, icon, evidenceChip, store  } = require("../core.js");
-const {  SEVERITY  } = require("../data/interactions.js");
+const { esc, icon, evidenceChip, store } = require("../core.js");
+const { SEVERITY } = require("../data/interactions.js");
 
 function pageHead(title, sub, action = "", eyebrow = "") {
   return `<header class="page-head">
@@ -19790,7 +19787,7 @@ try{
 } catch (err){
   window.__ND_ERROR = String((err && err.stack) || err);
   var host = document.getElementById("root");
-  host.innerHTML = '<div style="padding:20px;font-family:ui-monospace,monospace;color:#ffb4b4;background:#150b0b;min-height:100dvh"><h1 style="font-size:16px;margin:0 0 8px">Boot error</h1><pre style="white-space:pre-wrap;font-size:12px;line-height:1.5">' + String((err && err.stack) || err).replace(/[<>&]/g, function(c){ return {"<":"&lt;",">":"&gt;","&":"&amp;"}[c]; }) + '</pre></div>';
+  host.innerHTML = '<div style="padding:20px;font-family:ui-monospace,monospace;color:#ffb4b4;background:#150b0b;min-height:100dvh"><h1 style="font-size:16px;margin:0 0 8px">Boot error</h1><pre style="white-space:pre-wrap;font-size:12px;line-height:1.5">' + String((err && err.stack) || err).split("<").join("&lt;").split(">").join("&gt;").split("&").join("&amp;") + '</pre></div>';
 }
 })();
 <\/script>
