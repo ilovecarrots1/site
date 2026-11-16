@@ -174,7 +174,10 @@ export const lab = {
     ${pageHead(
       "Lab",
       "Model plasma levels before you touch anything. Numbers are a schematic, not a prescription.",
-      `<a class="btn ghost sm" href="#/lab/interactions">${icon("shield", 14)} Interactions</a>`
+      `<span class="row" style="gap:6px">
+        <a class="btn ghost sm" href="#/lab/interactions">${icon("shield", 14)} Interactions</a>
+        <a class="btn ghost sm" href="#/lab/taper">${icon("scale", 14)} Taper</a>
+      </span>`
     )}
 
     <div class="split">
