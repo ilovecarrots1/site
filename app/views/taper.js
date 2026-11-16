@@ -12,7 +12,7 @@
 
 import { esc, icon, store, fmt, toast, uid, copyText, awardXP, emptyState } from "../core.js";
 import { COMPOUNDS, getCompound } from "../data/compounds.js";
-import { pageHead, callout, backLink, statTile, classColor } from "./ui.js";
+import { pageHead, callout, statTile, classColor } from "./ui.js";
 
 /* ------------------------------------------------------------------ */
 /* Which compounds actually need a taper                               */
