@@ -1130,10 +1130,6 @@ html[data-motion="off"] .bm-tract { animation: none !important; }
   .cmp .cmp-head .cmp-cell a { font-size: 13px; }
 }
 .cmp::-webkit-scrollbar { height: 6px; }
-/* end compare */
-@media (max-width: 620px) {
-  .sy-row { grid-template-columns: minmax(0, 1fr) 46px; }
-}
 
 
 
