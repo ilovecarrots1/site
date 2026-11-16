@@ -19,6 +19,8 @@ import * as evidenceView from "./views/evidence.js";
 import * as askView from "./views/ask.js";
 import * as notesView from "./views/notes.js";
 import * as settingsView from "./views/settings.js";
+import * as researchView from "./views/research.js";
+import { subscribePlate, wireSubscribe } from "./views/ui.js";
 
 /* ------------------------------------------------------------------ */
 /* Navigation model                                                    */
@@ -43,6 +45,7 @@ const NAV = [
       { id: "compare", label: "Compare", href: "#/compare", icon: "grid" },
       { id: "interactions", label: "Interactions", href: "#/lab/interactions", icon: "shield" },
       { id: "evidence", label: "Evidence", href: "#/evidence", icon: "file" },
+      { id: "research", label: "Research", href: "#/research", icon: "microscope" },
       { id: "ask", label: "Ask the index", href: "#/ask", icon: "sparkles" },
       { id: "notes", label: "Notebook", href: "#/notes", icon: "edit", count: () => (store.data.notes || []).length || "" },
     ],
@@ -85,6 +88,7 @@ function sidebarHtml() {
           .join("")}`
     ).join("")}
     <div class="side-foot">
+      ${subscribePlate({ compact: true })}
       <a class="side-xp" href="#/settings" style="text-decoration:none;color:inherit;display:block">
         <div class="lv"><b>${lvl.level}</b><span>level · ${s.profile.xp || 0} XP</span></div>
         <div class="meter"><i style="width:${Math.round((lvl.into / (lvl.need || 1)) * 100)}%"></i></div>
@@ -194,11 +198,13 @@ function openDrawer() {
             )
             .join("")}`
       ).join("")}
-      <div style="margin-top:auto;padding-top:14px">
+      <div style="margin-top:auto;padding-top:14px;display:grid;gap:10px">
+        ${subscribePlate({ compact: true })}
         <button class="btn ghost sm block" data-search>${icon("search", 14)} Search everything</button>
       </div>
     </div>`;
   document.body.appendChild(host);
+  wireSubscribe(host);
   lockScroll(true);
   const close = () => closeLayers();
   host.addEventListener("click", (ev) => {
