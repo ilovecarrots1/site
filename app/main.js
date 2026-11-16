@@ -548,6 +548,9 @@ function renderRoute() {
       <a class="btn ghost sm" href="#/">Home</a></div></div>`;
   }
 
+  // Any view can render a subscribe plate; dismissal is delegated once here.
+  wireSubscribe(host);
+
   paintNav(match.nav);
   paintCounts();
 
