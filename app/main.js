@@ -24,6 +24,7 @@ import * as atlasView from "./views/atlas.js";
 import * as organsView from "./views/organs.js";
 import * as mapView from "./views/map.js";
 import * as calculatorView from "./views/calculator.js";
+import * as brainView from "./views/brain.js";
 import { PATHWAYS } from "./data/atlas.js";
 import { ORGANS } from "./data/organs.js";
 import { subscribePlate, wireSubscribe } from "./views/ui.js";
