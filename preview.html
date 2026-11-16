@@ -3603,15 +3603,7 @@ a.rf-flag:hover { color: var(--bad); }
 "use strict";
 var __M = {}, __C = {};
 function __def(id, fn){ __M[id] = fn; }
-function __req(id){
-  var c = __C[id];
-  if (c) return c;
-  var fn = __M[id];
-  if (!fn) throw new Error("Missing module: " + id);
-  var e = __C[id] = {};
-  fn(e);
-  return e;
-}
+function __req(id){ var c = __C[id]; if (c) return c; var fn = __M[id]; if (!fn) throw new Error("Missing module: " + id); var e = __C[id] = {}; fn(e); return e; }
 __def("./app/core.js", function(__e){/* NeuroDifference core runtime
  * Zero dependencies. Small utilities, state store, markdown, icons, toasts.
  */
@@ -11687,6 +11679,18 @@ const { COMPOUNDS_D } = __req("./app/data/compounds-d.js");
 const { COMPOUNDS_E } = __req("./app/data/compounds-e.js");
 const { COMPOUNDS_F } = __req("./app/data/compounds-f.js");
 
+/** Every dose row must carry the same message: a reference point, not advice. */
+const DOSE_DISCLAIMER = "Reference point for education only — not a recommendation.";
+
+const HAS_DISCLAIMER = /education only|not a recommendation|reference point|guideline|lower than/i;
+
+function doseNote(note) {
+  const n = String(note || "").trim();
+  if (!n) return DOSE_DISCLAIMER;
+  if (HAS_DISCLAIMER.test(n)) return n;
+  return n + (/[.!?]$/.test(n) ? " " : ". ") + DOSE_DISCLAIMER;
+}
+
 const COMPOUNDS = Array.from(
   [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COMPOUNDS_D, ...COMPOUNDS_E, ...COMPOUNDS_F].reduce((map, c) => {
     // Later entries win, so a newer, richer record replaces an older stub with the same id.
@@ -11705,6 +11709,7 @@ const COMPOUNDS = Array.from(
     tags: [],
     doses: [],
     ...c,
+    doses: ((c && c.doses) || []).map((d) => ({ ...d, note: doseNote(d.note) })),
     pk: {
       halfLife: null,
       tmax: null,
@@ -11789,7 +11794,7 @@ function resolveCompound(input) {
 function pubmedUrl(query) {
   return `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query || "")}`;
 }
-__e["COMPOUNDS"] = COMPOUNDS; __e["COMPOUND_BY_ID"] = COMPOUND_BY_ID; __e["COMPOUND_COUNT"] = COMPOUND_COUNT; __e["CLASSES"] = CLASSES; __e["EVIDENCE_ORDER"] = EVIDENCE_ORDER; __e["ALL_FLAGS"] = ALL_FLAGS; __e["ALL_TAGS"] = ALL_TAGS; __e["getCompound"] = getCompound; __e["haystack"] = haystack; __e["compoundsByFlag"] = compoundsByFlag; __e["compoundsByClass"] = compoundsByClass; __e["searchCompounds"] = searchCompounds; __e["resolveCompound"] = resolveCompound; __e["pubmedUrl"] = pubmedUrl;
+__e["DOSE_DISCLAIMER"] = DOSE_DISCLAIMER; __e["COMPOUNDS"] = COMPOUNDS; __e["COMPOUND_BY_ID"] = COMPOUND_BY_ID; __e["COMPOUND_COUNT"] = COMPOUND_COUNT; __e["CLASSES"] = CLASSES; __e["EVIDENCE_ORDER"] = EVIDENCE_ORDER; __e["ALL_FLAGS"] = ALL_FLAGS; __e["ALL_TAGS"] = ALL_TAGS; __e["getCompound"] = getCompound; __e["haystack"] = haystack; __e["compoundsByFlag"] = compoundsByFlag; __e["compoundsByClass"] = compoundsByClass; __e["searchCompounds"] = searchCompounds; __e["resolveCompound"] = resolveCompound; __e["pubmedUrl"] = pubmedUrl;
 __e["default"] = undefined;
 });
 __def("./app/data/conditions-a.js", function(__e){/* ==========================================================================
@@ -18190,7 +18195,8 @@ const { VERSION } = __req("./app/core.js");
 const { REGIONS, TARGETS } = __req("./app/data/brainmap.js");
 
 const ICD10 = /^[A-Z]\d{2}(\.\d+)?$/;
-const ICD11 = /^[1-9][A-Z]\d{2}(\.\w+)?$/;
+// ICD-11 stems start with a numeric chapter (6A70) or a letter chapter (MG30, NA07).
+const ICD11 = /^(?:[1-9]\d?|[A-Z])[A-Z]\d{2}(\.\w+)?$/;
 const ICD9 = /^\d{3}(\.\d+)?$/;
 
 function splitCodes(list) {
