@@ -3,7 +3,7 @@
 import { esc, icon, fmt, emptyState, evidenceChip } from "../core.js";
 import { SYSTEMS, SYSTEM_BY_ID, BRAIN_REGIONS, REGION_BY_ID } from "../data/neuro.js";
 import { COMPOUNDS, COMPOUND_BY_ID, getCompound, pubmedUrl } from "../data/compounds.js";
-import { pageHead, backLink, classColor, callout } from "./ui.js";
+import { pageHead, backLink, classColor, callout, mechFlow, barList, liveBadge } from "./ui.js";
 
 const state = { region: "prefrontal-cortex", highlight: "" };
 
@@ -263,6 +263,18 @@ function compoundChips(s) {
   </div>`;
 }
 
+function classBars(s) {
+  const list = COMPOUNDS.filter((c) => (c.flags || []).some((f) => (s.matchFlags || []).includes(f)));
+  if (!list.length) return "";
+  const counts = new Map();
+  list.forEach((c) => counts.set(c.cls, (counts.get(c.cls) || 0) + 1));
+  const rows = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([cls, n]) => ({ label: cls, value: n, color: classColor(cls) }));
+  return `<div style="margin-bottom:10px">${barList(rows)}</div>`;
+}
+
 export const system = {
   render(ctx) {
     const s = SYSTEM_BY_ID.get(String(ctx.params.id || "").toLowerCase());
@@ -297,6 +309,18 @@ export const system = {
           <div class="row wrap" style="gap:5px;margin-top:11px">
             ${s.functions.map((f) => `<span class="chip">${esc(f)}</span>`).join("")}
           </div>
+        </section>
+
+        <section class="card">
+          <div class="card-head"><h3 style="font-size:14px">${icon("git", 14)} Pathway, top to bottom</h3><span class="spacer"></span>${liveBadge("animated")}</div>
+          ${mechFlow(
+            (s.synthesis || []).slice(0, 5).map((st, i) => ({
+              icon: i === 0 ? "atom" : i === 1 ? "flask" : i === 2 ? "target" : "activity",
+              title: st.step,
+              sub: [st.enzyme, st.cofactor ? `needs ${st.cofactor}` : ""].filter(Boolean).join(" · ") || st.detail || "",
+            }))
+          )}
+          <p class="tiny dim" style="margin-top:10px;line-height:1.5">Every node is a step a drug can interrupt. Block an enzyme and you starve the next step; block a transporter and you flood the cleft; block a receptor and you silence the readout.</p>
         </section>
 
         <section class="card">
@@ -395,6 +419,7 @@ export const system = {
 
         <div class="card">
           <div class="eyebrow" style="margin-bottom:8px">Compounds acting here</div>
+          ${classBars(s)}
           ${compoundChips(s) || `<p class="tiny dim">No compounds in this database are flagged for ${esc(s.name)}.</p>`}
         </div>
 
