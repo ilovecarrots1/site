@@ -12,6 +12,7 @@ import * as homeView from "./views/home.js";
 import * as compoundsView from "./views/compounds.js";
 import * as neuroView from "./views/neuro.js";
 import * as labView from "./views/lab.js";
+import * as taperView from "./views/taper.js";
 import * as learnView from "./views/learn.js";
 import * as evidenceView from "./views/evidence.js";
 import * as askView from "./views/ask.js";
@@ -37,6 +38,7 @@ const NAV = [
     section: "Tools",
     items: [
       { id: "lab", label: "Dose lab", href: "#/lab", icon: "flask" },
+      { id: "taper", label: "Taper planner", href: "#/lab/taper", icon: "scale" },
       { id: "interactions", label: "Interactions", href: "#/lab/interactions", icon: "shield" },
       { id: "evidence", label: "Evidence", href: "#/evidence", icon: "file" },
       { id: "ask", label: "Ask the index", href: "#/ask", icon: "sparkles" },
@@ -411,6 +413,7 @@ function matchRoute(segs) {
   }
   if (a === "lab") {
     if (b === "interactions") return { nav: "interactions", title: "Interactions", view: labView.interactions };
+    if (b === "taper") return { nav: "taper", title: "Taper planner", view: taperView.taper };
     return { nav: "lab", title: "Dose lab", view: labView.lab };
   }
   if (a === "learn") {
