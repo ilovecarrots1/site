@@ -1224,8 +1224,7 @@ export const COMPOUNDS_E = [
       "A synthetic ligand for the nuclear receptors REV-ERB alpha and beta, which sit inside the circadian clock machinery. Rodent data show increased mitochondrial content and endurance; human data do not exist and oral bioavailability is very low.",
     moa: [
       "REV-ERB alpha/beta agonism, repressing BMAL1-driven clock gene transcription",
-      "Increases mitochondrial biogenesis and oxidative capacity in skeletal muscle (rodents)
-",
+      "Increases mitochondrial biogenesis and oxidative capacity in skeletal muscle (rodents)",
       "Shifts lipid and glucose metabolism toward oxidation",
       "Alters circadian gene expression in liver and muscle",
     ],
