@@ -147,7 +147,100 @@ function smoothPath(pts, tension = 0.16) {
   return d;
 }
 
-export function callout(kind, title, body) {  const map = {
+export const TELEGRAM_URL = "https://t.me/+JXFyHEQJInVjNmFl";
+
+/**
+ * Free-access plate with the Telegram subscribe CTA.
+ * Rendered on home, settings, drawer and sidebar footer. Dismissible once —
+ * the flag lives in settings so it never comes back uninvited.
+ */
+export function subscribePlate({ compact = false, dismissible = true, force = false, note = "" } = {}) {
+  if (!force && store.data.settings.subHidden && dismissible) return "";
+  return `<div class="sub-plate ${compact ? "compact" : ""}" data-sub-plate>
+    <span class="sp-ico">${icon("gift", compact ? 15 : 18)}</span>
+    <div class="sp-copy">
+      <b>Free access — nothing is locked</b>
+      <span>${
+        note ||
+        "Every monograph, pathway and quiz is open. Subscribe on Telegram for new compounds, study drops and release notes."
+      }</span>
+    </div>
+    <div class="sp-actions">
+      <a class="btn tg ${compact ? "xs" : "sm"}" href="${TELEGRAM_URL}" target="_blank" rel="noopener noreferrer">
+        ${icon("send", compact ? 13 : 14)} Subscribe
+      </a>
+      ${
+        dismissible
+          ? `<button class="icon-btn sp-close" data-sub-close aria-label="Dismiss subscribe plate" title="Dismiss">${icon("x", 15)}</button>`
+          : ""
+      }
+    </div>
+  </div>`;
+}
+
+/** One delegated listener per mount point; also persists the dismissal. */
+export function wireSubscribe(root) {
+  if (!root || root.dataset.subWired === "1") return;
+  root.dataset.subWired = "1";
+  root.addEventListener("click", (ev) => {
+    const btn = ev.target.closest("[data-sub-close]");
+    if (!btn) return;
+    const plate = btn.closest("[data-sub-plate]");
+    if (!plate) return;
+    plate.style.transition = "opacity .18s ease, transform .18s ease";
+    plate.style.opacity = "0";
+    plate.style.transform = "translateY(-4px)";
+    setTimeout(() => plate.remove(), 190);
+    try {
+      store.update((d) => {
+        d.settings.subHidden = true;
+      });
+      toast("Hidden — re-enable it in Settings", "info");
+    } catch (e) {
+      /* store failures must never break the click */
+    }
+  });
+}
+
+export function liveBadge(text = "live") {
+  return `<span class="live-dot">${esc(text)}</span>`;
+}
+
+/** Vertical mechanism / pathway chain with animated links. */
+export function mechFlow(steps, { animate = true } = {}) {
+  return `<div class="mech">${steps
+    .map(
+      (s, i) => `
+      ${i && animate ? `<div class="mech-link anim"></div>` : i ? `<div class="mech-link"></div>` : ""}
+      <div class="mech-node" style="--i:${i}">
+        <span class="mn-ico">${icon(s.icon || "target", 14)}</span>
+        <div style="min-width:0">
+          <div class="mn-t">${esc(s.title)}</div>
+          ${s.sub ? `<div class="mn-s">${esc(s.sub)}</div>` : ""}
+        </div>
+      </div>`
+    )
+    .join("")}</div>`;
+}
+
+/** Horizontal bar list. rows: [{label, value, max, text, color}] */
+export function barList(rows, { max = null } = {}) {
+  const top = max || Math.max(...rows.map((r) => Number(r.value) || 0), 1);
+  return `<div class="bars">${rows
+    .map((r) => {
+      const pct = Math.round(clamp01((Number(r.value) || 0) / top) * 100);
+      return `<div class="bar-row" style="--bc:${r.color || "var(--accent)"}">
+        <span class="dim" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.label)}</span>
+        <div class="bar-track"><i style="width:${pct}%"></i></div>
+        <span class="mono dim">${esc(r.text != null ? r.text : r.value)}</span>
+      </div>`;
+    })
+    .join("")}</div>`;
+}
+
+export function orb(size = 54) {
+  return `<span class="orb ${size <= 40 ? "sm" : ""}" aria-hidden="true"></span>`;
+}  const map = {
     danger: { ic: "alert", color: "var(--critical)", bg: "rgba(248,81,73,.08)", line: "rgba(248,81,73,.28)" },
     warn: { ic: "alert", color: "var(--warn)", bg: "rgba(210,153,34,.08)", line: "rgba(210,153,34,.26)" },
     ok: { ic: "check", color: "var(--good)", bg: "rgba(63,185,80,.08)", line: "rgba(63,185,80,.26)" },
