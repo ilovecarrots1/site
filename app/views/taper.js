@@ -348,9 +348,7 @@ export const taper = {
       `<a class="btn ghost sm" href="#/lab">${icon("flask", 14)} Dose lab</a>`
     )}
 
-    ${backLink("#/lab", "Lab")}
-
-    <div class="split">
+    <div class="split split-mobile-first">
       <div class="stack" style="gap:14px" id="taper-out">${planHtml(c, cfg)}</div>
 
       <aside class="stack sticky-side" style="gap:14px">
