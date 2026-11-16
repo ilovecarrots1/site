@@ -78,11 +78,25 @@ const DENSITIES = [
 export function applyAppearance() {
   const s = store.data.settings || {};
   const rootEl = document.documentElement;
-  rootEl.setAttribute("data-accent", s.accent || "violet");
+  const skin = SKINS.some(([k]) => k === s.skin) ? s.skin : "aurora";
+  rootEl.setAttribute("data-skin", skin);
   rootEl.setAttribute("data-density", s.density || "comfortable");
   rootEl.setAttribute("data-motion", s.motion === false ? "off" : "on");
   const scale = clamp(Number(s.scale) || 100, 85, 120);
   rootEl.style.setProperty("--scale", scale / 100);
+
+  const custom = accentTokens(s.accentHex);
+  if (custom) {
+    rootEl.setAttribute("data-accent", "custom");
+    rootEl.style.setProperty("--accent", custom.accent);
+    rootEl.style.setProperty("--accent-2", custom.accent2);
+    rootEl.style.setProperty("--accent-ink", custom.ink);
+    rootEl.style.setProperty("--accent-soft", custom.soft);
+    rootEl.style.setProperty("--accent-line", custom.line);
+  } else {
+    rootEl.setAttribute("data-accent", s.accent || "violet");
+    ["--accent", "--accent-2", "--accent-ink", "--accent-soft", "--accent-line"].forEach((p) => rootEl.style.removeProperty(p));
+  }
 }
 
 function settingRow({ title, sub, control }) {
