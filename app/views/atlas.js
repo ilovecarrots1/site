@@ -366,8 +366,13 @@ export function target(ctx) {
 /* ------------------------------------------------------------------ */
 
 export function mount(root, ctx) {
-  if (!ctx.params || !ctx.params.id) mountIndex(root);
-  else mountPathway(root);
+  const params = (ctx && ctx.params) || {};
+  if (!params.id) {
+    mountIndex(root);
+    return;
+  }
+  if (params.kind === "target") return;
+  mountPathway(root);
 }
 
 export { pathwaysForSystem, targetsForCompound };
