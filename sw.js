@@ -1,6 +1,6 @@
 /* NeuroDifference service worker — app-shell cache, offline-first reads. */
 
-const VERSION = "nd-v2.2.0";
+const VERSION = "nd-v2.3.0";
 const SHELL = [
   "./",
   "./index.html",
@@ -17,7 +17,11 @@ const SHELL = [
   "./app/data/compounds-b.js",
   "./app/data/compounds-c.js",
   "./app/data/compounds-d.js",
+  "./app/data/compounds-e.js",
+  "./app/data/compounds-f.js",
   "./app/data/neuro.js",
+  "./app/data/atlas.js",
+  "./app/data/organs.js",
   "./app/data/interactions.js",
   "./app/data/learn.js",
   "./app/data/card-queries.js",
@@ -34,6 +38,10 @@ const SHELL = [
   "./app/views/ask.js",
   "./app/views/notes.js",
   "./app/views/settings.js",
+  "./app/views/atlas.js",
+  "./app/views/organs.js",
+  "./app/views/map.js",
+  "./app/views/calculator.js",
 ];
 
 self.addEventListener("install", (event) => {
