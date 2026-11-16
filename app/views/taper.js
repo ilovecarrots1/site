@@ -91,6 +91,7 @@ function defaultDose(c) {
  * @returns {{steps:Array, totalDays:number, finalDose:number, floor:number, overshoot:boolean}}
  */
 export function buildPlan({ startDose, freq, stepPct, holdDays, finalPct, halfLife }) {
+  if (!(Number(startDose) > 0)) return { steps: [], totalDays: 0, finalDose: 0, floor: 0 };
   const floor = Number(((startDose * finalPct) / 100).toFixed(4));
   const steps = [];
   let current = startDose;
@@ -273,8 +274,20 @@ function warningsHtml(c, cfg) {
   return out.join("");
 }
 
+/** Single entry point so the view and its buttons always agree on the plan. */
+function planFor(c, cfg) {
+  return buildPlan({
+    startDose: Number(cfg.dose) || 0,
+    freq: Math.max(1, Number(cfg.freq) || 1),
+    stepPct: Number(cfg.stepPct) || 10,
+    holdDays: Math.max(1, Number(cfg.holdDays) || 14),
+    finalPct: Number(cfg.finalPct) || 12.5,
+    halfLife: Number(c?.pk?.halfLife) || 0,
+  });
+}
+
 function planHtml(c, cfg) {
-  const plan = buildPlan({ ...cfg, halfLife: Number(c.pk?.halfLife) || 0 });
+  const plan = planFor(c, cfg);
   return `<div class="stack" style="gap:14px">
     ${summaryHtml(c, plan, cfg)}
     <div class="card">
@@ -474,7 +487,7 @@ export const taper = {
 
       const c = current();
       const cfg = cfgOf();
-      const plan = buildPlan({ ...cfg, halfLife: Number(c.pk?.halfLife) || 0 });
+      const plan = planFor(c, cfg);
 
       if (act === "copy") {
         copyText(planText(c, plan, cfg), "Taper plan copied");
