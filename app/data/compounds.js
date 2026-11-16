@@ -4,8 +4,10 @@ import { COMPOUNDS_A } from "./compounds-a.js";
 import { COMPOUNDS_B } from "./compounds-b.js";
 import { COMPOUNDS_C } from "./compounds-c.js";
 import { COMPOUNDS_D } from "./compounds-d.js";
+import { COMPOUNDS_E } from "./compounds-e.js";
+import { COMPOUNDS_F } from "./compounds-f.js";
 
-export const COMPOUNDS = [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COMPOUNDS_D]
+export const COMPOUNDS = [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COMPOUNDS_D, ...COMPOUNDS_E, ...COMPOUNDS_F]
   .filter((c) => c && c.id && c.name)
   .map((c) => ({
     aliases: [],
@@ -29,6 +31,8 @@ export const COMPOUNDS = [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COM
   }));
 
 export const COMPOUND_BY_ID = new Map(COMPOUNDS.map((c) => [c.id, c]));
+
+export const COMPOUND_COUNT = COMPOUNDS.length;
 
 export function getCompound(id) {
   return COMPOUND_BY_ID.get(String(id || "").toLowerCase()) || null;
