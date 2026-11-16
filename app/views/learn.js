@@ -384,6 +384,24 @@ function sourcesHtml(card) {
   </div>`;
 }
 
+async function loadCardSources(card) {
+  if (!card) return;
+  const q = queryForCard(card);
+  session.src = { id: card.id, status: "loading", papers: [], error: null };
+  repaint();
+  try {
+    const res = await searchPapers(q, { retmax: 3, scope: "all" });
+    // Bail if the user already moved to another card.
+    if (!session.src || session.src.id !== card.id) return;
+    session.src = { id: card.id, status: "done", papers: res.papers, total: res.total, error: null };
+  } catch (err) {
+    if (!session.src || session.src.id !== card.id) return;
+    const msg = err && err.kind === "rate" ? "NCBI rate limit — wait a few seconds and retry." : String((err && err.message) || err || "network error");
+    session.src = { id: card.id, status: "error", papers: [], error: msg };
+  }
+  repaint();
+}
+
 function sessionBody() {
   if (!session.started) startSession(session.filter);
   const { queue, idx } = session;
