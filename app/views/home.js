@@ -76,24 +76,29 @@ export function render() {
     "NeuroDifference"
   )}
 
+  ${tickerHtml()}
+
   <div class="grid" style="gap:14px;margin-bottom:26px">
-    <section class="card glow" style="padding:18px">
+    <section class="card hero-card spot" style="padding:18px">
       <div class="row between wrap" style="gap:14px;align-items:flex-start">
-        <div class="stack" style="gap:8px;min-width:0;flex:1">
-          <div class="row" style="gap:8px">
+        <div class="row" style="gap:13px;align-items:flex-start;min-width:0;flex:1 1 290px">
+          ${orb(52)}
+          <div class="stack" style="gap:8px;min-width:0">
+          <div class="row wrap" style="gap:6px">
             <span class="chip chip-accent">${icon("sparkles", 12)} Level ${lvl.level}</span>
             ${s.profile.streak ? `<span class="chip">${icon("zap", 12)} ${s.profile.streak}-day streak</span>` : ""}
             <span class="chip">${(s.profile.xp || 0).toLocaleString()} XP</span>
           </div>
           <h2 style="font-size:19px;letter-spacing:-.025em">${next ? `${next.lesson.title}` : "You finished every lesson"}</h2>
-          <p class="small muted" style="max-width:56ch">
+          <p class="small muted" style="line-height:1.55;max-width:56ch">
             ${
               next
-                ? `${esc(next.course.title)} · ${next.lesson.minutes} min · +${next.lesson.xp} XP`
+                ? `${esc(next.course.title)} · ${next.lesson.minutes} min · <span class="mono" style="color:var(--accent)">+${next.lesson.xp} XP</span>`
                 : "Nice. Review your flashcards to keep the mechanisms sharp."
             }
           </p>
           <div style="max-width:340px">${metric("Level progress", `${lvl.into} / ${lvl.need} XP`, lvl.progress)}</div>
+          </div>
         </div>
         <div class="row wrap" style="gap:8px;flex:none">
           <a class="btn primary" href="${next ? `#/learn/${next.course.id}/${next.lesson.id}` : "#/cards"}">
