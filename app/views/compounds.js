@@ -4,7 +4,9 @@ import { esc, icon, store, fmt, toast, copyText, evidenceChip, EVIDENCE, emptySt
 import { COMPOUNDS, COMPOUND_BY_ID, CLASSES, searchCompounds, getCompound, pubmedUrl, ALL_TAGS } from "../data/compounds.js";
 import { SYSTEMS } from "../data/neuro.js";
 import { checkInteractions, worstSeverity, SEVERITY } from "../data/interactions.js";
-import { pageHead, compoundCard, classColor, backLink, callout, lineChart } from "./ui.js";
+import { pageHead, compoundCard, classColor, backLink, callout, lineChart, liveBadge } from "./ui.js";
+import { searchPapers, LINK as PM_LINK } from "../lib/pubmed.js";
+import { paperCard } from "./research.js";
 
 const EV_ORDER = ["strong", "moderate", "limited", "preclinical", "anecdotal"];
 
@@ -467,21 +469,75 @@ function panelResearch(c) {
   return `
   <div class="stack" style="gap:14px">
     <div class="card">
-      <div class="card-head"><h3 style="font-size:14px">Primary literature</h3></div>
-      <p class="small muted" style="line-height:1.6;margin-bottom:12px">
-        This entry is a summary, not a source. Read the evidence yourself — start with reviews, then check whether the trials actually measured what you care about.
+      <div class="card-head">
+        <h3 style="font-size:14px">Live from PubMed</h3>
+        <span class="spacer"></span>
+        ${liveBadge("api")}
+      </div>
+      <p class="tiny dim" style="line-height:1.55;margin-bottom:10px">
+        Fetched from NCBI the moment you opened this tab. Nothing here is bundled into the app or written to storage.
       </p>
-      <div class="stack" style="gap:8px">
-        <a class="btn soft sm" href="${pubmedUrl(q)}" target="_blank" rel="noopener noreferrer">${icon("external", 14)} PubMed: “${esc(q)}”</a>
-        <a class="btn ghost sm" href="${pubmedUrl(`"${c.name}" review`)}" target="_blank" rel="noopener noreferrer">${icon("external", 14)} Reviews for ${esc(c.name)}</a>
-        <a class="btn ghost sm" href="https://scholar.google.com/scholar?q=${encodeURIComponent(`"${c.name}" randomized controlled trial`)}" target="_blank" rel="noopener noreferrer">${icon("external", 14)} Google Scholar: RCTs</a>
+      <div data-live="${esc(q)}" data-token="">
+        <div class="stack" style="gap:9px">
+          <div class="skeleton" style="height:14px;width:78%"></div>
+          <div class="skeleton" style="height:11px;width:46%"></div>
+          <div class="skeleton" style="height:11px;width:92%"></div>
+          <div class="skeleton" style="height:11px;width:64%"></div>
+        </div>
       </div>
     </div>
+
+    <div class="card tight">
+      <div class="eyebrow" style="margin-bottom:7px">Search it yourself</div>
+      <div class="stack" style="gap:8px">
+        <a class="btn soft sm" href="${PM_LINK.search(q)}" target="_blank" rel="noopener noreferrer">${icon("external", 14)} PubMed: “${esc(q)}”</a>
+        <a class="btn ghost sm" href="${PM_LINK.search(`"${c.name}" AND (review[pt] OR meta-analysis[pt])`)}" target="_blank" rel="noopener noreferrer">${icon("book", 14)} Reviews for ${esc(c.name)}</a>
+        <a class="btn ghost sm" href="#/research?compound=${encodeURIComponent(q)}">${icon("microscope", 14)} Open the Research tab</a>
+      </div>
+    </div>
+
     <div class="card tight">
       <div class="row" style="gap:8px;margin-bottom:6px">${evidenceChip(c.evidence)}<span class="eyebrow">Evidence grade</span></div>
       <p class="small muted" style="line-height:1.6">${esc(EVIDENCE[c.evidence]?.label || "Unrated")} — assigned from the quality and consistency of human data, weighting controlled trials over mechanistic plausibility.</p>
     </div>
   </div>`;
+}
+
+/** Fetch the live PubMed block inside the research panel. */
+async function hydrateLive(host, c) {
+  const box = host && host.querySelector ? host.querySelector("[data-live]") : null;
+  if (!box) return;
+  const q = c.pubmed || c.name;
+  const token = String(Math.random()).slice(2);
+  box.dataset.token = token;
+  box.innerHTML = `<div class="stack" style="gap:9px">
+      <div class="skeleton" style="height:14px;width:78%"></div>
+      <div class="skeleton" style="height:11px;width:46%"></div>
+      <div class="skeleton" style="height:11px;width:92%"></div>
+      <div class="skeleton" style="height:11px;width:64%"></div>
+    </div>`;
+
+  try {
+    const res = await searchPapers(q, { retmax: 4 });
+    if (box.dataset.token !== token) return;
+    if (!res.papers.length) {
+      box.innerHTML = `<p class="small dim" style="line-height:1.6">PubMed returned no records for “${esc(q)}”. That usually means the stored query is too specific — try the plain compound name.</p>
+        <a class="btn ghost xs" href="#/research?compound=${encodeURIComponent(c.name)}" style="margin-top:8px">${icon("search", 13)} Search “${esc(c.name)}”</a>`;
+      return;
+    }
+    box.innerHTML = `<div class="stack" style="gap:10px">${res.papers.map((p, i) => paperCard(p, i)).join("")}</div>
+      <div class="row between wrap" style="gap:8px;margin-top:11px">
+        <span class="tiny dim">${res.total.toLocaleString()} records · ${res.ms} ms · live, not stored</span>
+        <a class="btn ghost xs" href="#/research?compound=${encodeURIComponent(q)}">Open in Research ${icon("arrowRight", 13)}</a>
+      </div>`;
+  } catch (err) {
+    if (box.dataset.token !== token) return;
+    box.innerHTML = `<p class="small" style="color:var(--warn);line-height:1.6">${icon("wifiOff", 14)} Could not reach NCBI${err && err.message ? ` — ${esc(err.message)}` : ""}.</p>
+      <div class="row wrap" style="gap:8px;margin-top:9px">
+        <button class="btn soft xs" data-live-retry>${icon("refresh", 13)} Retry</button>
+        <a class="btn ghost xs" href="${PM_LINK.search(q)}" target="_blank" rel="noopener noreferrer">${icon("external", 13)} PubMed</a>
+      </div>`;
+  }
 }
 
 function findingRow(f) {
@@ -571,6 +627,13 @@ export const detail = {
         b.setAttribute("aria-selected", String(on));
       });
       panelEl.innerHTML = panel(c, detailState.tab);
+      if (detailState.tab === "research") hydrateLive(panelEl, c);
+    });
+
+    if (detailState.tab === "research") hydrateLive(panelEl, c);
+
+    panelEl?.addEventListener("click", (ev) => {
+      if (ev.target.closest("[data-live-retry]")) hydrateLive(panelEl, c);
     });
 
     root.addEventListener("click", (ev) => {
