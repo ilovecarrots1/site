@@ -432,7 +432,7 @@ export const COMPOUNDS_F = [
     ],
     effects: {
       good: ["IGF-1 elevation", "Improved sleep quality", "Appetite", "Bone density in trial subgroups"],
-      bad: ["Fasting glucose and insulin resistance rise", "Water retention', 'Lethargy", "Hunger"],
+      bad: ["Fasting glucose and insulin resistance rise", "Water retention", "Lethargy", "Hunger"],
     },
     flags: ["gh-axis", "ghrelin-agonist", "oral", "insulin-resistance"],
     warnings: [
@@ -501,8 +501,7 @@ export const COMPOUNDS_F = [
     summary:
       "A modified IGF-1 with an arginine substitution and extended N-terminus that reduces IGFBP binding, extending its half-life from minutes to hours. It is far more potent per microgram than endogenous IGF-1, including at the hypoglycaemia risk level.",
     moa: [
-      "Binds the IGF-1 receptor tyrosine kinase with high affinity, activating PI3K-AKT and MAPK
-",
+      "Binds the IGF-1 receptor tyrosine kinase with high affinity, activating PI3K-AKT and MAPK",
       "Reduced binding to IGFBP-3 and ALS means more free, receptor-available hormone",
       "Drives mTORC1-dependent protein synthesis, myoblast proliferation and glucose uptake",
       "Suppresses GH secretion through negative feedback at the pituitary",
@@ -1285,8 +1284,7 @@ export const COMPOUNDS_F = [
       "A name used on social media for a blended product claimed to increase height. The contents are not disclosed with assay data, and the biology it appeals to - growth-plate cartilage expansion - is closed in anyone past puberty.",
     moa: [
       "Marketed on the premise of GH and IGF-1 elevation plus 'bone lengthening'",
-      "No disclosed composition, assay or dose: the mechanism cannot be evaluated
-",
+      "No disclosed composition, assay or dose: the mechanism cannot be evaluated",
       "Linear bone growth requires open epiphyseal growth plates, which fuse after puberty regardless of hormone exposure",
     ],
     targets: [
