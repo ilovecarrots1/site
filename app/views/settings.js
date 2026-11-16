@@ -6,7 +6,7 @@ import { SYSTEMS } from "../data/neuro.js";
 import { TOTAL_LESSONS, FLASHCARDS } from "../data/learn.js";
 import { PAIR_RULES, FLAG_RULES } from "../data/interactions.js";
 import { deckStats } from "../srs.js";
-import { pageHead, callout } from "./ui.js";
+import { pageHead, callout, subscribePlate } from "./ui.js";
 
 const ACCENTS = [
   ["violet", "Violet", "#8b7bff"],
@@ -70,6 +70,8 @@ export const settings = {
     return `
     ${pageHead("Settings", "Everything is stored locally in this browser. No account, no sync, no tracking.", "")}
 
+    <div style="margin-bottom:16px">${subscribePlate()}</div>
+
     <div class="split">
       <div class="col" style="gap:16px">
 
@@ -95,6 +97,11 @@ export const settings = {
             title: "Motion",
             sub: "Pulse animations on the brain map and hover transitions. Turn off to save battery.",
             control: `<label class="switch"><input type="checkbox" id="set-motion" ${st.motion !== false ? "checked" : ""}><span></span></label>`,
+          })}
+          ${settingRow({
+            title: "Subscribe plate",
+            sub: "The “free access” banner with the Telegram link. You can hide it — nothing in the app is locked either way.",
+            control: `<label class="switch"><input type="checkbox" id="set-sub" ${st.subHidden ? "" : "checked"}><span></span></label>`,
           })}
           ${settingRow({
             title: "Text size",
@@ -229,6 +236,12 @@ export const settings = {
     root.querySelector("#set-motion")?.addEventListener("change", (ev) => {
       store.set("settings.motion", ev.target.checked);
       bump();
+    });
+
+    root.querySelector("#set-sub")?.addEventListener("change", (ev) => {
+      store.set("settings.subHidden", !ev.target.checked);
+      toast(ev.target.checked ? "Subscribe plate is back" : "Subscribe plate hidden", "info");
+      rerender();
     });
 
     const scale = root.querySelector("#set-scale");
