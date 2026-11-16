@@ -26,6 +26,7 @@ import * as mapView from "./views/map.js";
 import * as calculatorView from "./views/calculator.js";
 import * as brainView from "./views/brain.js";
 import * as conditionsView from "./views/conditions.js";
+import * as bloodworkView from "./views/bloodwork.js";
 import { PATHWAYS } from "./data/atlas.js";
 import { ORGANS } from "./data/organs.js";
 import { CONDITIONS } from "./data/conditions.js";
@@ -50,6 +51,7 @@ const NAV = [
     section: "Clinic",
     items: [
       { id: "conditions", label: "Conditions", href: "#/conditions", icon: "shield", count: () => CONDITIONS.length },
+      { id: "bloodwork", label: "Bloodwork", href: "#/bloodwork", icon: "trend" },
     ],
   },
   {
@@ -447,6 +449,11 @@ function matchRoute(segs) {
     const key = String(b).toLowerCase();
     const sys = SYSTEM_BY_ID.get(key);
     return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
+  }
+  if (a === "bloodwork") {
+    const view = { render: bloodworkView.render, mount: bloodworkView.mount };
+    if (!b) return { nav: "bloodwork", title: "Bloodwork", view };
+    return { nav: "bloodwork", title: "Marker", view, params: { id: String(b).toLowerCase() } };
   }
   if (a === "conditions") {
     const view = { render: conditionsView.render, mount: conditionsView.mount };
