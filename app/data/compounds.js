@@ -7,6 +7,18 @@ import { COMPOUNDS_D } from "./compounds-d.js";
 import { COMPOUNDS_E } from "./compounds-e.js";
 import { COMPOUNDS_F } from "./compounds-f.js";
 
+/** Every dose row must carry the same message: a reference point, not advice. */
+export const DOSE_DISCLAIMER = "Reference point for education only — not a recommendation.";
+
+const HAS_DISCLAIMER = /education only|not a recommendation|reference point|guideline|lower than/i;
+
+function doseNote(note) {
+  const n = String(note || "").trim();
+  if (!n) return DOSE_DISCLAIMER;
+  if (HAS_DISCLAIMER.test(n)) return n;
+  return n + (/[.!?]$/.test(n) ? " " : ". ") + DOSE_DISCLAIMER;
+}
+
 export const COMPOUNDS = Array.from(
   [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COMPOUNDS_D, ...COMPOUNDS_E, ...COMPOUNDS_F].reduce((map, c) => {
     // Later entries win, so a newer, richer record replaces an older stub with the same id.
@@ -25,6 +37,7 @@ export const COMPOUNDS = Array.from(
     tags: [],
     doses: [],
     ...c,
+    doses: ((c && c.doses) || []).map((d) => ({ ...d, note: doseNote(d.note) })),
     pk: {
       halfLife: null,
       tmax: null,
