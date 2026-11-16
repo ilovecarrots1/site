@@ -136,7 +136,7 @@ function row(marker) {
 
 /* ------------------------------------------------------------------ index */
 
-export function render(ctx) {
+function indexHtml(ctx) {
   const q = (ctx && ctx.query) || {};
   const group = q.group ? String(q.group) : "";
   const filled = MARKERS.filter((m) => history(m.id).length).length;
@@ -185,6 +185,12 @@ export function render(ctx) {
       <b>Reference intervals, not targets.</b> Labs use different assays and intervals, and timing changes results — draw fasted, in the morning, and at least 48 h after hard training. Values here are adult general-population ranges kept universal on purpose; where male and female physiology differ the marker note says so.
     </div>
   </div>`;
+}
+
+export function render(ctx) {
+  const id = ctx && ctx.params && ctx.params.id;
+  if (id) return detail(String(id));
+  return indexHtml(ctx);
 }
 
 export function mount(root, ctx) {
