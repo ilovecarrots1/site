@@ -1,6 +1,6 @@
 /* NeuroDifference service worker — app-shell cache, offline-first reads. */
 
-const VERSION = "nd-v2.1.5";
+const VERSION = "nd-v2.1.6";
 const SHELL = [
   "./",
   "./index.html",
