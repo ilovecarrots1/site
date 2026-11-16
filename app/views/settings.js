@@ -145,13 +145,33 @@ export const settings = {
         <section class="card">
           <div class="card-head"><h3>Appearance</h3><span class="spacer"></span><span class="tag">applies instantly</span></div>
           <div class="block">
+            <div class="eyebrow" style="margin-bottom:7px">Skin</div>
+            <div class="skin-pick" id="set-skin">
+              ${SKINS.map(
+                ([key, label, sub]) => `<button class="skin-card ${(st.skin || "aurora") === key ? "on" : ""}" data-skin="${key}">
+                  <span class="skin-swatch" data-skin-swatch="${key}"></span>
+                  <span class="skin-name">${label}</span>
+                  <span class="skin-sub tiny dim">${sub}</span>
+                </button>`
+              ).join("")}
+            </div>
+          </div>
+          <div class="block">
             <div class="eyebrow" style="margin-bottom:7px">Accent</div>
             <div class="row wrap" style="gap:7px" id="set-accent">
               ${ACCENTS.map(
-                ([key, label, hex]) => `<button class="chip chip-btn ${st.accent === key ? "on" : ""}" data-accent="${key}">
+                ([key, label, hex]) => `<button class="chip chip-btn ${!st.accentHex && (st.accent || "violet") === key ? "on" : ""}" data-accent="${key}">
                   <span class="dot" style="background:${hex}"></span>${label}
                 </button>`
               ).join("")}
+            </div>
+            <div class="row wrap" style="gap:8px;margin-top:9px;align-items:center">
+              <span class="hs-swatch" id="set-hex-swatch" style="background:${esc(accentTokens(st.accentHex) ? accentTokens(st.accentHex).accent : "#8b7bff")}"></span>
+              <input class="input mono" id="set-hex" type="text" spellcheck="false" autocapitalize="off" autocomplete="off"
+                placeholder="#8b7bff" maxlength="7" value="${esc(st.accentHex || "")}" style="width:104px;font-size:12px;text-align:center">
+              <button class="btn soft xs" id="set-hex-apply" type="button">Apply</button>
+              <button class="btn ghost xs" id="set-hex-clear" type="button">Auto</button>
+              <span class="tiny dim" id="set-hex-note">${st.accentHex ? "custom" : "luminance-normalised on apply"}</span>
             </div>
           </div>
           <div class="block">
