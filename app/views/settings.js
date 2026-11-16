@@ -304,12 +304,63 @@ export const settings = {
       window.dispatchEvent(new CustomEvent("nd:appearance"));
     };
 
+    root.querySelector("#set-skin")?.addEventListener("click", (ev) => {
+      const b = ev.target.closest("[data-skin]");
+      if (!b) return;
+      store.set("settings.skin", b.dataset.skin);
+      bump();
+      root.querySelectorAll("#set-skin [data-skin]").forEach((el) => el.classList.toggle("on", el === b));
+    });
+
     root.querySelector("#set-accent")?.addEventListener("click", (ev) => {
       const b = ev.target.closest("[data-accent]");
       if (!b) return;
       store.set("settings.accent", b.dataset.accent);
+      store.set("settings.accentHex", "");
       bump();
       root.querySelectorAll("#set-accent [data-accent]").forEach((el) => el.classList.toggle("on", el === b));
+      const hex = root.querySelector("#set-hex");
+      if (hex) hex.value = "";
+      const sw = root.querySelector("#set-hex-swatch");
+      if (sw) sw.style.background = ACCENTS.find(([k]) => k === b.dataset.accent)?.[2] || "#8b7bff";
+      const note = root.querySelector("#set-hex-note");
+      if (note) note.textContent = "preset";
+    });
+
+    const hexApply = () => {
+      const input = root.querySelector("#set-hex");
+      if (!input) return;
+      const t = accentTokens(input.value);
+      if (!t) {
+        toast("Use a hex colour like #8b7bff", "info");
+        return;
+      }
+      store.set("settings.accentHex", t.accent);
+      store.set("settings.accent", "custom");
+      input.value = t.accent;
+      bump();
+      root.querySelectorAll("#set-accent [data-accent]").forEach((el) => el.classList.remove("on"));
+      const sw = root.querySelector("#set-hex-swatch");
+      if (sw) sw.style.background = t.accent;
+      const note = root.querySelector("#set-hex-note");
+      if (note) note.textContent = t.accent + " · L " + Math.round(t.lum * 100) + "%";
+    };
+    root.querySelector("#set-hex-apply")?.addEventListener("click", hexApply);
+    root.querySelector("#set-hex")?.addEventListener("change", hexApply);
+
+    root.querySelector("#set-hex-clear")?.addEventListener("click", () => {
+      store.set("settings.accentHex", "");
+      if (store.data.settings.accent === "custom") store.set("settings.accent", "violet");
+      const input = root.querySelector("#set-hex");
+      if (input) input.value = "";
+      bump();
+      root.querySelectorAll("#set-accent [data-accent]").forEach((el) =>
+        el.classList.toggle("on", el.dataset.accent === (store.data.settings.accent || "violet"))
+      );
+      const sw = root.querySelector("#set-hex-swatch");
+      if (sw) sw.style.background = "#8b7bff";
+      const note = root.querySelector("#set-hex-note");
+      if (note) note.textContent = "preset";
     });
 
     root.querySelector("#set-density")?.addEventListener("click", (ev) => {
