@@ -142,7 +142,8 @@ function bottomNavHtml() {
 }
 
 function mountShell(root) {
-  root.innerHTML = `<div class="app">
+  root.innerHTML = `<div class="bgfx" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="app">
       ${sidebarHtml()}
       <div class="main">
         ${topbarHtml()}
