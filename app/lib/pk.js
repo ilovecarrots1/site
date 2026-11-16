@@ -19,18 +19,18 @@ export function keFrom(halfLife) {
  */
 export function kaFrom(halfLife, tmax) {
   const ke = keFrom(halfLife);
-  const t = Math.max(tmax || DEFAULT_TMAX, 0.1);
-  // tmax ≈ ln(ka/ke) / (ka - ke); solve by bisection over a sane range.
-  const f = (ka) => (Math.log(ka / ke) || 0) / (ka - ke) - t;
-  let lo = Math.max(ke * 1.05, 0.05);
-  let hi = Math.max(ke * 6, 2.5);
-  if (f(lo) * f(hi) > 0) return Math.max(ke * 1.6, 1.2);
-  for (let i = 0; i < 40; i++) {
+  const t = Math.max(tmax || DEFAULT_TMAX, 0.05);
+  // tmax = ln(ka/ke) / (ka - ke); with r = ka/ke this is ln(r)/((r-1)ke) = t.
+  const m = Math.min(t * ke, 0.95);
+  let lo = 1 + 1e-6;
+  let hi = 1e6;
+  for (let i = 0; i < 60; i++) {
     const mid = (lo + hi) / 2;
-    if (f(lo) * f(mid) <= 0) hi = mid;
-    else lo = mid;
+    const g = Math.log(mid) / (mid - 1);
+    if (g > m) lo = mid;
+    else hi = mid;
   }
-  return (lo + hi) / 2;
+  return Math.max(((lo + hi) / 2) * ke, ke * 1.02);
 }
 
 /** Unit single-dose response, normalised to its own peak. */
