@@ -162,7 +162,7 @@ export const settings = {
             <p class="small muted" style="line-height:1.6">NeuroDifference is a personal study tool: an evidence-graded compound encyclopedia, a transmitter atlas, a pharmacokinetic sandbox and a spaced-repetition course set. It is not a medical device.</p>
             ${callout("danger", "Not medical advice", "Nothing here is a recommendation to take, combine, taper or stop any substance. Dosages are reference figures from the literature, not prescriptions. Talk to a clinician who knows your history.")}
             <div class="row wrap" style="gap:5px;margin-top:2px">
-              <span class="chip">v2.1.0</span>
+              <span class="chip">v2.2.0</span>
               <span class="chip">${COMPOUNDS.length} compounds</span>
               <span class="chip">${SYSTEMS.length} systems</span>
               <span class="chip">${TOTAL_LESSONS} lessons</span>
