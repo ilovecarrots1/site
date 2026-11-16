@@ -4,7 +4,7 @@ import { esc, icon, store, fmt, toast, copyText, evidenceChip, EVIDENCE, emptySt
 import { COMPOUNDS, COMPOUND_BY_ID, CLASSES, searchCompounds, getCompound, pubmedUrl, ALL_TAGS } from "../data/compounds.js";
 import { SYSTEMS } from "../data/neuro.js";
 import { checkInteractions, worstSeverity, SEVERITY } from "../data/interactions.js";
-import { pageHead, compoundCard, classColor, backLink, callout, lineChart, liveBadge } from "./ui.js";
+import { pageHead, compoundCard, classColor, backLink, callout, lineChart, liveBadge, mechFlow } from "./ui.js";
 import { searchPapers, LINK as PM_LINK } from "../lib/pubmed.js";
 import { paperCard } from "./research.js";
 
@@ -280,6 +280,19 @@ function panelMechanism(c) {
   const targets = c.targets || [];
   return `
   <div class="stack" style="gap:16px">
+    ${
+      (c.moa || []).length
+        ? `<div class="card">
+            <div class="card-head"><h3 style="font-size:14px">Mechanism chain</h3><span class="spacer"></span>${liveBadge("animated")}</div>
+            ${mechFlow(
+              (c.moa || []).slice(0, 4).map((m, i) => ({
+                icon: i === 0 ? "target" : i === 1 ? "dna" : i === 2 ? "activity" : "sparkles",
+                title: m,
+              }))
+            )}
+          </div>`
+        : ""
+    }
     ${
       (c.moa || []).length
         ? `<div class="card tight">
