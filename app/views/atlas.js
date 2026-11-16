@@ -69,7 +69,7 @@ function compoundChips(ids, { limit = 0 } = {}) {
         const c = COMPOUND_BY_ID.get(id);
         return `<a class="chip chip-btn chip-accent" href="#/compounds/${esc(id)}">${esc(c.name)}</a>`;
       })
-      .join("") + (rest > 0 ? `<a class="chip chip-btn" href="#/atlas/${esc("")}">+${rest}</a>` : "")
+      .join("") + (rest > 0 ? `<span class="chip chip-xs dim">+${rest}</span>` : "")
   );
 }
 
@@ -136,7 +136,7 @@ export function index(ctx) {
       ${callout(
         "info",
         "How to read this",
-        "Each pathway is a chain of actual enzymatic events. The <b>rate-limiting</b> step is the one that sets overall flux, so it is normally where drugs act. Cofactors matter: a pathway can stall on a vitamin deficiency with no drug involved at all."
+        "Each pathway is a chain of actual enzymatic events. The rate-limiting step sets overall flux, so it is normally where drugs act. Cofactors matter too: a pathway can stall on a vitamin deficiency with no drug involved at all."
       )}
       <section class="card">
         <div class="card-head"><h3>Molecular targets</h3><span class="spacer"></span><span class="tiny dim">${TARGETS.length}</span></div>
