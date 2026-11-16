@@ -1273,5 +1273,89 @@ export const COMPOUNDS_F = [
     tags: ["lashes", "glaucoma", "cosmetic"],
     pubmed: "bimatoprost eyelash growth FP receptor",
   },
+  {
+    id: "lux-growth-stack",
+    name: "Lux growth stack (social-media blend)",
+    aliases: ["Lux", "TikTok height stack", "growth stack"],
+    cls: "Proprietary blend",
+    subcls: "Unverified consumer blend",
+    status: "Supplement",
+    evidence: "anecdotal",
+    summary:
+      "A name used on social media for a blended product claimed to increase height. The contents are not disclosed with assay data, and the biology it appeals to - growth-plate cartilage expansion - is closed in anyone past puberty.",
+    moa: [
+      "Marketed on the premise of GH and IGF-1 elevation plus 'bone lengthening'",
+      "No disclosed composition, assay or dose: the mechanism cannot be evaluated
+",
+      "Linear bone growth requires open epiphyseal growth plates, which fuse after puberty regardless of hormone exposure",
+    ],
+    targets: [
+      { name: "Growth plate chondrocytes", action: "claimed", note: "fused after puberty in both sexes" },
+      { name: "GH/IGF-1 axis", action: "claimed", note: "no verified composition" },
+    ],
+    pk: {
+      halfLife: null,
+      tmax: null,
+      onset: null,
+      duration: null,
+      metabolism: "unknown",
+      excretion: "unknown",
+    },
+    doses: [],
+    effects: {
+      good: ["Placebo expectation and behavioural change (sleep, food) may help marginally"],
+      bad: ["Unverified ingredients", "Contamination risk", "Cost", "False hope in adolescents"],
+    },
+    flags: ["proprietary-blend", "consumer", "unverified", "marketing"],
+    warnings: [
+      "Height cannot be increased after epiphyseal fusion by any of the mechanisms these blends claim",
+      "Proprietary blends conceal doses, which makes risk assessment impossible",
+      "Actual GH or IGF-1 use in an adolescent with open plates can cause acromegalic and metabolic harm",
+      "Anyone genuinely concerned about growth should see a paediatric endocrinologist rather than buy a blend",
+    ],
+    tags: ["consumer", "marketing", "unverified"],
+    pubmed: "height increase growth plate epiphyseal fusion growth hormone adults",
+  },
+  {
+    id: "rostmax-growth-stack",
+    name: "RostMax growth stack (social-media blend)",
+    aliases: ["RostMax", "rost max", "height stack"],
+    cls: "Proprietary blend",
+    subcls: "Unverified consumer blend",
+    status: "Supplement",
+    evidence: "anecdotal",
+    summary:
+      "Another branded height stack circulated on short-video platforms, usually advertised alongside posture routines and stretching. No formulation, trial or toxicity data are published under this name.",
+    moa: [
+      "Advertising invokes GH secretagogues, amino acids and 'bone nutrition' without a formulation list",
+      "Any measured height change is more plausibly posture, diurnal disc variation or measurement error than bone growth",
+      "Diurnal height variation alone is up to 1-2 cm and reverses overnight",
+    ],
+    targets: [
+      { name: "Spinal posture", action: "possible indirect", note: "the plausible source of apparent change" },
+      { name: "Growth plate", action: "claimed, unavailable", note: "fused in adulthood" },
+    ],
+    pk: {
+      halfLife: null,
+      tmax: null,
+      onset: null,
+      duration: null,
+      metabolism: "unknown",
+      excretion: "unknown",
+    },
+    doses: [],
+    effects: {
+      good: ["Encourages sleep and stretching habits, which are independently useful"],
+      bad: ["Unverified ingredients", "Cost", "Delayed endocrine assessment in adolescents"],
+    },
+    flags: ["proprietary-blend", "consumer", "unverified", "marketing"],
+    warnings: [
+      "No published formulation or safety data under this brand name",
+      "Adolescents with genuine growth concerns need IGF-1, TSH and bone-age assessment, not a supplement",
+      "Height claims that rely on before/after photos are unfalsifiable and not evidence",
+    ],
+    tags: ["consumer", "marketing", "unverified"],
+    pubmed: "growth hormone adult height epiphyseal closure evidence",
+  },
 ];
 // END_F
