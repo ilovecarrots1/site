@@ -60,6 +60,9 @@ Secondary leftovers:
 - `index-standalone.html` - single-file build (~1.3 MB). Kept as a
   drag-and-drop fallback for hosts where folders are painful.
 - `preview.html` - same app inlined, used for offline preview.
+- `promo.html` - release teaser (vertical 1080x1920, 7 scenes, ~30 s).
+  Pure CSS/JS, no assets, no deps. `?fs=1&once=1` for a clean screen
+  recording, `?rec=1` hides the control bar, `?scene=N` jumps.
 - SprintHost (`141.8.192.182`) still serves an old copy over FTP. Not the
   source of truth. Domain DNS is managed there (`ns1..ns4.sprinthost`); mail
   and FTP records stay; only apex `A`/`AAAA` + `www` `CNAME` point to GitHub.
@@ -95,7 +98,7 @@ FTP password, provider API keys, the Telegram bot token. Keep them in
 conversation state or environment, never in a tracked file. This repo is
 public.
 
-## Where we are right now — 2026-11-16
+## Where we are right now — 2026-11-17
 
 - App is **v3.0.0**, feature-complete. `#/dev/audit` must show 12/12.
 - Hosting was migrated from SprintHost to **GitHub Pages**. Repo root is the site.
@@ -104,20 +107,22 @@ public.
 - DNS verified through `dns.google`: 4x A and 4x AAAA resolve to GitHub Pages
   IPs, `www` CNAME points to `ilovecarrots1.github.io.`, there are **no CAA
   records**, and no leftover SprintHost A/AAAA entries remain.
-- **Blocked:** GitHub shows "Unavailable for your site because your domain is
-  not properly configured to support HTTPS", so Enforce HTTPS is greyed out.
-  Per GitHub docs this can take up to 24 h. If it is still grey after that:
-  clear the custom domain field -> Save -> wait 5 min -> re-enter it -> Save.
-  Plan B: temporarily delete the four AAAA records, wait for the certificate,
-  then add them back.
+- **HTTPS is live.** The Let's Encrypt certificate was issued; all of these
+  return 200 over TLS: `/`, `/manifest.json`, `/sw.js`, `/app/main.js`,
+  `/promo.html`. The earlier "domain is not properly configured to support
+  HTTPS" banner in Settings -> Pages is resolved — if Enforce HTTPS is still
+  greyed out, reload the page; the toggle should be available now.
+- `promo.html` — vertical 1080x1920 release teaser, 7 scenes, ~30 s, zero
+  deps, transform/opacity only. `?fs=1&once=1` = tap to fullscreen + one clean
+  run, `?rec=1` = hide controls, `?scene=N` = jump. Not precached by the SW.
 - The old SprintHost copy is still reachable over FTP at `141.8.192.182`
   (user `playnd`). It is a backup only. Never write its password into a file.
 
 ### Next steps for the next agent
 
-1. Verify the deploy from the shell: `dig +short A neurodifference.ru`,
-   `curl -sI https://neurodifference.ru/`, then open `#/dev/audit`,
-   `/manifest.json`, `/sw.js` and confirm 200 + correct content types.
+1. ~~Verify the deploy~~ **done 2026-11-17**: `/`, `/manifest.json`, `/sw.js`,
+   `/app/main.js`, `/promo.html` all 200 over HTTPS. Remaining check: open
+   `#/dev/audit` (12/12) and install the PWA from the custom domain.
 2. Optional: deploy `tools/ai-proxy-worker.js` with `npx wrangler deploy`
    (needs a Cloudflare account and the three secrets listed in the file).
 3. Optional: Telegram digest. Create a bot with @BotFather, then send messages
