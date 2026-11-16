@@ -1,6 +1,6 @@
 /* Learn: courses, lessons, quizzes, flashcards */
 
-import { esc, icon, md, store, toast, awardXP, touchStreak, levelFor, emptyState, fmt } from "../core.js";
+import { esc, icon, md, store, toast, awardXP, touchStreak, levelFor, emptyState, fmt, copyText } from "../core.js";
 import { COURSES, LESSON_INDEX, TOTAL_LESSONS, FLASHCARDS, systemCardCount } from "../data/learn.js";
 import { SYSTEM_BY_ID } from "../data/neuro.js";
 import { deckStats, dueCards, gradeCard, GRADES, cardState, nextIntervalPreview } from "../srs.js";
@@ -503,6 +503,20 @@ export const cards = {
     root.addEventListener("click", (ev) => {
       if (ev.target.closest('[data-act="sources"]')) {
         loadCardSources(session.queue[session.idx]);
+        return;
+      }
+      const exp = ev.target.closest('[data-act="expand"]');
+      if (exp) {
+        const abs = exp.parentElement?.querySelector("[data-abs]");
+        if (!abs) return;
+        const clamped = abs.classList.toggle("clamp");
+        exp.innerHTML = clamped ? `${icon("chevronDown", 13)} Full abstract` : `${icon("chevronUp", 13) || icon("chevronDown", 13)} Collapse`;
+        return;
+      }
+      const cite = ev.target.closest('[data-act="cite"]');
+      if (cite) {
+        const p = (session.src?.papers || []).find((x) => x.pmid === cite.dataset.pmid);
+        if (p) copyText(PM_LINK.cite(p), "Citation copied");
         return;
       }
       if (ev.target.closest('[data-act="start"]')) {
