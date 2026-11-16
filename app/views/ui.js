@@ -126,6 +126,27 @@ export function metric(label, valueText, ratio, tone = "") {
 
 const clamp01 = (n) => Math.max(0, Math.min(1, Number(n) || 0));
 
+let chartSeq = 0;
+
+/** Catmull-Rom → cubic bezier. Low tension keeps PK peaks from overshooting. */
+function smoothPath(pts, tension = 0.16) {
+  if (!pts.length) return "";
+  if (pts.length < 3) return pts.map((p, i) => `${i ? "L" : "M"}${p[0]} ${p[1]}`).join(" ");
+  let d = `M${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] || p2;
+    const c1x = p1[0] + (p2[0] - p0[0]) * tension;
+    const c1y = p1[1] + (p2[1] - p0[1]) * tension;
+    const c2x = p2[0] - (p3[0] - p1[0]) * tension;
+    const c2y = p2[1] - (p3[1] - p1[1]) * tension;
+    d += ` C${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+  return d;
+}
+
 export function callout(kind, title, body) {  const map = {
     danger: { ic: "alert", color: "var(--critical)", bg: "rgba(248,81,73,.08)", line: "rgba(248,81,73,.28)" },
     warn: { ic: "alert", color: "var(--warn)", bg: "rgba(210,153,34,.08)", line: "rgba(210,153,34,.26)" },
@@ -142,6 +163,7 @@ export function callout(kind, title, body) {  const map = {
 
 /** Simple line chart from numeric series; pure SVG, responsive. */
 export function lineChart(series, { width = 340, height = 140, yLabel = "", xTicks = [], yMax = null } = {}) {
+  const uid = `ch${++chartSeq}`;
   const padL = 30;
   const padR = 8;
   const padT = 10;
@@ -163,13 +185,23 @@ export function lineChart(series, { width = 340, height = 140, yLabel = "", xTic
     .join("");
 
   const paths = series
-    .map((s) => {
+    .map((s, si) => {
       if (!s.points.length) return "";
-      const d = s.points.map((p, i) => `${i ? "L" : "M"}${sx(p.x).toFixed(1)} ${sy(p.y).toFixed(1)}`).join(" ");
-      const area = `${d} L${sx(s.points[s.points.length - 1].x).toFixed(1)} ${padT + h} L${sx(s.points[0].x).toFixed(1)} ${padT + h} Z`;
-      return `<path class="chart-area" d="${area}" fill="${s.color}"/>
-        <path class="chart-line" d="${d}" stroke="${s.color}" ${s.dash ? 'stroke-dasharray="3 3"' : ""}/>
-        ${s.marker ? `<circle class="chart-dot" cx="${sx(s.marker.x).toFixed(1)}" cy="${sy(s.marker.y).toFixed(1)}" r="3" fill="${s.color}"/>` : ""}`;
+      const pts = s.points.map((p) => [Number(sx(p.x).toFixed(1)), Number(sy(p.y).toFixed(1))]);
+      const d = smoothPath(pts);
+      const last = pts[pts.length - 1];
+      const area = `${d} L${last[0]} ${padT + h} L${pts[0][0]} ${padT + h} Z`;
+      const gid = `${uid}-${si}`;
+      return `<defs>
+          <linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${s.color}" stop-opacity="0.34"/>
+            <stop offset="100%" stop-color="${s.color}" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path class="chart-area" d="${area}" fill="url(#${gid})"/>
+        <path class="chart-line draw" pathLength="1" d="${d}" stroke="${s.color}" ${s.dash ? 'stroke-dasharray="3 3"' : ""}/>
+        <circle class="chart-halo" cx="${last[0]}" cy="${last[1]}" r="5" fill="${s.color}" opacity="0.22"/>
+        ${s.marker ? `<circle class="chart-dot" cx="${sx(s.marker.x).toFixed(1)}" cy="${sy(s.marker.y).toFixed(1)}" r="3.2" fill="${s.color}"/>` : ""}`;
     })
     .join("");
 
