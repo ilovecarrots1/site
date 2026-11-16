@@ -92,51 +92,50 @@ html,body{height:100%;margin:0;background:#05070a;color:var(--text);font-family:
 .touch{position:absolute;width:96px;height:96px;border-radius:50%;left:12.5%;bottom:24px;margin-left:-48px;
   background:radial-gradient(closest-side,rgba(233,237,243,.30),rgba(233,237,243,.05) 70%,transparent 72%);
   border:1px solid rgba(255,255,255,.22);opacity:0}
-/* scene 2 choreography (7200ms total) */
+/* scene 2 choreography (7200ms total) — taps at 33% / 51% / 69% */
 .on .touch{animation:touchPath 7.2s var(--e-out) both}
 .on .ripple{animation:taps 7.2s linear both}
 .on .s1{animation:scr 7.2s linear both}
-.on .s2{animation:scr 7.2s linear both}
-.on .s3{animation:scr 7.2s linear both}
-.on .s4{animation:scr 7.2s linear both}
+.on .s2{animation:scr2 7.2s linear both}
+.on .s3{animation:scr3 7.2s linear both}
+.on .s4{animation:scr4 7.2s linear both}
 @keyframes touchPath{
-  0%{opacity:0;transform:translate(0,0) scale(.8)}
-  8%{opacity:1;transform:translate(0,0) scale(1)}
-  16%{transform:translate(0,0) scale(.88)}
-  28%{transform:translate(165px,0) scale(1)}
-  34%{transform:translate(165px,0) scale(.88)}
-  48%{transform:translate(330px,0) scale(1)}
-  54%{transform:translate(330px,0) scale(.88)}
-  68%{transform:translate(495px,0) scale(1)}
-  74%{transform:translate(495px,0) scale(.88)}
-  88%{opacity:1;transform:translate(495px,0) scale(1)}
-  100%{opacity:0;transform:translate(495px,0) scale(1)}
+  0%{opacity:0;transform:translate(165px,0) scale(.9)}
+  8%{opacity:1;transform:translate(165px,0) scale(1)}
+  31%{transform:translate(165px,0) scale(1)}
+  34%{transform:translate(165px,0) scale(.86)}
+  49%{transform:translate(330px,0) scale(1)}
+  52%{transform:translate(330px,0) scale(.86)}
+  67%{transform:translate(495px,0) scale(1)}
+  70%{transform:translate(495px,0) scale(.86)}
+  88%{opacity:1;transform:translate(495px,0) scale(.92)}
+  100%{opacity:0;transform:translate(495px,0) scale(.92)}
 }
 @keyframes taps{
-  0%,14%{opacity:0;transform:scale(.2)}
-  16%{opacity:.85;transform:scale(.2)}
-  30%{opacity:0;transform:scale(3.4)}
-  32%,48%{opacity:0}
-  50%{opacity:.85;transform:scale(.2)}
-  64%{opacity:0;transform:scale(3.4)}
-  66%,70%{opacity:0;transform:scale(.2)}
-  72%{opacity:0;transform:scale(.2)}
-  74%{opacity:.85;transform:scale(.2)}
-  88%{opacity:0;transform:scale(3.4)}
-  100%{opacity:0;transform:scale(.2)}
+  0%,30%{opacity:0;transform:translate(165px,0) scale(.2)}
+  33%{opacity:.9;transform:translate(165px,0) scale(.2)}
+  43%{opacity:0;transform:translate(165px,0) scale(3.2)}
+  49%{opacity:0;transform:translate(330px,0) scale(.2)}
+  51%{opacity:.9;transform:translate(330px,0) scale(.2)}
+  61%{opacity:0;transform:translate(330px,0) scale(3.2)}
+  67%{opacity:0;transform:translate(495px,0) scale(.2)}
+  69%{opacity:.9;transform:translate(495px,0) scale(.2)}
+  79%{opacity:0;transform:translate(495px,0) scale(3.2)}
+  100%{opacity:0;transform:translate(495px,0) scale(.2)}
 }
 @keyframes scr{
-  0%,12%{opacity:1;transform:translateY(0)}
-  16%,100%{opacity:0;transform:translateY(-18px)}
+  0%,30%{opacity:1;transform:translateY(0)}
+  34%,100%{opacity:0;transform:translateY(-18px)}
 }
-.on .s2{animation-name:scr2}
-@keyframes scr2{0%,24%{opacity:0;transform:translateY(26px)}30%,44%{opacity:1;transform:translateY(0)}50%,100%{opacity:0;transform:translateY(-18px)}}
-.on .s3{animation-name:scr3}
-@keyframes scr3{0%,44%{opacity:0;transform:translateY(26px)}50%,62%{opacity:1;transform:translateY(0)}68%,100%{opacity:0;transform:translateY(-18px)}}
-.on .s4{animation-name:scr4}
-@keyframes scr4{0%,62%{opacity:0;transform:translateY(26px)}68%,88%{opacity:1;transform:translateY(0)}94%,100%{opacity:0;transform:translateY(-14px)}}
-.on .nav .it{animation:navOn 7.2s linear both}
-@keyframes navOn{0%,14%{color:var(--text-3)}16%,28%{color:var(--accent)}30%,46%{color:var(--text-3)}48%,60%{color:var(--accent)}62%,72%{color:var(--text-3)}74%,90%{color:var(--accent)}92%,100%{color:var(--text-3)}}
+@keyframes scr2{0%,32%{opacity:0;transform:translateY(26px)}36%,50%{opacity:1;transform:translateY(0)}54%,100%{opacity:0;transform:translateY(-18px)}}
+@keyframes scr3{0%,50%{opacity:0;transform:translateY(26px)}54%,68%{opacity:1;transform:translateY(0)}72%,100%{opacity:0;transform:translateY(-18px)}}
+@keyframes scr4{0%,68%{opacity:0;transform:translateY(26px)}72%,92%{opacity:1;transform:translateY(0)}97%,100%{opacity:0;transform:translateY(-14px)}}
+.on .nav .it:nth-child(2){animation:navA 7.2s linear both}
+.on .nav .it:nth-child(3){animation:navB 7.2s linear both}
+.on .nav .it:nth-child(4){animation:navC 7.2s linear both}
+@keyframes navA{0%,31%{color:var(--accent)}34%,100%{color:var(--text-3)}}
+@keyframes navB{0%,32%{color:var(--text-3)}35%,49%{color:var(--accent)}52%,100%{color:var(--text-3)}}
+@keyframes navC{0%,50%{color:var(--text-3)}53%,100%{color:var(--accent)}}
 .on .bar i{animation:fillBar 7.2s var(--e-out) both}
 @keyframes fillBar{0%{transform:scaleX(0)}24%{transform:scaleX(.62)}50%{transform:scaleX(.41)}76%{transform:scaleX(.83)}100%{transform:scaleX(.9)}}
 .on .card{animation:cardIn .8s var(--e-out) both}
@@ -157,10 +156,13 @@ html,body{height:100%;margin:0;background:#05070a;color:var(--text);font-family:
 .node{position:absolute;display:flex;align-items:center;gap:14px;font-size:26px;font-weight:600;color:var(--text);white-space:nowrap}
 .node i{width:16px;height:16px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 6px rgba(139,124,246,.16)}
 .node b{font-weight:600;color:var(--text-2);font-size:23px}
-.n1{left:8%;top:18%;animation-delay:.7s}
-.n2{right:4%;top:44%;animation-delay:1.15s}
-.n3{left:12%;bottom:26%;animation-delay:1.6s}
+.n1{left:8%;top:18%}
+.n2{right:4%;top:44%}
+.n3{left:12%;bottom:26%}
 .on .node{animation:nodeIn .8s var(--e-spring) both}
+.on .n1{animation-delay:.7s}
+.on .n2{animation-delay:1.15s}
+.on .n3{animation-delay:1.6s}
 @keyframes nodeIn{from{opacity:0;transform:translateY(16px) scale(.92)}to{opacity:1;transform:none}}
 .atlasCap{position:absolute;left:0;right:0;bottom:0;text-align:center;font-size:30px;color:var(--text-2)}
 .on .atlasCap{animation:cardIn .9s var(--e-out) .2s both}
@@ -231,6 +233,10 @@ html,body{height:100%;margin:0;background:#05070a;color:var(--text);font-family:
 html.rec #hud{display:none}
 @media (prefers-reduced-motion:reduce){
   .scene *,.scene{animation:none!important;transition:opacity .2s linear!important}
+  .curveClip,.link{transform:none!important}
+  .card,.stat,.flag,.node,.atlasCap,.cmp,.touch,.ripple,.screen{opacity:1!important}
+  .screen.s1,.screen.s2,.screen.s3,.screen.s4{opacity:0!important}
+  .screen.s1{opacity:1!important}
 }
 </style>
 </head>
@@ -446,14 +452,14 @@ html.rec #hud{display:none}
 
   function countUp(el, to, dur){
     var start = performance.now();
-    if (rafCount) cancelAnimationFrame(rafCount);
+    if (el._raf) cancelAnimationFrame(el._raf);
     function step(now){
       var p = Math.min(1, (now - start) / dur);
       var eased = 1 - Math.pow(1 - p, 3);
       el.textContent = Math.round(to * eased);
-      if (p < 1) rafCount = requestAnimationFrame(step);
+      if (p < 1) el._raf = requestAnimationFrame(step);
     }
-    rafCount = requestAnimationFrame(step);
+    el._raf = requestAnimationFrame(step);
   }
 
   function go(k){
