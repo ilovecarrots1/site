@@ -1331,6 +1331,27 @@ body::after {
   background: radial-gradient(50% 50% at 50% 0%, var(--accent-soft), transparent 70%);
   pointer-events: none;
 }
+
+/* --- Text never touches the container wall ------------------------- */
+.hero-card > * { position: relative; z-index: 1; }
+.hero-card h2,
+.hero-card p,
+.hero-card .metric,
+.hero-card .mono { overflow-wrap: anywhere; }
+.card h1,
+.card h2,
+.card h3,
+.card p,
+.card li,
+.list-row .title,
+.list-row .sub,
+.detail-title,
+.detail-alias,
+.paper-title,
+.paper-abs { overflow-wrap: break-word; }
+.detail-title { hyphens: auto; }
+.metric-label,
+.eyebrow { overflow-wrap: anywhere; }
 .orb {
   position: relative;
   width: 54px;
