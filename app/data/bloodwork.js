@@ -4,6 +4,7 @@
    marker's `note` says so. Nothing here is a diagnosis or a target to chase.
    ========================================================================== */
 
+import { COMPOUND_BY_ID } from "./compounds.js";
 import { MARKERS_A } from "./bloodwork-a.js";
 import { MARKERS_B } from "./bloodwork-b.js";
 
@@ -15,7 +16,11 @@ for (const m of RAW) {
   if (!seen.has(m.id)) seen.set(m.id, m);
 }
 
-export const MARKERS = Array.from(seen.values());
+/** Authored links are filtered so a stale id can never render as a dead chip. */
+export const MARKERS = Array.from(seen.values()).map((m) => ({
+  ...m,
+  compounds: (m.compounds || []).filter((id) => COMPOUND_BY_ID.has(id)),
+}));
 export const MARKER_BY_ID = new Map(MARKERS.map((m) => [m.id, m]));
 export const MARKER_COUNT = MARKERS.length;
 
