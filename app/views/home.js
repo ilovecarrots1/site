@@ -104,6 +104,9 @@ export function render() {
           ${actionCard("flask", "PK simulator", "Plot plasma curves, half-lives and accumulation", "#/lab", "violet")}
           ${actionCard("shield", "Interaction check", "Stack combinations against a rule engine", "#/lab/interactions", "green")}
           ${actionCard("brain", "Pathway explorer", "Trace synthesis, receptors and drug targets", "#/brain", "amber")}
+          ${actionCard("scale", "Taper planner", "Turn a half-life into a step-down schedule", "#/lab/taper", "blue")}
+          ${actionCard("grid", "Compare compounds", "Two or three monographs, fact by fact", "#/compare", "violet")}
+          ${actionCard("message", "Ask the library", "Plain-language answers from the local data", "#/ask", "blue")}
         </div>
       </section>
 
