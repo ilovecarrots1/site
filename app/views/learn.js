@@ -4,7 +4,10 @@ import { esc, icon, md, store, toast, awardXP, touchStreak, levelFor, emptyState
 import { COURSES, LESSON_INDEX, TOTAL_LESSONS, FLASHCARDS, systemCardCount } from "../data/learn.js";
 import { SYSTEM_BY_ID } from "../data/neuro.js";
 import { deckStats, dueCards, gradeCard, GRADES, cardState, nextIntervalPreview } from "../srs.js";
-import { pageHead, backLink, callout, metric, statTile } from "./ui.js";
+import { pageHead, backLink, callout, metric, statTile, liveBadge } from "./ui.js";
+import { queryForCard } from "../data/card-queries.js";
+import { searchPapers, LINK as PM_LINK } from "../lib/pubmed.js";
+import { paperCard } from "./research.js";
 
 function lessonDone(id) {
   return !!store.data.lessons?.[id]?.completed;
@@ -321,7 +324,8 @@ function deckMeta(id) {
   return { ...(DECK_META[id] || { name: id, color: "var(--accent)" }), abbr: "" };
 }
 
-const session = { queue: [], idx: 0, flipped: false, reviewed: 0, started: false, filter: "" };
+const session = { queue: [], idx: 0, flipped: false, reviewed: 0, started: false, filter: "", src: null };
+let repaint = () => {};
 
 function startSession(filter = "") {
   const deck = filter ? FLASHCARDS.filter((c) => c.system === filter) : FLASHCARDS;
@@ -332,6 +336,7 @@ function startSession(filter = "") {
   session.reviewed = 0;
   session.started = true;
   session.filter = filter;
+  session.src = null;
 }
 
 function cardFaceHtml(card, flipped) {
@@ -350,6 +355,32 @@ function cardFaceHtml(card, flipped) {
         <div class="fc-hint">Tap to flip back</div>
       </div>
     </div>
+  </div>`;
+}
+
+function sourcesHtml(card) {
+  const q = queryForCard(card);
+  const src = session.src && session.src.id === card.id ? session.src : null;
+  let body = "";
+  if (src && src.status === "loading") {
+    body = `<div class="stack" style="gap:8px;margin-top:10px">${'<div class="skeleton" style="height:58px"></div>'.repeat(2)}</div>`;
+  } else if (src && src.status === "error") {
+    body = `<div class="callout warn" style="margin-top:10px"><strong class="small">PubMed did not answer</strong><p class="tiny" style="margin-top:4px;opacity:.8">${esc(src.error || "network error")}</p></div>`;
+  } else if (src && src.papers && src.papers.length) {
+    body = `<div class="stack" style="gap:8px;margin-top:10px">${src.papers.map((p, i) => paperCard(p, i)).join("")}</div>`;
+  } else if (src) {
+    body = `<p class="tiny dim" style="margin-top:10px">No indexed record matched this query. Open the full search and widen the terms.</p>`;
+  }
+  return `<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)">
+    <div class="row between wrap" style="gap:8px">
+      <div class="row" style="gap:7px;min-width:0;flex:1 1 auto">
+        ${liveBadge()}
+        <span class="tiny dim" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(q)}</span>
+      </div>
+      <button class="btn ghost xs" data-act="sources" ${src && src.status === "loading" ? "disabled" : ""}>${icon("microscope", 12)} ${src ? "Refresh" : "Live sources"}</button>
+    </div>
+    ${body}
+    <a class="tiny" href="#/research?q=${encodeURIComponent(q)}" style="display:inline-block;margin-top:9px">Open in Research →</a>
   </div>`;
 }
 
@@ -394,7 +425,8 @@ function sessionBody() {
             <button class="btn ghost sm" data-act="skip">Skip</button>
           </div>`
     }
-  </div>`;
+  </div>
+  ${sourcesHtml(card)}`;
 }
 
 export const cards = {
@@ -436,6 +468,7 @@ export const cards = {
     const paint = () => {
       out.innerHTML = sessionBody();
     };
+    repaint = paint;
 
     // Always rebuild the queue on entry — due dates change between visits.
     startSession(session.filter);
@@ -450,6 +483,10 @@ export const cards = {
     });
 
     root.addEventListener("click", (ev) => {
+      if (ev.target.closest('[data-act="sources"]')) {
+        loadCardSources(session.queue[session.idx]);
+        return;
+      }
       if (ev.target.closest('[data-act="start"]')) {
         startSession(session.filter);
         paint();
