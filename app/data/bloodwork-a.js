@@ -88,7 +88,7 @@ export const MARKERS_A = [
     ref: { low: 13, high: 60 },
     better: "low",
     note: "The confirmatory test for pancreatitis. GLP-1 agonists are the classic drug link.",
-    compounds: ["semaglutide", "tirzepatide", "retatrutide", "liraglutide"],
+    compounds: ["semaglutide", "tirzepatide", "retatrutide"],
   },
 
   /* ---------------- kidney ---------------- */
@@ -164,7 +164,7 @@ export const MARKERS_A = [
     ref: { low: 4.0, high: 5.6 },
     better: "low",
     note: "Reflects ~3 months of average glucose; anaemia and haemolysis make it unreliable.",
-    compounds: ["semaglutide", "tirzepatide", "retatrutide", "insulin", "mk-677", "somatotropin", "metformin"],
+    compounds: ["semaglutide", "tirzepatide", "retatrutide", "insulin", "mk-677", "somatotropin"],
   },
   {
     id: "insulin",
@@ -176,7 +176,7 @@ export const MARKERS_A = [
     ref: { low: 2, high: 25 },
     better: "low",
     note: "High fasting insulin with normal glucose is the earliest sign of insulin resistance.",
-    compounds: ["mk-677", "somatotropin", "insulin", "semaglutide", "berberine", "ghrp-2", "ghrp-6"],
+    compounds: ["mk-677", "somatotropin", "insulin", "semaglutide", "ghrp-2", "ghrp-6"],
   },
   {
     id: "homa-ir",
@@ -188,7 +188,7 @@ export const MARKERS_A = [
     ref: { low: 0.5, high: 2.0 },
     better: "low",
     note: "Computed as glucose (mg/dL) × insulin (µIU/mL) / 405.",
-    compounds: ["mk-677", "somatotropin", "semaglutide", "tirzepatide", "berberine"],
+    compounds: ["mk-677", "somatotropin", "semaglutide", "tirzepatide"],
   },
 
   /* ---------------- lipids ---------------- */
@@ -226,7 +226,7 @@ export const MARKERS_A = [
     ref: { low: 40, high: 90 },
     better: "high",
     note: "Oral anabolics drop HDL hard; that is the main reason they are avoided in cardiac risk.",
-    compounds: ["oxandrolone", "stanozolol", "methandienone", "trenbolone-acetate", "cardarine", "omega-3", "niacin"],
+    compounds: ["oxandrolone", "stanozolol", "methandienone", "trenbolone-acetate", "cardarine", "omega-3"],
   },
   {
     id: "triglycerides",
@@ -238,7 +238,7 @@ export const MARKERS_A = [
     ref: { low: 40, high: 150 },
     better: "low",
     note: "Sensitive to the last meal and to alcohol; fast 10–12 h before testing.",
-    compounds: ["omega-3", "semaglutide", "mk-677", "somatotropin", "insulin", "cardarine", "berberine"],
+    compounds: ["omega-3", "semaglutide", "mk-677", "somatotropin", "insulin", "cardarine"],
   },
   {
     id: "apob",
@@ -313,5 +313,4 @@ export const MARKERS_A = [
     better: "low",
     note: "Present in Hashimoto thyroiditis; a positive result with normal TSH means monitoring, not treatment.",
     compounds: ["ashwagandha", "liothyronine"],
-  },
-];
+  }];
