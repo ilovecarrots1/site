@@ -6,7 +6,7 @@ import { SYSTEMS, SYSTEM_BY_ID } from "../data/neuro.js";
 import { COURSES, TOTAL_LESSONS, LESSON_INDEX, FLASHCARDS } from "../data/learn.js";
 import { checkInteractions, worstSeverity } from "../data/interactions.js";
 import { deckStats } from "../srs.js";
-import { pageHead, statTile, compoundCard, classColor, metric, callout } from "./ui.js";
+import { pageHead, statTile, compoundCard, classColor, metric, callout, subscribePlate, orb } from "./ui.js";
 
 function greeting() {
   const h = new Date().getHours();
@@ -34,6 +34,25 @@ function dailyPick() {
 function dailySystem() {
   const seed = Math.floor(Date.now() / 86400000);
   return SYSTEMS[(seed + 3) % SYSTEMS.length];
+}
+
+function tickerHtml() {
+  const items = [
+    ["t½", `sertraline ${fmt.duration(26)}`],
+    ["Adenosine", "caffeine blocks A1/A2A — it does not add energy"],
+    ["SERT", "SSRIs keep serotonin in the cleft, not create it"],
+    ["GABA-A", "benzodiazepines raise opening frequency, not conductance"],
+    ["MAO-A", "tyramine + irreversible MAOI → hypertensive crisis"],
+    ["NMDA", "ketamine is a use-dependent channel blocker"],
+    ["CYP2D6", "~7% of people are poor metabolisers"],
+    ["Taper", "step ≈5–10% of the current dose, hold 5 half-lives"],
+    ["Peak", "oral caffeine Tmax ≈ 45 min"],
+  ];
+  const row = (list) =>
+    list.map(([tag, text]) => `<span class="ticker-item"><b>${esc(tag)}</b> ${esc(text)}</span>`).join("");
+  return `<div class="ticker" style="margin-bottom:18px" aria-hidden="true">
+    <div class="ticker-track">${row(items)}${row(items)}</div>
+  </div>`;
 }
 
 export function render() {
@@ -93,6 +112,8 @@ export function render() {
     </div>
   </div>
 
+  <div style="margin-bottom:22px">${subscribePlate()}</div>
+
   <div class="split-wide">
     <div>
 
@@ -106,6 +127,7 @@ export function render() {
           ${actionCard("brain", "Pathway explorer", "Trace synthesis, receptors and drug targets", "#/brain", "amber")}
           ${actionCard("scale", "Taper planner", "Turn a half-life into a step-down schedule", "#/lab/taper", "blue")}
           ${actionCard("grid", "Compare compounds", "Two or three monographs, fact by fact", "#/compare", "violet")}
+          ${actionCard("microscope", "Live research", "Search PubMed at request time — nothing stored", "#/research", "green")}
           ${actionCard("message", "Ask the library", "Plain-language answers from the local data", "#/ask", "blue")}
         </div>
       </section>
