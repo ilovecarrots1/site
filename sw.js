@@ -25,6 +25,7 @@ const SHELL = [
   "./app/views/neuro.js",
   "./app/views/lab.js",
   "./app/views/taper.js",
+  "./app/views/compare.js",
   "./app/views/learn.js",
   "./app/views/evidence.js",
   "./app/views/ask.js",
