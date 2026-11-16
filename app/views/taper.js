@@ -350,7 +350,7 @@ export const taper = {
 
     <div class="split split-mobile-first">
       <div class="stack" style="gap:14px">
-        <div id="taper-out">${planHtml(c, cfg)}</div>
+        <div id="taper-out" aria-live="polite">${planHtml(c, cfg)}</div>
 
         <div class="card tight">
           <div class="stack-3">
