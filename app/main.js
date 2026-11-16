@@ -25,8 +25,10 @@ import * as organsView from "./views/organs.js";
 import * as mapView from "./views/map.js";
 import * as calculatorView from "./views/calculator.js";
 import * as brainView from "./views/brain.js";
+import * as conditionsView from "./views/conditions.js";
 import { PATHWAYS } from "./data/atlas.js";
 import { ORGANS } from "./data/organs.js";
+import { CONDITIONS } from "./data/conditions.js";
 import { subscribePlate, wireSubscribe } from "./views/ui.js";
 
 /* ------------------------------------------------------------------ */
@@ -42,6 +44,12 @@ const NAV = [
       { id: "brain", label: "Brain map", href: "#/brain", icon: "brain", count: () => SYSTEMS.length },
       { id: "learn", label: "Learn", href: "#/learn", icon: "book" },
       { id: "cards", label: "Flashcards", href: "#/cards", icon: "layers", count: () => deckStats(FLASHCARDS).due || "" },
+    ],
+  },
+  {
+    section: "Clinic",
+    items: [
+      { id: "conditions", label: "Conditions", href: "#/conditions", icon: "shield", count: () => CONDITIONS.length },
     ],
   },
   {
@@ -439,6 +447,11 @@ function matchRoute(segs) {
     const key = String(b).toLowerCase();
     const sys = SYSTEM_BY_ID.get(key);
     return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
+  }
+  if (a === "conditions") {
+    const view = { render: conditionsView.render, mount: conditionsView.mount };
+    if (!b) return { nav: "conditions", title: "Conditions", view };
+    return { nav: "conditions", title: "Condition", view, params: { id: String(b).toLowerCase() } };
   }
   if (a === "compare") return { nav: "compare", title: "Compare", view: compareView.compare };
 
