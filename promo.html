@@ -237,14 +237,20 @@ html,body{height:100%;margin:0;background:#05070a;color:var(--text);font-family:
 @keyframes ringIn{from{opacity:0;transform:scale(.78)}to{opacity:1;transform:none}}
 
 /* ---------- HUD ---------- */
-#hud{position:fixed;left:0;right:0;bottom:0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));display:flex;gap:12px;align-items:center;
-  background:linear-gradient(0deg,rgba(5,7,10,.95),transparent);font-size:13px;color:#9aa4b2;z-index:20}
+#hud{position:fixed;left:0;right:0;bottom:0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  background:linear-gradient(0deg,rgba(5,7,10,.95),transparent);font-size:13px;color:#9aa4b2;z-index:20;
+  transition:opacity .25s linear}
 #hud button{appearance:none;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e9edf3;
   border-radius:999px;padding:10px 16px;font-size:13px;font-family:inherit}
-#hud .dots{display:flex;gap:6px;margin-left:auto}
+#hud .dots{display:flex;gap:6px;margin-left:auto;padding:8px 2px}
 #hud .dots b{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.22);cursor:pointer}
 #hud .dots b.on{background:#8b7cf6}
 html.rec #hud{display:none}
+html.fs.idle #hud{opacity:0;pointer-events:none}
+#hint{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);padding:14px 24px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);background:rgba(8,10,13,.82);color:#e9edf3;font-size:14px;
+  letter-spacing:.02em;z-index:30;opacity:0;transition:opacity .25s linear;pointer-events:none;white-space:nowrap}
+#hint.on{opacity:1}
 @media (prefers-reduced-motion:reduce){
   .scene *,.scene{animation:none!important;transition:opacity .2s linear!important}
   .curveClip,.link{transform:none!important}
@@ -430,9 +436,11 @@ html.rec #hud{display:none}
 
 </div></div>
 
+<div id="hint">Tap anywhere to go fullscreen</div>
 <div id="hud">
   <button id="pp">Pause</button>
   <button id="rs">Restart</button>
+  <button id="fs">Fullscreen</button>
   <button id="rec">Record mode</button>
   <div class="dots" id="dots"></div>
 </div>
@@ -540,11 +548,99 @@ html.rec #hud{display:none}
     this.textContent = on ? "Show controls" : "Record mode";
   });
 
+  /* ---------- fullscreen ---------- */
+  var rootEl = document.documentElement;
+  var fsBtn = document.getElementById("fs");
+  var hintEl = document.getElementById("hint");
+  var idleT = null;
+
+  function isFs(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+
+  function lockPortrait(){
+    try{
+      if (screen.orientation && screen.orientation.lock) {
+        var p = screen.orientation.lock("portrait");
+        if (p && p.catch) p.catch(function(){});
+      }
+    }catch(e){}
+  }
+
+  function hintMsg(txt){
+    if (!hintEl) return;
+    hintEl.textContent = txt;
+    hintEl.classList.add("on");
+    setTimeout(function(){ hintEl.classList.remove("on"); }, 2400);
+  }
+
+  function enterFs(){
+    var el = rootEl;
+    var req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (!req) { hintMsg("Fullscreen is not available here"); return; }
+    var res;
+    try { res = req.call(el, { navigationUI: "hide" }); }
+    catch(e){ try { res = req.call(el); } catch(e2){ hintMsg("Fullscreen was blocked"); return; } }
+    if (res && res.then) res.then(lockPortrait).catch(function(){ hintMsg("Fullscreen was blocked"); });
+    else lockPortrait();
+  }
+
+  function exitFs(){
+    var ex = document.exitFullscreen || document.webkitExitFullscreen;
+    if (ex) ex.call(document);
+  }
+
+  function toggleFs(){ if (isFs()) exitFs(); else enterFs(); }
+
+  function armIdle(){
+    clearTimeout(idleT);
+    rootEl.classList.remove("idle");
+    idleT = setTimeout(function(){ if (isFs()) rootEl.classList.add("idle"); }, 2600);
+  }
+
+  function syncFs(){
+    var on = isFs();
+    rootEl.classList.toggle("fs", on);
+    if (fsBtn) fsBtn.textContent = on ? "Exit fullscreen" : "Fullscreen";
+    if (on) armIdle(); else rootEl.classList.remove("idle");
+    fit();
+  }
+
+  document.addEventListener("fullscreenchange", syncFs);
+  document.addEventListener("webkitfullscreenchange", syncFs);
+  if (fsBtn) fsBtn.addEventListener("click", function(){ toggleFs(); });
+
+  stage.addEventListener("pointerdown", function(){
+    if (!isFs()) return;
+    if (rootEl.classList.contains("idle")) { armIdle(); return; }
+    clearTimeout(idleT);
+    rootEl.classList.add("idle");
+  });
+
+  // ?fs=1 — ждáм первый тап, уходим в полноэкран, стартуем с нуля
+  if (params.get("fs") === "1") {
+    if (hintEl) hintEl.classList.add("on");
+    var kicked = false;
+    var kick = function(){
+      if (kicked) return;
+      kicked = true;
+      document.removeEventListener("pointerdown", kick, true);
+      if (hintEl) hintEl.classList.remove("on");
+      enterFs();
+      setTimeout(function(){
+        go(0);
+        paused = false;
+        var b = document.getElementById("pp");
+        if (b) b.textContent = "Pause";
+      }, 420);
+    };
+    document.addEventListener("pointerdown", kick, true);
+  }
+
   document.addEventListener("keydown", function(e){
     if (e.key === " ") { e.preventDefault(); document.getElementById("pp").click(); }
     if (e.key === "ArrowRight") next();
     if (e.key === "ArrowLeft") go(Math.max(0, i - 1));
     if (e.key === "r") document.getElementById("rs").click();
+    if (e.key === "f") toggleFs();
   });
 
   // autoplay: last scene only if ?scene=N
