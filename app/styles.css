@@ -988,6 +988,11 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
   align-items: start;
 }
 
+/* Calculators read better with the controls first on a phone. */
+@media (max-width: 999px) {
+  .split-mobile-first > :last-child { order: -1; }
+}
+
 @media (min-width: 1000px) {
   .split { grid-template-columns: minmax(0, 1fr) 280px; gap: 18px; }
   .split-wide { grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; }
