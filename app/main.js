@@ -713,6 +713,85 @@ function wireKeys() {
 /* Boot                                                                */
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/* Service worker + update prompt                                      */
+/* ------------------------------------------------------------------ */
+
+function wireServiceWorker() {
+  if (!("serviceWorker" in navigator)) return;
+  const isSecure =
+    location.protocol === "https:" || ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
+  if (!isSecure) return;
+
+  let reloading = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloading) return;
+    reloading = true;
+    location.reload();
+  });
+
+  const offer = (reg) => {
+    if (!reg || !reg.waiting) return;
+    if (document.querySelector(".update-bar")) return;
+    const bar = document.createElement("div");
+    bar.className = "update-bar";
+    bar.innerHTML =
+      '<span class="update-bar-txt"><b>New version ready</b><span class="tiny dim">Reload to pick up the fresh build</span></span>' +
+      '<button type="button" class="btn primary xs" data-update="go">Reload</button>' +
+      '<button type="button" class="icon-btn" data-update="later" aria-label="Later">' + icon("x", 14) + "</button>";
+    document.body.appendChild(bar);
+    bar.addEventListener("click", (ev) => {
+      const b = ev.target.closest("[data-update]");
+      if (!b) return;
+      if (b.dataset.update === "go") {
+        bar.classList.add("busy");
+        try {
+          reg.waiting.postMessage({ type: "SKIP_WAITING" });
+        } catch (err) {
+          location.reload();
+        }
+      } else {
+        bar.remove();
+      }
+    });
+  };
+
+  let reg = null;
+  const check = () => {
+    if (!reg) return;
+    reg.update().catch(() => {});
+  };
+
+  try {
+    // Resolve against the document base so a subfolder deployment still
+    // registers the right worker.
+    const swUrl = new URL("sw.js", document.baseURI);
+    navigator.serviceWorker
+      .register(swUrl, { scope: "./", updateViaCache: "none" })
+      .then((r) => {
+        reg = r;
+        offer(reg);
+        r.addEventListener("updatefound", () => {
+          const sw = r.installing;
+          if (!sw) return;
+          sw.addEventListener("statechange", () => {
+            if (sw.state === "installed" && navigator.serviceWorker.controller) offer(r);
+          });
+        });
+      })
+      .catch(() => {});
+  } catch (err) {
+    /* ignore */
+  }
+
+  // Look again when the tab comes back, and every half hour for long sessions.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") check();
+  });
+  window.addEventListener("focus", check);
+  setInterval(check, 30 * 60 * 1000);
+}
+
 function boot() {
   try {
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
@@ -739,20 +818,7 @@ function boot() {
   if (!location.hash) history.replaceState(null, "", "#/");
   renderRoute();
 
-  if ("serviceWorker" in navigator) {
-    const isSecure =
-      location.protocol === "https:" || ["localhost", "127.0.0.1", "[::1]"].includes(location.hostname);
-    if (isSecure) {
-      try {
-        // Resolve against the document base so a subfolder deployment
-        // (/site/main/) still registers the right worker.
-        const swUrl = new URL("sw.js", document.baseURI);
-        navigator.serviceWorker.register(swUrl, { scope: "./" }).catch(() => {});
-      } catch (err) {
-        /* ignore */
-      }
-    }
-  }
+  wireServiceWorker();
 
   document.addEventListener("click", (ev) => {
     const a = ev.target.closest('a[href^="#/"]');
