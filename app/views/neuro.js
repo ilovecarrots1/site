@@ -27,14 +27,61 @@ function mapHtml() {
 
   return `<svg class="brain-svg" viewBox="0 0 420 320" role="img" aria-label="Interactive sagittal brain map">
     <defs>
-      <linearGradient id="brainFill" x1="0" y1="0" x2="0.4" y2="1">
-        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.045"/>
-        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.012"/>
+      <linearGradient id="cortexFill" x1="8%" y1="0%" x2="72%" y2="100%">
+        <stop offset="0%" stop-color="#9d8cff" stop-opacity="0.18"/>
+        <stop offset="46%" stop-color="#8b7bff" stop-opacity="0.075"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0.03"/>
       </linearGradient>
+      <linearGradient id="stemFill" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f2b23e" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#8b7bff" stop-opacity="0.05"/>
+      </linearGradient>
+      <linearGradient id="cbFill" x1="0%" y1="0%" x2="70%" y2="100%">
+        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.16"/>
+        <stop offset="100%" stop-color="#8b7bff" stop-opacity="0.04"/>
+      </linearGradient>
+      <linearGradient id="sweepGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+        <stop offset="50%" stop-color="#ffffff" stop-opacity="0.085"/>
+        <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+      <radialGradient id="deepFill" cx="50%" cy="45%" r="60%">
+        <stop offset="0%" stop-color="#8b7bff" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#8b7bff" stop-opacity="0"/>
+      </radialGradient>
+      <filter id="dotGlow" x="-90%" y="-90%" width="280%" height="280%">
+        <feGaussianBlur stdDeviation="2.2" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <clipPath id="cortexClip"><path d="M54 150 C54 118 70 88 104 74 C132 62 160 50 196 47 C236 44 276 52 308 70 C338 87 362 106 374 128 C382 143 380 158 370 170 C360 182 344 190 330 198 C314 207 296 214 276 220 C252 227 226 230 202 226 C180 222 162 214 148 206 C132 197 116 196 100 190 C78 181 55 170 54 150 Z"/></clipPath>
     </defs>
 
     <!-- cerebrum -->
-    <path class="outline" fill="url(#brainFill)" d="M46 150 C46 94 92 54 150 49 C206 44 258 58 296 77 C330 94 356 113 366 139 C374 159 371 177 357 191 C343 205 322 205 306 215 C291 225 267 233 243 232 C207 231 176 219 150 199 C122 177 74 187 56 169 C48 161 46 156 46 150 Z"/>
+    <path class="cortex" d="M54 150 C54 118 70 88 104 74 C132 62 160 50 196 47 C236 44 276 52 308 70 C338 87 362 106 374 128 C382 143 380 158 370 170 C360 182 344 190 330 198 C314 207 296 214 276 220 C252 227 226 230 202 226 C180 222 162 214 148 206 C132 197 116 196 100 190 C78 181 55 170 54 150 Z"/>
+
+    <!-- gyri: folds clipped to the cortex so nothing spills past the outline -->
+    <g clip-path="url(#cortexClip)">
+      <path class="gyrus bright" d="M64 132 C92 120 118 100 136 78"/>
+      <path class="gyrus" d="M60 156 C92 148 120 132 142 108"/>
+      <path class="gyrus" d="M76 178 C104 172 132 158 156 136"/>
+      <path class="gyrus" d="M96 196 C124 190 150 176 170 154"/>
+      <path class="gyrus bright" d="M118 210 C144 206 168 194 188 172"/>
+      <path class="gyrus" d="M148 84 C164 104 176 124 182 146"/>
+      <path class="gyrus" d="M176 64 C192 88 202 112 206 136"/>
+      <path class="gyrus bright" d="M206 60 C220 88 230 116 234 142"/>
+      <path class="gyrus" d="M238 60 C250 90 258 118 260 146"/>
+      <path class="gyrus" d="M272 68 C282 98 288 126 290 152"/>
+      <path class="gyrus" d="M304 82 C312 108 318 134 320 160"/>
+      <path class="gyrus bright" d="M196 152 C222 160 250 158 272 148"/>
+      <path class="gyrus" d="M206 172 C236 180 264 176 288 164"/>
+      <path class="gyrus" d="M218 194 C246 200 272 196 292 184"/>
+      <path class="gyrus" d="M250 210 C274 214 296 210 312 200"/>
+      <path class="gyrus" d="M340 128 C346 148 344 166 334 182"/>
+      <path class="gyrus" d="M348 150 C352 166 348 180 340 190"/>
+    </g>
 
     <!-- sulci -->
     <path class="sulcus" d="M96 88 C120 104 140 118 150 136 C160 154 158 172 150 190"/>
@@ -49,16 +96,33 @@ function mapHtml() {
     <path class="sulcus" d="M150 199 C176 210 206 214 236 208 C258 204 274 210 286 218"/>
 
     <!-- cerebellum -->
-    <path class="outline" d="M300 214 C324 202 352 210 358 232 C364 254 344 270 322 266 C302 262 288 238 300 214 Z"/>
-    <path class="sulcus" d="M304 226 C316 220 332 220 344 228"/>
-    <path class="sulcus" d="M302 240 C316 234 334 234 348 242"/>
-    <path class="sulcus" d="M306 252 C318 246 336 246 348 252"/>
+    <path class="cerebellum" d="M304 218 C312 202 336 196 352 204 C368 212 372 230 364 240 C354 252 328 250 314 242 C304 236 300 226 304 218 Z"/>
+    <path class="folia" d="M308 224 C324 216 344 216 358 226"/>
+    <path class="folia" d="M305 234 C324 227 346 227 362 237"/>
+    <path class="folia" d="M307 244 C326 237 346 237 360 246"/>
+    <path class="folia" d="M318 250 C330 245 344 245 354 250"/>
 
-    <!-- brainstem -->
-    <path class="outline" d="M288 226 C296 246 298 268 296 292 C295 300 306 302 308 294 C312 268 314 246 312 228 Z"/>
+    <!-- brainstem: midbrain → pons → medulla -->
+    <path class="brainstem" d="M252 192 C274 202 292 218 302 236 C312 254 318 272 320 288 C321 296 329 297 329 288 C330 264 322 238 306 218 C292 202 276 190 256 184 Z"/>
+    <path class="gyrus" d="M264 198 C278 212 290 230 296 250"/>
+    <path class="gyrus" d="M280 194 C296 210 306 232 312 254"/>
 
-    <!-- pineal stalk hint -->
-    <path class="sulcus" d="M268 158 C276 156 284 158 288 164"/>
+    <!-- deep structures: callosum, ventricles, thalamus, hippocampus -->
+    <path class="deep" style="stroke-width:5;stroke-dasharray:none;opacity:.5" d="M176 170 C178 148 196 132 222 130 C250 128 274 142 280 164 C284 180 272 192 256 192" stroke-linecap="round"/>
+    <path class="deep" style="opacity:.6" d="M188 152 C204 140 228 140 240 154 C250 165 246 178 232 182"/>
+    <ellipse class="deep" cx="232" cy="132" rx="27" ry="21" style="opacity:.32"/>
+    <ellipse cx="214" cy="160" rx="27" ry="17" fill="url(#deepFill)"/>
+    <path class="deep" style="stroke-width:3;stroke-dasharray:none;opacity:.45" d="M240 174 C252 168 266 172 270 183 C274 195 263 202 252 199"/>
+
+    <!-- projection tracts -->
+    <path class="tract" d="M204 214 C182 200 162 184 148 170"/>
+    <path class="tract" d="M148 170 C130 152 114 134 104 116"/>
+    <path class="tract" d="M296 176 C266 150 228 132 196 122"/>
+    <path class="tract" d="M284 208 C258 184 226 166 196 154"/>
+    <path class="tract" d="M330 224 C310 200 288 182 264 168"/>
+
+    <!-- slow cortical sweep -->
+    <ellipse class="sweep" cx="206" cy="128" rx="152" ry="64" fill="url(#sweepGrad)" pointer-events="none"/>
 
     ${hot}
   </svg>`;
