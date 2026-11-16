@@ -116,7 +116,8 @@ export function chipRow(items, activeValue, dataAttr, { allLabel = "All" } = {})
   </div>`;
 }
 
-/** Horizontal "meter" with a label and value text. */export function metric(label, valueText, ratio, tone = "") {
+/** Horizontal "meter" with a label and value text. */
+export function metric(label, valueText, ratio, tone = "") {
   return `<div class="stack-3">
     <div class="row between tiny"><span class="muted">${esc(label)}</span><span class="mono dim">${esc(valueText)}</span></div>
     <div class="meter ${tone}"><i style="width:${Math.round(clamp01(ratio) * 100)}%"></i></div>
