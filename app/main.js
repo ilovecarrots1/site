@@ -20,6 +20,12 @@ import * as askView from "./views/ask.js";
 import * as notesView from "./views/notes.js";
 import * as settingsView from "./views/settings.js";
 import * as researchView from "./views/research.js";
+import * as atlasView from "./views/atlas.js";
+import * as organsView from "./views/organs.js";
+import * as mapView from "./views/map.js";
+import * as calculatorView from "./views/calculator.js";
+import { PATHWAYS } from "./data/atlas.js";
+import { ORGANS } from "./data/organs.js";
 import { subscribePlate, wireSubscribe } from "./views/ui.js";
 
 /* ------------------------------------------------------------------ */
@@ -35,6 +41,15 @@ const NAV = [
       { id: "brain", label: "Brain map", href: "#/brain", icon: "brain", count: () => SYSTEMS.length },
       { id: "learn", label: "Learn", href: "#/learn", icon: "book" },
       { id: "cards", label: "Flashcards", href: "#/cards", icon: "layers", count: () => deckStats(FLASHCARDS).due || "" },
+    ],
+  },
+  {
+    section: "Atlas",
+    items: [
+      { id: "atlas", label: "Biochemical atlas", href: "#/atlas", icon: "atom", count: () => PATHWAYS.length },
+      { id: "organs", label: "Organ map", href: "#/organs", icon: "body", count: () => ORGANS.length },
+      { id: "map", label: "Convergence map", href: "#/map", icon: "dna", count: () => COMPOUNDS.length },
+      { id: "calc", label: "Peptide calculator", href: "#/calc", icon: "calculator" },
     ],
   },
   {
@@ -259,6 +274,10 @@ function buildIndex() {
     ["Home", "#/", "home", "dashboard"],
     ["Flashcards", "#/cards", "layers", "spaced repetition"],
     ["Brain map", "#/brain", "brain", "regions and pathways"],
+    ["Biochemical atlas", "#/atlas", "atom", "pathways, enzymes and targets"],
+    ["Organ map", "#/organs", "body", "organs, hormones and diseases"],
+    ["Convergence map", "#/map", "dna", "compound threads into regions"],
+    ["Peptide calculator", "#/calc", "calculator", "reconstitution arithmetic"],
     ["Dose lab", "#/lab", "flask", "pharmacokinetics sandbox"],
     ["Interaction checker", "#/lab/interactions", "shield", "stack safety"],
     ["Evidence", "#/evidence", "file", "research topics"],
@@ -420,6 +439,37 @@ function matchRoute(segs) {
     return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
   }
   if (a === "compare") return { nav: "compare", title: "Compare", view: compareView.compare };
+
+  if (a === "atlas") {
+    if (!b) return { nav: "atlas", title: "Biochemical atlas", view: { render: atlasView.index, mount: atlasView.mount } };
+    if (b === "target" && c)
+      return {
+        nav: "atlas",
+        title: "Target",
+        view: { render: atlasView.target, mount: atlasView.mount },
+        params: { id: String(c).toLowerCase(), kind: "target" },
+      };
+    return {
+      nav: "atlas",
+      title: "Pathway",
+      view: { render: atlasView.pathway, mount: atlasView.mount },
+      params: { id: String(b).toLowerCase(), kind: "pathway" },
+    };
+  }
+  if (a === "organs" || a === "organ") {
+    return {
+      nav: "organs",
+      title: "Organ map",
+      view: { render: organsView.organs, mount: organsView.mount },
+      params: b ? { id: String(b).toLowerCase() } : {},
+    };
+  }
+  if (a === "map" || a === "network") {
+    return { nav: "map", title: "Convergence map", view: { render: mapView.map, mount: mapView.mount } };
+  }
+  if (a === "calc" || a === "calculator") {
+    return { nav: "calc", title: "Peptide calculator", view: { render: calculatorView.calculator, mount: calculatorView.mount } };
+  }
 
   if (a === "lab") {
     if (b === "interactions") return { nav: "interactions", title: "Interactions", view: labView.interactions };
