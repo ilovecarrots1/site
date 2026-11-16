@@ -9,7 +9,7 @@ export const ORGANS = [
     id: "brain",
     name: "Brain",
     group: "Neuro",
-    x: 150, y: 52, rx: 20, ry: 16,
+    x: 150, y: 44, rx: 17, ry: 12,
     system: "Central nervous system",
     summary:
       "About 86 billion neurons and a similar number of glia, consuming 20% of the body's oxygen. It is the organ every psychoactive compound in this database acts on, and the reason receptor-level detail matters.",
@@ -35,7 +35,7 @@ export const ORGANS = [
     id: "hypothalamus",
     name: "Hypothalamus",
     group: "Neuro",
-    x: 150, y: 66, rx: 8, ry: 5,
+    x: 150, y: 58, rx: 5, ry: 4,
     system: "Neuroendocrine interface",
     summary:
       "A one-gram region that runs the endocrine system: it releases releasing hormones into the portal blood and integrates temperature, hunger, satiety and circadian signals.",
@@ -61,7 +61,7 @@ export const ORGANS = [
     id: "pituitary",
     name: "Pituitary gland",
     group: "Endocrine",
-    x: 160, y: 72, rx: 7, ry: 5,
+    x: 152, y: 68, rx: 4, ry: 4,
     system: "Endocrine",
     summary:
       "Two lobes in a bony saddle: the anterior lobe makes the tropic hormones that command other glands, the posterior lobe stores vasopressin and oxytocin made in the hypothalamus.",
@@ -86,7 +86,7 @@ export const ORGANS = [
     id: "pineal",
     name: "Pineal gland",
     group: "Neuro",
-    x: 141, y: 52, rx: 6, ry: 4,
+    x: 166, y: 40, rx: 4, ry: 4,
     system: "Neuroendocrine",
     summary:
       "A tiny gland that converts the light-dark signal into melatonin, telling the body what time it is. Calcifies with age and is often used as a midline landmark on scans.",
@@ -101,7 +101,7 @@ export const ORGANS = [
     id: "thyroid",
     name: "Thyroid gland",
     group: "Endocrine",
-    x: 150, y: 108, rx: 13, ry: 8,
+    x: 150, y: 98, rx: 11, ry: 7,
     system: "Endocrine",
     summary:
       "Two lobes wrapped around the trachea that set the body's metabolic rate. Every cell in the body depends on its output, and iodine is the bottleneck.",
@@ -121,7 +121,7 @@ export const ORGANS = [
     id: "parathyroid",
     name: "Parathyroid glands",
     group: "Endocrine",
-    x: 163, y: 110, rx: 5, ry: 4,
+    x: 162, y: 100, rx: 4, ry: 4,
     system: "Endocrine",
     summary:
       "Four pea-sized glands that control calcium by acting on bone, kidney and gut vitamin D activation. Calcium regulation has almost nothing to do with how much calcium you swallow.",
@@ -140,7 +140,7 @@ export const ORGANS = [
     id: "thymus",
     name: "Thymus",
     group: "Viscera",
-    x: 150, y: 148, rx: 14, ry: 10,
+    x: 150, y: 128, rx: 13, ry: 10,
     system: "Lymphatic and immune",
     summary:
       "Where T lymphocytes learn self-tolerance. Largest in childhood and largely replaced by fat in adults, but it remains functional throughout life.",
@@ -155,7 +155,7 @@ export const ORGANS = [
     id: "heart",
     name: "Heart",
     group: "Cardiorespiratory",
-    x: 137, y: 180, rx: 16, ry: 14,
+    x: 140, y: 152, rx: 14, ry: 13,
     system: "Cardiovascular",
     summary:
       "A four-chambered pump that moves about five litres a minute at rest and five times that during hard exercise. It is the organ whose injury most often ends stimulant and anabolic misuse stories.",
@@ -175,7 +175,7 @@ export const ORGANS = [
     id: "lungs",
     name: "Lungs",
     group: "Cardiorespiratory",
-    x: 122, y: 166, rx: 18, ry: 16,
+    x: 121, y: 146, rx: 17, ry: 15,
     system: "Respiratory",
     summary:
       "Seventy square metres of alveolar surface for gas exchange, plus a second job as a filter and metabolic organ that deactivates many drugs on their first pass.",
@@ -195,7 +195,7 @@ export const ORGANS = [
     id: "liver",
     name: "Liver",
     group: "Viscera",
-    x: 176, y: 214, rx: 20, ry: 14,
+    x: 178, y: 186, rx: 18, ry: 12,
     system: "Hepatobiliary",
     summary:
       "The metabolic clearing house: first-pass metabolism, gluconeogenesis, cholesterol and hormone synthesis, and detoxification. Nearly every oral drug in this database passes through it.",
@@ -215,7 +215,7 @@ export const ORGANS = [
     id: "stomach",
     name: "Stomach",
     group: "Viscera",
-    x: 126, y: 214, rx: 15, ry: 12,
+    x: 129, y: 184, rx: 13, ry: 10,
     system: "Digestive",
     summary:
       "Acid factory and slow-release reservoir. Its pH determines whether a drug dissolves, and its emptying rate determines how fast it reaches the duodenum.",
@@ -235,7 +235,7 @@ export const ORGANS = [
     id: "pancreas",
     name: "Pancreas",
     group: "Viscera",
-    x: 143, y: 232, rx: 16, ry: 7,
+    x: 143, y: 202, rx: 14, ry: 6,
     system: "Digestive and endocrine",
     summary:
       "Two organs in one: exocrine acini that release digestive enzymes, and islets that release insulin, glucagon and somatostatin. The islet is where incretin drugs and GH side effects collide.",
@@ -255,7 +255,7 @@ export const ORGANS = [
     id: "spleen",
     name: "Spleen",
     group: "Viscera",
-    x: 190, y: 224, rx: 10, ry: 8,
+    x: 192, y: 192, rx: 8, ry: 9,
     system: "Lymphatic and immune",
     summary:
       "A blood filter and immune sampling station. It removes aged red cells, recycles iron and mounts antibody responses against blood-borne pathogens.",
@@ -279,7 +279,7 @@ export const ORGANS = [
     id: "adrenals",
     name: "Adrenal glands",
     group: "Endocrine",
-    x: 116, y: 230, rx: 9, ry: 6,
+    x: 118, y: 200, rx: 7, ry: 5,
     system: "Endocrine",
     summary:
       "Cortex makes cortisol, aldosterone and adrenal androgens; the medulla makes adrenaline and noradrenaline. Two different organs in one capsule sharing a blood supply.",
@@ -305,7 +305,7 @@ export const ORGANS = [
     id: "kidneys",
     name: "Kidneys",
     group: "Viscera",
-    x: 180, y: 236, rx: 10, ry: 12,
+    x: 182, y: 206, rx: 9, ry: 11,
     system: "Renal",
     summary:
       "Filter about 180 litres of plasma a day and reabsorb almost all of it. They set acid-base balance, blood pressure, red cell production and activated vitamin D.",
@@ -331,7 +331,7 @@ export const ORGANS = [
     id: "gut",
     name: "Gut (intestines)",
     group: "Viscera",
-    x: 150, y: 256, rx: 24, ry: 18,
+    x: 150, y: 226, rx: 23, ry: 17,
     system: "Digestive",
     summary:
       "Nine metres of intestine with about 300 square metres of absorptive surface, the largest immune compartment in the body, and a microbial ecosystem that metabolises drugs.",
@@ -358,7 +358,7 @@ export const ORGANS = [
     id: "bladder",
     name: "Bladder",
     group: "Viscera",
-    x: 150, y: 300, rx: 12, ry: 9,
+    x: 150, y: 262, rx: 11, ry: 8,
     system: "Urinary",
     summary:
       "A muscular reservoir with parasympathetic voiding and sympathetic filling signals. Anticholinergic and stimulant drugs both change how it behaves.",
@@ -381,7 +381,7 @@ export const ORGANS = [
     id: "prostate",
     name: "Prostate",
     group: "Reproductive",
-    x: 150, y: 316, rx: 9, ry: 5,
+    x: 150, y: 280, rx: 7, ry: 5,
     system: "Reproductive (male)",
     summary:
       "A walnut-sized gland under the bladder that adds fluid to semen. Its growth is entirely androgen-dependent, which makes it the clearest clinical readout of androgen exposure.",
@@ -400,7 +400,7 @@ export const ORGANS = [
     id: "testes",
     name: "Testes",
     group: "Reproductive",
-    x: 150, y: 340, rx: 12, ry: 8,
+    x: 150, y: 300, rx: 11, ry: 7,
     system: "Reproductive (male)",
     summary:
       "Leydig cells make testosterone under LH drive; Sertoli cells support spermatogenesis under FSH and testosterone. Exogenous androgen shuts down both arms through feedback.",
@@ -420,7 +420,7 @@ export const ORGANS = [
     id: "ovaries",
     name: "Ovaries",
     group: "Reproductive",
-    x: 132, y: 324, rx: 10, ry: 6,
+    x: 133, y: 282, rx: 6, ry: 6,
     system: "Reproductive (female)",
     summary:
       "Produce oocytes and the cyclical oestradiol and progesterone that drive the menstrual cycle, bone density and cardiovascular risk profile.",
@@ -440,7 +440,7 @@ export const ORGANS = [
     id: "uterus",
     name: "Uterus",
     group: "Reproductive",
-    x: 160, y: 330, rx: 10, ry: 8,
+    x: 161, y: 284, rx: 8, ry: 7,
     system: "Reproductive (female)",
     summary:
       "A muscular organ whose lining cycles under oestradiol and progesterone. Hormonal drugs from SERMs to progestins change it in opposite directions.",
@@ -460,7 +460,7 @@ export const ORGANS = [
     id: "breast",
     name: "Breast tissue",
     group: "Reproductive",
-    x: 184, y: 192, rx: 12, ry: 9,
+    x: 172, y: 142, rx: 10, ry: 8,
     system: "Reproductive",
     summary:
       "Glandular tissue that responds to oestradiol, progesterone and prolactin. It is also where aromatase inhibitors and SERMs have their most important clinical effects.",
@@ -479,7 +479,7 @@ export const ORGANS = [
     id: "skin",
     name: "Skin",
     group: "Structural",
-    x: 244, y: 252, rx: 10, ry: 34,
+    x: 92, y: 180, rx: 7, ry: 10,
     system: "Integumentary",
     summary:
       "About two square metres of barrier with its own endocrine capability: it makes vitamin D, converts androgens locally and hosts the largest microbial population on the body.",
@@ -506,7 +506,7 @@ export const ORGANS = [
     id: "hair-follicle",
     name: "Hair follicle",
     group: "Structural",
-    x: 128, y: 34, rx: 14, ry: 9,
+    x: 150, y: 24, rx: 9, ry: 6,
     system: "Integumentary",
     summary:
       "A miniature organ cycling through growth, regression and rest. Androgens shorten the growth phase on the scalp in genetically susceptible follicles while lengthening it on the face.",
@@ -526,7 +526,7 @@ export const ORGANS = [
     id: "eyes",
     name: "Eyes",
     group: "Structural",
-    x: 143, y: 48, rx: 8, ry: 4,
+    x: 137, y: 36, rx: 5, ry: 4,
     system: "Sensory",
     summary:
       "Neural tissue pushed out of the skull during development. The retina is the only place where blood vessels and neurons can be inspected directly, and the iris controls light input to the circadian system.",
@@ -546,7 +546,7 @@ export const ORGANS = [
     id: "bone",
     name: "Bone",
     group: "Structural",
-    x: 118, y: 432, rx: 10, ry: 26,
+    x: 130, y: 420, rx: 6, ry: 20,
     system: "Musculoskeletal",
     summary:
       "A living tissue that remodels continuously, storing calcium and hosting the marrow where blood is made. Its density tracks hormone status closely and predictably.",
@@ -567,7 +567,7 @@ export const ORGANS = [
     id: "skeletal-muscle",
     name: "Skeletal muscle",
     group: "Structural",
-    x: 206, y: 300, rx: 14, ry: 30,
+    x: 212, y: 214, rx: 9, ry: 20,
     system: "Musculoskeletal",
     summary:
       "Around 40% of body mass and the body's main glucose sink. It adapts fast to mechanical load, and androgen, GH and IGF-1 signalling all converge on its protein balance.",
@@ -587,7 +587,7 @@ export const ORGANS = [
     id: "adipose",
     name: "Adipose tissue",
     group: "Structural",
-    x: 104, y: 258, rx: 12, ry: 20,
+    x: 104, y: 232, rx: 8, ry: 10,
     system: "Endocrine and metabolic",
     summary:
       "Not storage padding but an endocrine organ that secretes leptin and adiponectin and carries the aromatase that converts androgens to oestradiol. Fat mass therefore changes hormone balance directly.",
@@ -606,7 +606,7 @@ export const ORGANS = [
     id: "joints",
     name: "Joints and connective tissue",
     group: "Structural",
-    x: 190, y: 452, rx: 9, ry: 9,
+    x: 170, y: 360, rx: 7, ry: 7,
     system: "Musculoskeletal",
     summary:
       "Cartilage, tendon and ligament are slow-turnover tissues with poor blood supply, which is why injury there heals slowly and why collagen-support claims get so much attention.",
