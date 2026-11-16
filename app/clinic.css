@@ -381,3 +381,21 @@ html[data-motion="off"] .bm-tract { animation: none !important; }
   .bm-tract { animation: none !important; }
   .bm-layer { transform: none !important; }
 }
+
+/* Selection ring — base state, lit by .on */
+.bm-region .bm-ring {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 0.9;
+  opacity: 0;
+  transition: opacity var(--t-2) var(--e-out);
+}
+.bm-region.on .bm-ring { opacity: 0.85; }
+
+/* Literature rows under the map */
+.paper-row:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.paper-row:last-child { border-bottom: 0 !important; }
+
+/* Keyboard walk of regions */
+.bm-region:focus-visible { outline: none; }
+.bm-region:focus-visible .bm-ring { opacity: 1; stroke-dasharray: 1 2; }
