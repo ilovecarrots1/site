@@ -2,7 +2,7 @@
  * Zero dependencies. Small utilities, state store, markdown, icons, toasts.
  */
 
-export const VERSION = "2.2.0";
+export const VERSION = "2.3.0";
 
 /* ------------------------------------------------------------------ */
 /* DOM + string helpers                                                */
@@ -322,6 +322,8 @@ const ICON_PATHS = {
   sliders: "M5 21V14M5 10V3M12 21v-9M12 8V3M19 21v-5M19 12V3M2.5 14h5M9.5 8h5M16.5 16h5",
   trend: "M3 17l5.5-6 4 4L21 6m0 0h-5m5 0v5",
   globe: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Zm-9-9h18M12 3c2.5 2.5 3.8 5.5 3.8 9S14.5 18.5 12 21c-2.5-2.5-3.8-5.5-3.8-9S9.5 5.5 12 3Z",
+  calculator: "M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm1 4h8M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01",
+  body: "M12 3a3 3 0 1 1 0 6 3 3 0 0 1 0-6ZM9 10h6l1 4-2 1v6M9 10 8 14l2 1v6M12 15v6",
 };
 
 export function icon(name, size = 18, cls = "") {
