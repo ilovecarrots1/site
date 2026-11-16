@@ -1,0 +1,14 @@
+# NeuroDifference — redirect to HTTPS + index file
+# Rename this file to  .htaccess  and upload it into public_html/
+# (keep the leading dot!). Delete it if it causes a 500 error.
+
+DirectoryIndex index.html index.htm
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Behind nginx (SprintHost front-end) HTTPS shows up in X-Forwarded-Proto.
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
