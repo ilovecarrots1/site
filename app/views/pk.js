@@ -230,7 +230,7 @@ function outHtml(state) {
     )
     .join("");
 
-  return `${chartSvg(series, days, { steadyAt: Math.max(...series.map((s) => s.steadyAt)) } as any)}
+  return `${chartSvg(series, days, { steadyAt: Math.max(...series.map((s) => s.steadyAt)) })}
     <div class="row between wrap" style="gap:8px;margin-top:8px">
       <div class="chip-row">${legend}</div>
       <span class="tiny dim">y = relative to one single-dose peak</span>
