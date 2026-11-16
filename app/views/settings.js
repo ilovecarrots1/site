@@ -15,7 +15,60 @@ const ACCENTS = [
   ["rose", "Rose", "#fb7185"],
   ["green", "Green", "#4ade80"],
   ["blue", "Blue", "#60a5fa"],
+  ["cyan", "Cyan", "#22d3ee"],
+  ["lime", "Lime", "#a3e635"],
+  ["orange", "Orange", "#fb923c"],
+  ["magenta", "Magenta", "#e879f9"],
 ];
+
+const SKINS = [
+  ["aurora", "Aurora glass", "Soft light behind frosted cards"],
+  ["scope", "Oscilloscope", "Phosphor traces on a gridded scope"],
+  ["prism", "Prism", "Spectral gradients, harder edges"],
+];
+
+/* ---- accent maths ---------------------------------------------------- */
+
+function hexRgb(hex) {
+  const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(String(hex || "").trim());
+  if (!m) return null;
+  let s = m[1];
+  if (s.length === 3) s = s[0] + s[0] + s[1] + s[1] + s[2] + s[2];
+  return [parseInt(s.slice(0, 2), 16), parseInt(s.slice(2, 4), 16), parseInt(s.slice(4, 6), 16)];
+}
+
+function rgbHex(rgb) {
+  return "#" + rgb.map((v) => clamp(Math.round(v), 0, 255).toString(16).padStart(2, "0")).join("");
+}
+
+function luminance(rgb) {
+  const f = (v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * f(rgb[0]) + 0.7152 * f(rgb[1]) + 0.0722 * f(rgb[2]);
+}
+
+/* Pull any hex into a usable accent band so a near-black or neon pick still
+   reads against the dark UI. Returns the full token set the CSS expects. */
+export function accentTokens(hex) {
+  const rgb = hexRgb(hex);
+  if (!rgb) return null;
+  const L = luminance(rgb);
+  let f = 1;
+  if (L < 0.14) f = clamp(Math.sqrt(0.14 / Math.max(L, 0.004)), 1, 3);
+  else if (L > 0.6) f = clamp(0.6 / L, 0.45, 1);
+  const norm = rgb.map((v) => clamp(v * f, 0, 255));
+  const out = {
+    accent: rgbHex(norm),
+    accent2: rgbHex(norm.map((v) => v * 0.84)),
+    ink: luminance(norm) > 0.4 ? "#0b0d10" : "#ffffff",
+    soft: `rgba(${Math.round(norm[0])}, ${Math.round(norm[1])}, ${Math.round(norm[2])}, 0.14)`,
+    line: `rgba(${Math.round(norm[0])}, ${Math.round(norm[1])}, ${Math.round(norm[2])}, 0.38)`,
+    lum: luminance(norm),
+  };
+  return out;
+}
 
 const DENSITIES = [
   ["comfortable", "Comfortable"],
