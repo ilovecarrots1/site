@@ -31,6 +31,7 @@ import * as pkView from "./views/pk.js";
 import * as stackView from "./views/stack.js";
 import * as symptomsView from "./views/symptoms.js";
 import * as emergencyView from "./views/emergency.js";
+import * as auditView from "./views/audit.js";
 import { PATHWAYS } from "./data/atlas.js";
 import { ORGANS } from "./data/organs.js";
 import { CONDITIONS } from "./data/conditions.js";
@@ -457,6 +458,9 @@ function matchRoute(segs) {
     const key = String(b).toLowerCase();
     const sys = SYSTEM_BY_ID.get(key);
     return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
+  }
+  if (a === "dev" && (b === "audit" || !b)) {
+    return { nav: "settings", title: "Data audit", view: { render: auditView.render, mount: auditView.mount } };
   }
   if (a === "emergency" || a === "redflags") {
     return { nav: "emergency", title: "Red flags", view: { render: emergencyView.render, mount: emergencyView.mount } };
