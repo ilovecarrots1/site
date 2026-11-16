@@ -349,9 +349,29 @@ export const taper = {
     )}
 
     <div class="split split-mobile-first">
-      <div class="stack" style="gap:14px" id="taper-out">${planHtml(c, cfg)}</div>
+      <div class="stack" style="gap:14px">
+        <div id="taper-out">${planHtml(c, cfg)}</div>
 
-      <aside class="stack sticky-side" style="gap:14px">
+        <div class="card tight">
+          <div class="stack-3">
+            <b style="font-size:13px">Why hyperbolic</b>
+            <p class="tiny muted" style="line-height:1.6">
+              The same 1 mg is a 50% cut at 2 mg and a 5% cut at 20 mg. Fixed-percent steps therefore remove more drug early and
+              smaller amounts later, which is what receptor adaptation can follow. Time between steps is set by the half-life:
+              about five of them and the plasma level has finished moving.
+            </p>
+          </div>
+        </div>
+
+        <div class="card tight">
+          <p class="tiny dim" style="line-height:1.6">
+            Educational model. It knows the half-life and the arithmetic — not your kidneys, your dose form or your history.
+            Anyone on benzodiazepines, opioids, antipsychotics or antidepressants should taper with a prescriber.
+          </p>
+        </div>
+      </div>
+
+      <aside class="sticky-side">
         <div class="card">
           <div class="card-head"><h3>Inputs</h3></div>
           <div class="stack" style="gap:12px">
@@ -392,24 +412,6 @@ export const taper = {
               }).join("")}
             </div>
           </div>
-        </div>
-
-        <div class="card tight">
-          <div class="stack-3">
-            <b style="font-size:13px">Why hyperbolic</b>
-            <p class="tiny muted" style="line-height:1.6">
-              The same 1 mg is a 50% cut at 2 mg and a 5% cut at 20 mg. Fixed-percent steps therefore remove more drug early and
-              smaller amounts later, which is what receptor adaptation can follow. Time between steps is set by the half-life:
-              about five of them and the plasma level has finished moving.
-            </p>
-          </div>
-        </div>
-
-        <div class="card tight">
-          <p class="tiny dim" style="line-height:1.6">
-            Educational model. It knows the half-life and the arithmetic — not your kidneys, your dose form or your history.
-            Anyone on benzodiazepines, opioids, antipsychotics or antidepressants should taper with a prescriber.
-          </p>
         </div>
       </aside>
     </div>`;
