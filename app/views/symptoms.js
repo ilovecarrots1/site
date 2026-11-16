@@ -6,7 +6,8 @@
 
 import { esc, icon, store } from "../core.js";
 import { COMPOUNDS, COMPOUND_BY_ID } from "../data/compounds.js";
-import { SYMPTOM_INDEX, SYMPTOM_COUNT, CONDITION_BY_ID, symptomsForCondition, CONDITION_COUNT, SYSTEM_BY_ID } from "../data/conditions.js";
+import { SYMPTOM_INDEX, SYMPTOM_COUNT, CONDITION_BY_ID, symptomsForCondition, CONDITION_COUNT } from "../data/conditions.js";
+import { SYSTEM_BY_ID } from "../data/neuro.js";
 
 const AXES = {
   psych: "Psychiatric",
@@ -186,7 +187,6 @@ export function render(ctx) {
     if (list.length) {
       store.data.symptomPick = list.slice(0, 6);
       store.save();
-      return { redirect: `#/symptoms` };
     }
   }
   const axis = q.axis && AXES[q.axis] ? String(q.axis) : "";
