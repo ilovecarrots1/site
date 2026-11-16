@@ -450,10 +450,11 @@ html,body{height:100%;margin:0;background:#05070a;color:var(--text);font-family:
 
   var i = -1, timer = null, paused = true;
 
-  /* stage centred, small margin on all four sides */
+  /* stage centred, small margin on all four sides (?pad=NN overrides, in CSS px) */
   function fit(){
     var vw = window.innerWidth, vh = window.innerHeight;
-    var pad = Math.max(12, Math.round(Math.min(vw, vh) * 0.028));
+    var ov = parseInt(params.get("pad"), 10);
+    var pad = (ov >= 0 && ov < 240) ? ov : Math.max(12, Math.round(Math.min(vw, vh) * 0.028));
     var s = Math.min((vw - pad * 2) / 1080, (vh - pad * 2) / 1920);
     stage.style.transform = "scale(" + s + ")";
   }
