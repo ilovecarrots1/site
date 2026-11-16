@@ -63,7 +63,7 @@ export const MARKERS_B = [
     ref: { low: 4, high: 15 },
     better: "mid",
     note: "Stress, sleep and nipple stimulation all raise it transiently — retest before imaging.",
-    compounds: ["cabergoline", "quetiapine", "mirtazapine", "risperidone", "sertraline", "fluoxetine", "escitalopram", "olanzapine", "trenbolone-acetate", "methenolone-enanthate"],
+    compounds: ["cabergoline", "quetiapine", "mirtazapine", "sertraline", "fluoxetine", "escitalopram", "trenbolone-acetate", "methenolone-enanthate"],
   },
   {
     id: "lh",
@@ -99,7 +99,7 @@ export const MARKERS_B = [
     ref: { low: 6, high: 23 },
     better: "mid",
     note: "Must be drawn 07:00–09:00; late shifts change the whole reference interval.",
-    compounds: ["hydrocortisone", "mk-677", "somatotropin", "ashwagandha", "lithium", "mirtazapine", "testosterone-cypionate"],
+    compounds: ["mk-677", "somatotropin", "ashwagandha", "lithium", "mirtazapine", "testosterone-cypionate"],
   },
   {
     id: "acth",
@@ -111,7 +111,7 @@ export const MARKERS_B = [
     ref: { low: 7, high: 63 },
     better: "mid",
     note: "Interpreted together with cortisol: the pair tells you whether the drive is central or adrenal.",
-    compounds: ["hydrocortisone", "ashwagandha", "mirtazapine"],
+    compounds: ["ashwagandha", "mirtazapine"],
   },
   {
     id: "igf-1",
@@ -149,7 +149,7 @@ export const MARKERS_B = [
     ref: { low: 0, high: 3 },
     better: "low",
     note: "Under 1 mg/L is low cardiovascular risk, 1–3 average, above 3 high; above 10 usually means infection.",
-    compounds: ["omega-3", "n-acetylcysteine", "testosterone-cypionate", "trenbolone-acetate", "semaglutide", "cbd", "curcumin"],
+    compounds: ["omega-3", "n-acetylcysteine", "testosterone-cypionate", "trenbolone-acetate", "semaglutide", "cbd"],
   },
   {
     id: "esr",
@@ -173,7 +173,7 @@ export const MARKERS_B = [
     ref: { low: 30, high: 300 },
     better: "mid",
     note: "Both an iron store marker and an acute-phase protein — it rises with inflammation regardless of iron.",
-    compounds: ["testosterone-cypionate", "nandrolone-decanoate", "omega-3", "n-acetylcysteine", "iron-bisglycinate"],
+    compounds: ["testosterone-cypionate", "nandrolone-decanoate", "omega-3", "n-acetylcysteine"],
   },
   {
     id: "homocysteine",
@@ -199,7 +199,7 @@ export const MARKERS_B = [
     ref: { low: 60, high: 170 },
     better: "mid",
     note: "Swingy within a day; interpret with ferritin and transferrin saturation.",
-    compounds: ["iron-bisglycinate", "testosterone-cypionate", "nandrolone-decanoate"],
+    compounds: ["testosterone-cypionate", "nandrolone-decanoate"],
   },
   {
     id: "transferrin-sat",
@@ -211,7 +211,7 @@ export const MARKERS_B = [
     ref: { low: 20, high: 50 },
     better: "mid",
     note: "Above 50% suggests iron overload; below 20% suggests functional iron deficiency.",
-    compounds: ["iron-bisglycinate", "testosterone-enanthate"],
+    compounds: ["testosterone-enanthate"],
   },
   {
     id: "b12",
@@ -247,7 +247,7 @@ export const MARKERS_B = [
     ref: { low: 30, high: 60 },
     better: "mid",
     note: "Under 20 is deficiency; there is no benefit proven above 60.",
-    compounds: ["vitamin-d3", "testosterone-cypionate", "semaglutide", "omega-3"],
+    compounds: ["testosterone-cypionate", "semaglutide", "omega-3"],
   },
   {
     id: "magnesium",
@@ -273,7 +273,7 @@ export const MARKERS_B = [
     ref: { low: 135, high: 145 },
     better: "mid",
     note: "Low sodium is the one to respect: it can cause seizures when it falls fast.",
-    compounds: ["desmopressin", "mdma", "quetiapine", "mirtazapine", "sertraline", "escitalopram", "cabergoline"],
+    compounds: ["mdma", "quetiapine", "mirtazapine", "sertraline", "escitalopram", "cabergoline"],
   },
   {
     id: "potassium",
@@ -285,7 +285,7 @@ export const MARKERS_B = [
     ref: { low: 3.5, high: 5.1 },
     better: "mid",
     note: "Haemolysed samples read falsely high — repeat before acting on a borderline result.",
-    compounds: ["clenbuterol", "salbutamol", "insulin", "testosterone-cypionate", "anastrozole"],
+    compounds: ["clenbuterol", "insulin", "testosterone-cypionate", "anastrozole"],
   },
   {
     id: "calcium",
@@ -297,7 +297,7 @@ export const MARKERS_B = [
     ref: { low: 8.6, high: 10.3 },
     better: "mid",
     note: "Correct for albumin; a normal total with low albumin can hide free calcium that is high.",
-    compounds: ["vitamin-d3", "abaloparatide", "liothyronine", "testosterone-cypionate", "calcium-carbonate"],
+    compounds: ["abaloparatide", "liothyronine", "testosterone-cypionate", "calcium-carbonate"],
   },
   {
     id: "phosphate",
@@ -309,7 +309,7 @@ export const MARKERS_B = [
     ref: { low: 2.5, high: 4.5 },
     better: "mid",
     note: "Falls with refeeding and with insulin; rises in kidney failure.",
-    compounds: ["insulin", "vitamin-d3", "somatotropin"],
+    compounds: ["insulin", "somatotropin"],
   },
 
   /* ---------------- blood count ---------------- */
@@ -323,7 +323,7 @@ export const MARKERS_B = [
     ref: { low: 13.5, high: 17.5 },
     better: "mid",
     note: "Universal interval; typical female ranges start around 12.0 g/dL.",
-    compounds: ["testosterone-cypionate", "sustanon-blend", "nandrolone-decanoate", "oxandrolone", "iron-bisglycinate", "semaglutide"],
+    compounds: ["testosterone-cypionate", "sustanon-blend", "nandrolone-decanoate", "oxandrolone", "semaglutide"],
   },
   {
     id: "hematocrit",
@@ -335,7 +335,7 @@ export const MARKERS_B = [
     ref: { low: 38, high: 50 },
     better: "mid",
     note: "Above 54% blood viscosity rises sharply — the practical ceiling for testosterone therapy.",
-    compounds: ["testosterone-enanthate", "testosterone-cypionate", "sustanon-blend", "nandrolone-decanoate", "oxandrolone", "erythropoietin"],
+    compounds: ["testosterone-enanthate", "testosterone-cypionate", "sustanon-blend", "nandrolone-decanoate", "oxandrolone"],
   },
   {
     id: "wbc",
@@ -347,7 +347,7 @@ export const MARKERS_B = [
     ref: { low: 4.0, high: 11.0 },
     better: "mid",
     note: "Cortisol and lithium both raise it; most viral infections lower it.",
-    compounds: ["lithium", "hydrocortisone", "clozapine", "quetiapine", "testosterone-cypionate"],
+    compounds: ["lithium", "quetiapine", "testosterone-cypionate"],
   },
   {
     id: "neutrophils",
@@ -359,7 +359,7 @@ export const MARKERS_B = [
     ref: { low: 1.8, high: 7.0 },
     better: "mid",
     note: "Under 1.0 is neutropenia — a fever there is an emergency.",
-    compounds: ["clozapine", "quetiapine", "lithium", "hydrocortisone"],
+    compounds: ["quetiapine", "lithium"],
   },
   {
     id: "platelets",
@@ -371,7 +371,7 @@ export const MARKERS_B = [
     ref: { low: 150, high: 400 },
     better: "mid",
     note: "Raised by inflammation and iron deficiency; lowered by alcohol and some anticonvulsants.",
-    compounds: ["valproate", "lamotrigine", "lithium", "n-acetylcysteine", "testosterone-cypionate"],
+    compounds: ["lamotrigine", "lithium", "n-acetylcysteine", "testosterone-cypionate"],
   },
 
   /* ---------------- muscle and waste ---------------- */
@@ -385,7 +385,7 @@ export const MARKERS_B = [
     ref: { low: 30, high: 200 },
     better: "low",
     note: "Rises 10–100× after hard training. Rest 3–5 days before trusting a value.",
-    compounds: ["creatine", "stanozolol", "oxandrolone", "trenbolone-acetate", "clenbuterol", "statin"],
+    compounds: ["creatine", "stanozolol", "oxandrolone", "trenbolone-acetate", "clenbuterol"],
   },
   {
     id: "ldh",
@@ -409,7 +409,7 @@ export const MARKERS_B = [
     ref: { low: 3.4, high: 7.0 },
     better: "low",
     note: "High urate plus a hot swollen joint is gout until proven otherwise.",
-    compounds: ["testosterone-cypionate", "creatine", "furosemide", "niacin", "vitamin-c"],
+    compounds: ["testosterone-cypionate", "creatine"],
   },
   {
     id: "ammonia",
@@ -421,6 +421,5 @@ export const MARKERS_B = [
     ref: { low: 11, high: 32 },
     better: "low",
     note: "Sample handling matters more than the assay — an unspun tube reads falsely high.",
-    compounds: ["valproate", "creatine", "l-carnitine"],
-  },
-];
+    compounds: ["creatine"],
+  }];
