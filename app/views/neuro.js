@@ -177,7 +177,7 @@ export const map = {
     <div class="split" style="margin-bottom:24px">
       <div>
         <div class="brain-wrap" id="brain-wrap">${mapHtml()}</div>
-        <p class="tiny dim" style="margin-top:8px;line-height:1.5">Sagittal schematic — frontal pole left, cerebellum and brainstem lower right. Not to anatomical scale; the ring marks regions with multiple systems.</p>
+        <p class="tiny dim" style="margin-top:8px;line-height:1.5">Sagittal view — frontal pole left, cerebellum and brainstem lower right. Regional outlines are stylised for clarity; the ring marks regions driven by more than one transmitter system. Tap any marker.</p>
       </div>
       <div id="region-panel">${regionPanel()}</div>
     </div>
