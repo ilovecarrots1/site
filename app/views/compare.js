@@ -9,7 +9,7 @@ import { esc, icon, fmt, copyText, evidenceChip } from "../core.js";
 import { COMPOUNDS, getCompound } from "../data/compounds.js";
 import { pageHead, classColor, backLink, callout } from "./ui.js";
 
-const MAX = 3;
+const MAX = 6;
 
 const PRESETS = [
   ["caffeine", "modafinil"],
@@ -210,7 +210,7 @@ export const compare = {
           .join("")}
         ${
           list.length < MAX
-            ? `<button class="btn ghost sm block" data-act="add">${icon("plus", 14)} Add a third compound</button>`
+            ? `<button class="btn ghost sm block" data-act="add">${icon("plus", 14)} Add a compound</button>`
             : ""
         }
         <div class="row wrap" style="gap:6px;padding-top:2px">
