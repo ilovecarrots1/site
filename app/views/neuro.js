@@ -312,7 +312,7 @@ export const system = {
         </section>
 
         <section class="card">
-          <div class="card-head"><h3 style="font-size:14px">${icon("git", 14)} Pathway, top to bottom</h3><span class="spacer"></span>${liveBadge("animated")}</div>
+          <div class="card-head"><h3 style="font-size:14px">${icon("dna", 14)} Pathway, top to bottom</h3><span class="spacer"></span>${liveBadge("animated")}</div>
           ${mechFlow(
             (s.synthesis || []).slice(0, 5).map((st, i) => ({
               icon: i === 0 ? "atom" : i === 1 ? "flask" : i === 2 ? "target" : "activity",
