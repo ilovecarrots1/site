@@ -7,7 +7,13 @@ import { COMPOUNDS_D } from "./compounds-d.js";
 import { COMPOUNDS_E } from "./compounds-e.js";
 import { COMPOUNDS_F } from "./compounds-f.js";
 
-export const COMPOUNDS = [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COMPOUNDS_D, ...COMPOUNDS_E, ...COMPOUNDS_F]
+export const COMPOUNDS = Array.from(
+  [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COMPOUNDS_D, ...COMPOUNDS_E, ...COMPOUNDS_F].reduce((map, c) => {
+    // Later entries win, so a newer, richer record replaces an older stub with the same id.
+    if (c && c.id && c.name) map.set(String(c.id).toLowerCase(), c);
+    return map;
+  }, new Map()).values()
+)
   .filter((c) => c && c.id && c.name)
   .map((c) => ({
     aliases: [],
