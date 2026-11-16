@@ -44,6 +44,18 @@ const state = {
   finalPct: 12.5,
 };
 
+let appliedQuery = "";
+
+/** Adopt a compound's unit, typical dose and dosing frequency. */
+function useCompound(c) {
+  if (!c) return;
+  state.id = c.id;
+  const first = (c.doses || [])[0];
+  state.unit = (first && first.unit) || "mg";
+  state.dose = defaultDose(c);
+  state.freq = 1;
+}
+
 /* ------------------------------------------------------------------ */
 /* Dose maths                                                          */
 /* ------------------------------------------------------------------ */
@@ -300,15 +312,13 @@ function compoundOptions() {
 export const taper = {
   render(ctx) {
     const wanted = String(ctx.query.compound || "").toLowerCase();
-    const c = getCompound(wanted) || getCompound(state.id) || TAPERABLE[0] || COMPOUNDS[0];
-
-    if (c && c.id !== state.id) {
-      state.id = c.id;
-      const first = (c.doses || [])[0];
-      state.unit = (first && first.unit) || "mg";
-      state.dose = defaultDose(c);
-      state.freq = 1;
+    if (wanted && wanted !== appliedQuery) {
+      appliedQuery = wanted;
+      const next = getCompound(wanted);
+      if (next && Number(next.pk?.halfLife) > 0) useCompound(next);
     }
+
+    const c = getCompound(state.id) || TAPERABLE[0] || COMPOUNDS[0];
 
     const cfg = {
       dose: state.dose,
@@ -375,7 +385,7 @@ export const taper = {
 
         <div class="card tight">
           <div class="stack-3">
-            <b style="font-size:13px">Why hyperbolic</div>
+            <b style="font-size:13px">Why hyperbolic</b>
             <p class="tiny muted" style="line-height:1.6">
               The same 1 mg is a 50% cut at 2 mg and a 5% cut at 20 mg. Fixed-percent steps therefore remove more drug early and
               smaller amounts later, which is what receptor adaptation can follow. Time between steps is set by the half-life:
@@ -421,14 +431,8 @@ export const taper = {
     root.querySelector("#tp-c")?.addEventListener("change", (ev) => {
       const c = getCompound(ev.target.value);
       if (!c) return;
-      state.id = c.id;
-      const first = (c.doses || [])[0];
-      state.unit = (first && first.unit) || "mg";
-      state.dose = defaultDose(c);
-      setVal("#tp-dose", state.dose);
-      const label = root.querySelector('label.field');
-      if (label) label.lastChild; // no-op, keeps the label untouched
-      repaint();
+      useCompound(c);
+      ctx.rerender?.();
     });
 
     const bindNumber = (sel, key, min, max, { integer = false } = {}) => {
@@ -453,13 +457,8 @@ export const taper = {
       if (pick) {
         const c = getCompound(pick.dataset.pick);
         if (!c) return;
-        state.id = c.id;
-        const first = (c.doses || [])[0];
-        state.unit = (first && first.unit) || "mg";
-        state.dose = defaultDose(c);
-        setVal("#tp-dose", state.dose);
-        setVal("#tp-c", state.id);
-        repaint();
+        useCompound(c);
+        ctx.rerender?.();
         return;
       }
 
