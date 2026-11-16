@@ -1146,7 +1146,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 18px 0; }
   background: var(--text-3);
 }
 .cmp-list.good li::before { background: var(--ok); }
-.cmp-list.bad li::before { background: var(--danger); }
+.cmp-list.bad li::before { background: var(--bad); }
 
 @media (min-width: 720px) {
   .cmp-row {
