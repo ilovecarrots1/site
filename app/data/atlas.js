@@ -351,7 +351,7 @@ export const PATHWAYS = [
       { label: "PI3K activation", enzyme: "PI3K class I", cofactor: "PIP2", detail: "PI3K converts PIP2 to PIP3, recruiting PDK1 and AKT to the membrane.", drugs: [] },
       { label: "AKT phosphorylation", enzyme: "PDK1 and mTORC2", cofactor: "ATP", detail: "AKT phosphorylates TSC2, releasing Rheb to activate mTORC1, and phosphorylates FOXO to stop catabolic gene expression.", drugs: [] },
       { label: "mTORC1 activation", enzyme: "mTOR in complex with Raptor", cofactor: "Leucine, ATP, Rheb-GTP", detail: "mTORC1 phosphorylates p70S6K and 4E-BP1, increasing translation initiation and ribosome biogenesis.", drugs: ["creatine", "leucine"] },
-      { label: "Muscle protein synthesis", enzyme: "p70S6K → eIF4B", cofactor: "Amino acids, resistance exercise", detail: "Protein synthesis needs both the signalling input and sufficient amino acids; without substrate, mTOR activation wastes energy.", drugs: ["oxandrolone", "testosterone-enanthate", "ligf"] },
+      { label: "Muscle protein synthesis", enzyme: "p70S6K → eIF4B", cofactor: "Amino acids, resistance exercise", detail: "Protein synthesis needs both the signalling input and sufficient amino acids; without substrate, mTOR activation wastes energy.", drugs: ["oxandrolone", "testosterone-enanthate", "ligandrol"] },
       { label: "Feedback restraint", enzyme: "p70S6K → IRS-1 serine phosphorylation; PTEN", cofactor: "—", detail: "Chronic mTORC1 activity desensitises insulin signalling, which is why sustained GH or IGF-1 exposure raises glucose.", drugs: [] },
     ],
     links: [{ id: "gh-igf1-axis", note: "IGF-1 is the main upstream activator" }, { id: "fgf-fgfr-mapk", note: "MAPK and PI3K are parallel outputs of RTKs" }],
@@ -422,7 +422,148 @@ export const PATHWAYS = [
 
 export const PATHWAY_BY_ID = new Map(PATHWAYS.map((p) => [p.id, p]));
 
-export const TARGETS = [];
+export const TARGETS = [
+  {
+    id: "d1-receptor",
+    name: "Dopamine D1 receptor",
+    kind: "GPCR",
+    gene: "DRD1",
+    location: "Striatum, prefrontal cortex, nucleus accumbens",
+    function:
+      "Gs-coupled dopamine receptor that raises cAMP and drives motor activation, motivation and cortical plasticity. D1 and D2 co-expression on the same neuron produces the classic 'direct pathway' output.",
+    systems: ["dopamine"],
+    compounds: ["levodopa", "modafinil", "bromantane", "caffeine"],
+    drugClasses: ["D1 agonists (experimental)", "D1 antagonists (experimental)"],
+    note: "No D1-selective drug is approved; D1 signalling is still the main target of levodopa therapy in Parkinson's disease.",
+    pubmed: "dopamine D1 receptor DRD1 striatum signalling",
+  },
+  {
+    id: "d2-receptor",
+    name: "Dopamine D2 receptor",
+    kind: "GPCR",
+    gene: "DRD2",
+    location: "Striatum, pituitary lactotrophs, VTA",
+    function:
+      "Gi-coupled receptor that inhibits cAMP, acting as both a postsynaptic striatal brake and a presynaptic autoreceptor. In the pituitary it suppresses prolactin.",
+    systems: ["dopamine"],
+    compounds: ["pramipexole", "cabergoline", "quetiapine", "amantadine"],
+    drugClasses: ["Atypical antipsychotics (antagonists)", "D2 agonists (pramipexole, ropinirole)"],
+    note: "Blocking more than 70-80% of striatal D2 receptors produces extrapyramidal symptoms; agonism produces impulse-control disorders.",
+    pubmed: "dopamine D2 receptor antagonism prolactin striatum",
+  },
+  {
+    id: "5ht1a-receptor",
+    name: "Serotonin 5-HT1A receptor",
+    kind: "GPCR",
+    gene: "HTR1A",
+    location: "Raphe nuclei (autoreceptor), hippocampus, cortex",
+    function:
+      "Gi-coupled receptor that hyperpolarises neurons. Somatodendritic autoreceptors on raphe neurons limit serotonin release, while postsynaptic receptors mediate anxiolytic effects.",
+    systems: ["serotonin"],
+    compounds: ["buspirone", "vortioxetine", "mirtazapine", "sertraline"],
+    drugClasses: ["Buspirone, gepirone (partial agonists)", "Pindolol (antagonist)"],
+    note: "Desensitisation of raphe autoreceptors over 2-3 weeks is part of why SSRIs take weeks to work.",
+    pubmed: "5-HT1A receptor autoreceptor SSRIs desensitisation",
+  },
+  {
+    id: "5ht2a-receptor",
+    name: "Serotonin 5-HT2A receptor",
+    kind: "GPCR",
+    gene: "HTR2A",
+    location: "Layer V cortical pyramidal neurons, thalamus",
+    function:
+      "Gq-coupled receptor that increases cortical excitability. It is the principal target of psychedelics and of the atypical antipsychotics that block it.",
+    systems: ["serotonin", "glutamate"],
+    compounds: ["psilocybin", "lsd", "quetiapine", "mirtazapine"],
+    drugClasses: ["Psychedelics (agonists)", "Atypical antipsychotics (antagonists)"],
+    note: "Psychedelic effects correlate with 5-HT2A occupancy, while chronic blockade is thought to contribute to the metabolic side effects of some antipsychotics.",
+    pubmed: "5-HT2A receptor psilocybin LSD cortical signalling",
+  },
+  {
+    id: "sert",
+    name: "Serotonin transporter (SERT)",
+    kind: "Transporter",
+    gene: "SLC6A4",
+    location: "Raphe terminals, platelets, gut enterochromaffin cells",
+    function:
+      "Na⁺/Cl⁻-dependent reuptake carrier that terminates serotonergic signalling by returning serotonin into the presynaptic terminal.",
+    systems: ["serotonin"],
+    compounds: ["sertraline", "fluoxetine", "escitalopram", "mdma", "sam-e"],
+    drugClasses: ["SSRIs (inhibitors)", "MDMA and analogues (substrate releasers)"],
+    note: "Genetic variants in the promoter region alter expression but do not reliably predict antidepressant response.",
+    pubmed: "serotonin transporter SLC6A4 SSRI reuptake",
+  },
+  {
+    id: "net",
+    name: "Noradrenaline transporter (NET)",
+    kind: "Transporter",
+    gene: "SLC6A2",
+    location: "Locus coeruleus terminals, peripheral sympathetic nerves",
+    function:
+      "Reuptake carrier for noradrenaline, and the main peripheral clearance route for circulating catecholamines.",
+    systems: ["noradrenaline", "dopamine"],
+    compounds: ["atomoxetine", "venlafaxine", "dextroamphetamine", "bupropion"],
+    drugClasses: ["SNRIs", "Atomoxetine", "Tricyclics"],
+    note: "Peripheral NET blockade is why venlafaxine raises blood pressure at higher doses.",
+    pubmed: "norepinephrine transporter SLC6A2 reuptake inhibitor",
+  },
+  {
+    id: "dat",
+    name: "Dopamine transporter (DAT)",
+    kind: "Transporter",
+    gene: "SLC6A3",
+    location: "Striatum and midbrain dopamine terminals",
+    function:
+      "Clears synaptic dopamine back into the presynaptic neuron; sparse in prefrontal cortex, where COMT takes over.",
+    systems: ["dopamine"],
+    compounds: ["methylphenidate", "modafinil", "dextroamphetamine", "bupropion"],
+    drugClasses: ["Stimulants (blockers or substrates)", "Benztropine analogues (research)"],
+    note: "Amphetamines reverse DAT and release dopamine, while methylphenidate only blocks it — a mechanistic difference with different abuse kinetics.",
+    pubmed: "dopamine transporter DAT methylphenidate amphetamine",
+  },
+  {
+    id: "alpha1-receptor",
+    name: "Alpha-1 adrenergic receptor",
+    kind: "GPCR",
+    gene: "ADRA1A/B/D",
+    location: "Vascular smooth muscle, prostate, cortex",
+    function:
+      "Gq-coupled receptor that constricts blood vessels and raises blood pressure; central alpha-1 blockade contributes to sedation.",
+    systems: ["noradrenaline"],
+    compounds: ["quetiapine", "clenbuterol", "propranolol"],
+    drugClasses: ["Alpha blockers (prazosin, tamsulosin)", "Alpha agonists (phenylephrine)"],
+    note: "Blockade causes orthostatic hypotension and miosis; it is also the mechanism behind the 'alpha-1' side effects of some antipsychotics.",
+    pubmed: "alpha-1 adrenergic receptor vasoconstriction blood pressure",
+  },
+  {
+    id: "alpha2-receptor",
+    name: "Alpha-2 adrenergic receptor",
+    kind: "GPCR",
+    gene: "ADRA2A/B/C",
+    location: "Locus coeruleus (autoreceptor), presynaptic terminals",
+    function:
+      "Gi-coupled autoreceptor that suppresses noradrenaline release. Central alpha-2 agonism reduces sympathetic outflow, producing sedation and lower blood pressure.",
+    systems: ["noradrenaline"],
+    compounds: ["clonidine", "guanfacine", "mirtazapine"],
+    drugClasses: ["Clonidine, guanfacine, dexmedetomidine (agonists)", "Yohimbine, mirtazapine (antagonists)"],
+    note: "Abrupt clonidine withdrawal produces rebound hypertension through upregulated receptors.",
+    pubmed: "alpha-2 adrenergic autoreceptor clonidine guanfacine",
+  },
+  {
+    id: "beta1-receptor",
+    name: "Beta-1 adrenergic receptor",
+    kind: "GPCR",
+    gene: "ADRB1",
+    location: "Heart, kidney juxtaglomerular cells, adipose tissue",
+    function:
+      "Gs-coupled receptor that raises heart rate and contractility and stimulates renin release. Chronically overstimulated in heart failure.",
+    systems: ["noradrenaline"],
+    compounds: ["propranolol", "clenbuterol", "clonidine"],
+    drugClasses: ["Beta blockers (metoprolol, bisoprolol)", "Dobutamine (agonist)"],
+    note: "Beta-1 blockade reduces mortality in heart failure, which is why selectivity matters clinically.",
+    pubmed: "beta-1 adrenergic receptor heart rate contractility",
+  },
+];
 // END_ATLAS
 
 export const TARGET_BY_ID = new Map(TARGETS.map((t) => [t.id, t]));
