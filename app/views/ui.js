@@ -1,6 +1,6 @@
 /* Shared view helpers: page headers, cards, tiles, chips. */
 
-import { esc, icon, evidenceChip } from "../core.js";
+import { esc, icon, evidenceChip, store } from "../core.js";
 import { SEVERITY } from "../data/interactions.js";
 
 export function pageHead(title, sub, action = "", eyebrow = "") {
@@ -116,8 +116,7 @@ export function chipRow(items, activeValue, dataAttr, { allLabel = "All" } = {})
   </div>`;
 }
 
-/** Horizontal "meter" with a label and value text. */
-export function metric(label, valueText, ratio, tone = "") {
+/** Horizontal "meter" with a label and value text. */export function metric(label, valueText, ratio, tone = "") {
   return `<div class="stack-3">
     <div class="row between tiny"><span class="muted">${esc(label)}</span><span class="mono dim">${esc(valueText)}</span></div>
     <div class="meter ${tone}"><i style="width:${Math.round(clamp01(ratio) * 100)}%"></i></div>
@@ -126,8 +125,7 @@ export function metric(label, valueText, ratio, tone = "") {
 
 const clamp01 = (n) => Math.max(0, Math.min(1, Number(n) || 0));
 
-export function callout(kind, title, body) {
-  const map = {
+export function callout(kind, title, body) {  const map = {
     danger: { ic: "alert", color: "var(--critical)", bg: "rgba(248,81,73,.08)", line: "rgba(248,81,73,.28)" },
     warn: { ic: "alert", color: "var(--warn)", bg: "rgba(210,153,34,.08)", line: "rgba(210,153,34,.26)" },
     ok: { ic: "check", color: "var(--good)", bg: "rgba(63,185,80,.08)", line: "rgba(63,185,80,.26)" },
