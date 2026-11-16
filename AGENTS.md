@@ -94,3 +94,42 @@ Do not hand-write a `CNAME` file - GitHub creates it from Settings -> Pages.
 FTP password, provider API keys, the Telegram bot token. Keep them in
 conversation state or environment, never in a tracked file. This repo is
 public.
+
+## Where we are right now — 2026-11-16
+
+- App is **v3.0.0**, feature-complete. `#/dev/audit` must show 12/12.
+- Hosting was migrated from SprintHost to **GitHub Pages**. Repo root is the site.
+- `CNAME` exists in the repo, so the custom domain `neurodifference.ru` is
+  saved in Settings -> Pages.
+- DNS verified through `dns.google`: 4x A and 4x AAAA resolve to GitHub Pages
+  IPs, `www` CNAME points to `ilovecarrots1.github.io.`, there are **no CAA
+  records**, and no leftover SprintHost A/AAAA entries remain.
+- **Blocked:** GitHub shows "Unavailable for your site because your domain is
+  not properly configured to support HTTPS", so Enforce HTTPS is greyed out.
+  Per GitHub docs this can take up to 24 h. If it is still grey after that:
+  clear the custom domain field -> Save -> wait 5 min -> re-enter it -> Save.
+  Plan B: temporarily delete the four AAAA records, wait for the certificate,
+  then add them back.
+- The old SprintHost copy is still reachable over FTP at `141.8.192.182`
+  (user `playnd`). It is a backup only. Never write its password into a file.
+
+### Next steps for the next agent
+
+1. Verify the deploy from the shell: `dig +short A neurodifference.ru`,
+   `curl -sI https://neurodifference.ru/`, then open `#/dev/audit`,
+   `/manifest.json`, `/sw.js` and confirm 200 + correct content types.
+2. Optional: deploy `tools/ai-proxy-worker.js` with `npx wrangler deploy`
+   (needs a Cloudflare account and the three secrets listed in the file).
+3. Optional: Telegram digest. Create a bot with @BotFather, then send messages
+   with a plain GET: `https://api.telegram.org/bot<TOKEN>/sendMessage?chat_id=<ID>&text=<text>`.
+   Keep the token in chat state or an env var, never in the repo.
+4. Optional: downgrade SprintHost to a domain-only plan, hosting is no longer
+   needed there.
+
+## Working from the shell
+
+The project lives in the Acode Terminal home (`~/neuro`, shown in Files as
+**Terminal Public**). `bash` only exists when the open project is inside that
+folder. Useful: `apk add git nodejs curl bind-tools`, `git pull`, `git push`
+(needs a PAT), `npx wrangler`. Device storage is mounted at
+`/mnt/user/0/emulated` if files must be copied out.
