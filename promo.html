@@ -185,7 +185,7 @@ html,body{height:100%;margin:0;background:#05070a;color:var(--text);font-family:
 .cmp{flex:1;border:1px solid var(--line);border-radius:32px;padding:38px 34px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.01))}
 .cmp .k{font-size:22px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3)}
 .cmp .v{font-size:44px;font-weight:700;margin-top:14px;letter-spacing:-.01em}
-.link{position:absolute;left:0;right:0;top:50%;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transform-origin:left;transform:scaleX(0)}
+.link{position:absolute;left:50%;width:150px;margin-left:-75px;top:calc(50% - 2px);height:4px;border-radius:2px;z-index:2;background:linear-gradient(90deg,var(--accent),var(--accent-2));box-shadow:0 0 28px rgba(139,124,246,.55);transform-origin:center;transform:scaleX(0)}
 .on .link{animation:linkDraw 1s var(--e-out) .5s both}
 @keyframes linkDraw{to{transform:scaleX(1)}}
 .cmp.a{transform-origin:left center}
