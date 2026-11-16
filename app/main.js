@@ -435,7 +435,7 @@ function matchRoute(segs) {
     return { nav: "compounds", title: cmp ? cmp.name : "Compound", view: compoundsView.detail, params: { id: key } };
   }
   if (a === "brain" || a === "systems") {
-    if (!b) return { nav: "brain", title: "Brain map", view: neuroView.map };
+    if (!b) return { nav: "brain", title: "Brain map", view: { render: brainView.render, mount: brainView.mount } };
     const key = String(b).toLowerCase();
     const sys = SYSTEM_BY_ID.get(key);
     return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
