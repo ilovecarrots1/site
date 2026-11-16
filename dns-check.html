@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>DNS monitor — NeuroDifference</title>
+<meta name="theme-color" content="#0b0d10" />
+<meta name="color-scheme" content="dark" />
+<style>
+  :root {
+    --bg: #0b0d10;
+    --bg-2: #14181e;
+    --line: #232a34;
+    --text: #e6e8eb;
+    --text-2: #a9b2bf;
+    --text-3: #78828f;
+    --accent: #8b7bff;
+    --good: #3fb950;
+    --warn: #d29922;
+    --bad: #f85149;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background:
+      radial-gradient(900px 520px at 12% -10%, rgba(139, 123, 255, 0.16), transparent 60%),
+      radial-gradient(700px 420px at 96% 4%, rgba(63, 185, 80, 0.10), transparent 62%),
+      var(--bg);
+    color: var(--text);
+    font: 15px/1.55 var(--sans);
+    -webkit-text-size-adjust: 100%;
+    padding: max(16px, env(safe-area-inset-top)) 14px max(28px, env(safe-area-inset-bottom));
+    min-height: 100dvh;
+  }
+  main { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 21px; line-height: 1.25; margin: 0 0 6px; letter-spacing: -0.01em; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-3); margin: 0 0 10px; font-weight: 650; }
+  p { margin: 0 0 14px; color: var(--text-2); }
+  .sub { color: var(--text-3); font-size: 13px; }
+  code, pre { font-family: var(--mono); font-size: 12.5px; }
+
+  .panel {
+    border: 1px solid var(--line);
+    background: rgba(20, 24, 30, 0.72);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .fields { display: grid; gap: 10px; grid-template-columns: 1fr; }
+  @media (min-width: 620px) { .fields { grid-template-columns: 1fr 1fr; } }
+  label.f { display: block; font-size: 12px; color: var(--text-3); letter-spacing: 0.04em; text-transform: uppercase; }
+  input[type="text"] {
+    width: 100%;
+    margin-top: 5px;
+    padding: 11px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: #0e1218;
+    color: var(--text);
+    font: 14px var(--mono);
+  }
+  input[type="text"]:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+  .btn {
+    appearance: none;
+    border: 1px solid var(--line);
+    background: var(--bg-2);
+    color: var(--text);
+    padding: 11px 16px;
+    border-radius: 11px;
+    font: 600 14px var(--sans);
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn[disabled] { opacity: 0.55; cursor: progress; }
+  .chk { display: inline-flex; gap: 8px; align-items: center; color: var(--text-2); font-size: 13px; cursor: pointer; }
+  .chk input { width: 17px; height: 17px; accent-color: var(--accent); }
+
+  .verdict {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    border-radius: 14px;
+    padding: 14px 15px;
+    border: 1px solid var(--line);
+    background: rgba(20, 24, 30, 0.8);
+    margin-bottom: 14px;
+    transition: border-color 0.2s ease;
+  }
+  .verdict .dot {
+    width: 11px; height: 11px; border-radius: 50%;
+    margin-top: 6px; flex: 0 0 auto;
+    background: var(--text-3);
+    box-shadow: 0 0 0 4px rgba(120, 130, 143, 0.15);
+  }
+  .verdict.live { border-color: rgba(63, 185, 80, 0.5); }
+  .verdict.live .dot { background: var(--good); box-shadow: 0 0 0 4px rgba(63, 185, 80, 0.18); }
+  .verdict.half { border-color: rgba(210, 153, 34, 0.5); }
+  .verdict.half .dot { background: var(--warn); box-shadow: 0 0 0 4px rgba(210, 153, 34, 0.18); }
+  .verdict.none { border-color: rgba(248, 81, 73, 0.45); }
+  .verdict.none .dot { background: var(--bad); box-shadow: 0 0 0 4px rgba(248, 81, 73, 0.16); }
+  .verdict b { display: block; font-size: 15px; margin-bottom: 3px; }
+  .verdict span { color: var(--text-2); font-size: 13px; }
+
+  .grid { display: grid; gap: 12px; grid-template-columns: 1fr; }
+  @media (min-width: 780px) { .grid { grid-template-columns: 1fr 1fr 1fr; } }
+  .card { border: 1px solid var(--line); background: rgba(14, 18, 24, 0.75); border-radius: 14px; padding: 13px; min-height: 108px; }
+  .card pre { margin: 0; white-space: pre-wrap; word-break: break-word; color: var(--text-2); }
+  .ok { color: var(--good); }
+  .bad { color: var(--bad); }
+  .warn { color: var(--warn); }
+  .muted { color: var(--text-3); }
+  .hooks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .hooks a {
+    color: var(--text);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    background: rgba(20, 24, 30, 0.8);
+    border-radius: 999px;
+    padding: 8px 13px;
+    font-size: 13px;
+  }
+  .hooks a:active { transform: scale(0.97); }
+  .stamp { margin-top: 16px; color: var(--text-3); font: 12px var(--mono); }
+  .note { margin-top: 12px; font-size: 12.5px; color: var(--text-3); line-height: 1.6; }
+</style>
+</head>
+<body>
+<main>
+  <h1>DNS &amp; deploy monitor</h1>
+  <p class="sub">Watch the exact moment a domain starts resolving. Works offline-first, no keys, no server — talks straight to public DNS-over-HTTPS resolvers.</p>
+
+  <div class="panel">
+    <div class="fields">
+      <label class="f">Domain<input id="dom" type="text" value="neurodifference.ru" spellcheck="false" autocapitalize="off" autocomplete="off" /></label>
+      <label class="f">Expected IP<input id="ip" type="text" value="141.8.192.182" spellcheck="false" autocapitalize="off" autocomplete="off" /></label>
+    </div>
+    <div class="actions">
+      <button id="go" class="btn primary" type="button">Check now</button>
+      <label class="chk"><input id="auto" type="checkbox" checked /> auto re-check every 30 s</label>
+      <button id="copy" class="btn" type="button">Copy report</button>
+    </div>
+  </div>
+
+  <div id="verdict" class="verdict">
+    <i class="dot"></i>
+    <div><b>Not checked yet</b><span>Press “Check now”.</span></div>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>1 · NS at the registry</h2>
+      <pre id="r-ns">—</pre>
+    </section>
+    <section class="card">
+      <h2>2 · A record</h2>
+      <pre id="r-a">—</pre>
+    </section>
+    <section class="card">
+      <h2>3 · Site answers</h2>
+      <pre id="r-site">—</pre>
+    </section>
+  </div>
+
+  <div class="hooks">
+    <a id="l-root" href="#" target="_blank" rel="noopener">Open site</a>
+    <a id="l-deploy" href="#" target="_blank" rel="noopener">deploy-check.html</a>
+    <a id="l-raw" href="#" target="_blank" rel="noopener">Raw NS lookup</a>
+  </div>
+
+  <p class="note">
+    <b>Как читать.</b> Пока в шаге 1 стоит <code>NXDOMAIN</code> — домен ещё не делегирован, браузер вообще не знает, куда идти
+    (файлы, <code>.htaccess</code> и MIME тут ни при чём). Когда NS появятся, а A покажет ожидаемый IP — включится «site answers»:
+    если там <span class="bad">not reachable</span> при правильном A, значит проблема уже на сервере — смотри <code>index.html</code>
+    в <code>public_html</code> и <code>deploy-check.html</code>.
+  </p>
+
+  <p id="stamp" class="stamp">idle</p>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var domEl = $("dom"), ipEl = $("ip"), goEl = $("go"), autoEl = $("auto"), copyEl = $("copy");
+  var vEl = $("verdict"), nsEl = $("r-ns"), aEl = $("r-a"), siteEl = $("r-site"), stampEl = $("stamp");
+  var lastReport = "";
+  var timer = null;
+  var busy = false;
+
+  /* ---------- resolvers (both send permissive CORS headers) ---------- */
+  var RESOLVERS = [
+    function (name, type) {
+      return fetch("https://dns.google/resolve?name=" + encodeURIComponent(name) + "&type=" + type, { cache: "no-store" })
+        .then(function (r) { return r.json(); });
+    },
+    function (name, type) {
+      return fetch("https://1.1.1.1/dns-query?name=" + encodeURIComponent(name) + "&type=" + type + "&ct=application/dns-json", {
+        headers: { accept: "application/dns-json" },
+        cache: "no-store"
+      }).then(function (r) { return r.json(); });
+    }
+  ];
+
+  function ask(name, type) {
+    var i = 0;
+    function next() {
+      if (i >= RESOLVERS.length) return Promise.reject(new Error("all resolvers failed"));
+      var fn = RESOLVERS[i++];
+      return fn(name, type).catch(next);
+    }
+    return next().then(function (j) {
+      return {
+        status: typeof j.Status === "number" ? j.Status : -1,
+        answers: (j.Answer || []).map(function (a) { return String(a.data); }),
+        types: (j.Answer || []).map(function (a) { return a.type; })
+      };
+    });
+  }
+
+  /* ---------- helpers ---------- */
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
+  function statusWord(code) {
+    if (code === 0) return "NOERROR";
+    if (code === 3) return "NXDOMAIN";
+    if (code === 2) return "SERVFAIL";
+    if (code === 5) return "REFUSED";
+    return "status " + code;
+  }
+
+  function setVerdict(kind, title, text) {
+    vEl.className = "verdict" + (kind ? " " + kind : "");
+    vEl.innerHTML = '<i class="dot"></i><div><b>' + esc(title) + "</b><span>" + esc(text) + "</span></div>";
+  }
+
+  function normHost(v) {
+    return String(v || "").trim().replace(/^https?:\/\//i, "").replace(/\/.*$/, "").replace(/\.$/, "").toLowerCase();
+  }
+
+  /* ---------- the check ---------- */
+  function run() {
+    if (busy) return;
+    busy = true;
+    goEl.disabled = true;
+    goEl.textContent = "Checking…";
+
+    var domain = normHost(domEl.value) || "neurodifference.ru";
+    var wantIp = String(ipEl.value || "").trim();
+    domEl.value = domain;
+
+    $("l-root").href = "https://" + domain + "/";
+    $("l-deploy").href = "https://" + domain + "/deploy-check.html";
+    $("l-raw").href = "https://dns.google/resolve?name=" + encodeURIComponent(domain) + "&type=NS";
+
+    var started = Date.now();
+    var nsTxt = "";
+    var aTxt = "";
+    var nsOk = false;
+    var aOk = false;
+
+    var nsP = ask(domain, "NS").catch(function (e) { return { status: -1, answers: [], err: e.message }; });
+    var aP = ask(domain, "A").catch(function (e) { return { status: -1, answers: [], err: e.message }; });
+
+    Promise.all([nsP, aP]).then(function (out) {
+      var ns = out[0], a = out[1];
+
+      /* 1 — NS */
+      if (ns.status === 3) {
+        nsTxt = '<span class="bad">NXDOMAIN</span> <span class="muted">— домен ещё не делегирован</span>\n' +
+          '<span class="muted">в реестре нет NS-записей</span>';
+      } else if (ns.answers.length) {
+        nsOk = true;
+        nsTxt = '<span class="ok">' + ns.answers.length + ' NS</span>\n' + ns.answers.map(esc).join("\n");
+      } else if (ns.err) {
+        nsTxt = '<span class="warn">resolver error</span>\n' + esc(ns.err);
+      } else {
+        nsTxt = '<span class="warn">' + statusWord(ns.status) + "</span>\n" + '<span class="muted">записи есть, но пустые</span>';
+      }
+
+      /* 2 — A */
+      if (a.answers.length) {
+        aOk = wantIp ? a.answers.indexOf(wantIp) !== -1 : true;
+        aTxt = (aOk ? '<span class="ok">' : '<span class="warn">') + a.answers.length + " A</span>\n" +
+          a.answers.map(function (ip) {
+            return ip === wantIp ? '<span class="ok">' + esc(ip) + " ← ok</span>" : esc(ip);
+          }).join("\n");
+      } else if (a.status === 3) {
+        aTxt = '<span class="bad">NXDOMAIN</span>\n<span class="muted">ждать делегирования</span>';
+      } else {
+        aTxt = '<span class="warn">' + statusWord(a.status) + "</span>\n" + '<span class="muted">A-записи пока нет</span>';
+      }
+
+      nsEl.innerHTML = nsTxt;
+      aEl.innerHTML = aTxt;
+      siteEl.innerHTML = '<span class="muted">probing…</span>';
+
+      /* 3 — can we actually reach it? */
+      var probeUrl = "https://" + domain + "/?nd-probe=" + Date.now();
+      var siteP = fetch(probeUrl, { mode: "no-cors", cache: "no-store" })
+        .then(function () { return true; })
+        .catch(function () { return false; });
+
+      return siteP.then(function (reachable) {
+        siteEl.innerHTML = reachable
+          ? '<span class="ok">reachable</span>\n<span class="muted">сервер ответил на HTTPS</span>'
+          : '<span class="bad">not reachable</span>\n<span class="muted">' + (aOk ? "DNS ok — проблема на сервере" : "домен ещё не резолвится") + "</span>";
+
+        if (aOk && reachable) {
+          setVerdict("live", "DOMAIN IS LIVE",
+            "DNS отдаёт " + wantIp + ", сервер отвечает. Открывай сайт и deploy-check.html.");
+        } else if (aOk && !reachable) {
+          setVerdict("half", "DNS OK, SERVER SILENT",
+            "A-запись уже правильная, но HTTPS не отвечает: смотри сертификат, index.html в public_html и .htaccess.");
+        } else if (nsOk && !aOk) {
+          setVerdict("half", "DELEGATED, NO A RECORD",
+            "NS в реестре есть, но A не указывает на " + (wantIp || "нужный IP") + ". Пропиши A-запись в панели хостера.");
+        } else {
+          setVerdict("none", "NOT YET",
+            "Реестр .ru пока не отдаёт домен (NXDOMAIN). Ждём, ничего не сломано.");
+        }
+
+        var ms = Date.now() - started;
+        var when = new Date().toLocaleString();
+        stampEl.textContent = "checked " + when + " · " + ms + " ms · " + (autoEl.checked ? "auto every 30 s" : "manual");
+
+        lastReport =
+          "domain: " + domain + "\n" +
+          "expected IP: " + (wantIp || "-") + "\n" +
+          "NS status: " + statusWord(ns.status) + " -> " + (ns.answers.join(", ") || "none") + "\n" +
+          "A status: " + statusWord(a.status) + " -> " + (a.answers.join(", ") || "none") + "\n" +
+          "reachable: " + reachable + "\n" +
+          "at: " + when;
+      });
+    }).catch(function (err) {
+      setVerdict("half", "CHECK FAILED", String(err && err.message ? err.message : err));
+      stampEl.textContent = "error";
+    }).then(function () {
+      busy = false;
+      goEl.disabled = false;
+      goEl.textContent = "Check now";
+    });
+  }
+
+  /* ---------- wiring ---------- */
+  goEl.addEventListener("click", run);
+
+  copyEl.addEventListener("click", function () {
+    var text = lastReport || "nothing checked yet";
+    var done = function () {
+      copyEl.textContent = "Copied";
+      setTimeout(function () { copyEl.textContent = "Copy report"; }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, done);
+    } else {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) { /* ignore */ }
+      ta.remove();
+      done();
+    }
+  });
+
+  function syncTimer() {
+    if (timer) { clearInterval(timer); timer = null; }
+    if (autoEl.checked) {
+      timer = setInterval(function () {
+        if (document.visibilityState === "visible") run();
+      }, 30000);
+    }
+  }
+  autoEl.addEventListener("change", syncTimer);
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible" && autoEl.checked) run();
+  });
+  domEl.addEventListener("keydown", function (e) { if (e.key === "Enter") run(); });
+  ipEl.addEventListener("keydown", function (e) { if (e.key === "Enter") run(); });
+
+  syncTimer();
+  run();
+})();
+</script>
+</body>
+</html>
