@@ -85,13 +85,13 @@ body{
 /* ---------- scene 1 : data wall ---------- */
 .wall{
   position:absolute;inset:-6% -4%;
-  display:grid;grid-template-columns:repeat(12,1fr);
+  display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:1fr;
   gap:10px;padding:0;
   transform:rotate(-2deg) scale(1.06);
 }
 .wall.dim{opacity:.3}
 .tile{
-  position:relative;height:74px;border-radius:10px;
+  position:relative;min-height:0;border-radius:10px;
   background:linear-gradient(160deg,rgba(255,255,255,.09),rgba(255,255,255,.025));
   border:1px solid rgba(255,255,255,.06);
   opacity:0;
@@ -107,7 +107,7 @@ body{
 }
 .tile.hot{background:linear-gradient(160deg,rgba(139,124,246,.5),rgba(139,124,246,.14));border-color:rgba(139,124,246,.5)}
 .tile.hot::before,.tile.hot::after{background:rgba(255,255,255,.5)}
-.scene.on .tile{animation:tileIn .55s var(--e-out) both;animation-delay:calc(var(--i) * 5ms)}
+.scene.on .tile{animation:tileIn .5s var(--e-out) both;animation-delay:calc(var(--i) * 3ms)}
 @keyframes tileIn{from{opacity:0;transform:translateY(26px) scale(.9)}to{opacity:1;transform:none}}
 
 .scrim{
@@ -592,8 +592,8 @@ html[data-motion="off"] .mark{opacity:1!important;transform:none!important;strok
       el.appendChild(d);
     }
   }
-  buildWall(document.getElementById("wall1"), 132);
-  buildWall(document.getElementById("wall2"), 132);
+  buildWall(document.getElementById("wall1"), 240);
+  buildWall(document.getElementById("wall2"), 240);
 
   /* ---- fit ---- */
   function fit(){
