@@ -98,9 +98,9 @@ FTP password, provider API keys, the Telegram bot token. Keep them in
 conversation state or environment, never in a tracked file. This repo is
 public.
 
-## Where we are right now — v4.2.0
+## Where we are right now — v4.3.0
 
-- App is **v4.2.0**. `#/dev/audit` must show 12/12.
+- App is **v4.3.0**. `#/dev/audit` must show 12/12.
 - **210 compounds**: 148 legacy + 62 new in `compounds-g/h/i/j.js`
   (antidepressants/anxiolytics · hypnotics/neurosteroids · antipsychotics/
   anticonvulsants · addiction medicine/migraine/Parkinson's).
@@ -115,9 +115,15 @@ public.
   28 clickable zones: 12 lateral + 21 medial/deep via the "Глубокие структуры"
   toggle). Click/Enter → red highlight (`var(--bad)`) → the existing region
   card through the same `select()`. Toolbar chips: Анатомия / 3D / Схема.
-- Secondary **3D mode** (`app/lib/brain3d.js`, hand-rolled canvas, zero deps):
-  full 360° hemispheres (azimuth fix — no more half-brain), pink palette,
-  drag-orbit + inertia + pinch zoom, hotspots wired to the same selection.
+- Secondary **3D mode** (`app/lib/brain3d.js`, hand-rolled canvas, zero deps)
+  is now a **solid lambert-shaded surface** (v4.3 rewrite): 2104 verts /
+  3900 tris, two gyrified hemispheres with carved Sylvian / central /
+  superior-temporal fissures, cerebellum folia, tapered brainstem tagged
+  pons/medulla/spinal-cord. Every face carries a region id; click =
+  point-in-triangle hit-test on visible faces (nearest wins), deep nuclei
+  fall back to hotspot picking. Selection tints faces toward `--bad`.
+  Back-face cull + painter sort, shade cache [part][lit][24 buckets].
+  Drag-orbit + inertia + pinch zoom, hotspots wired to the same selection.
   Lifecycle: the frame loop self-destructs when the canvas leaves the DOM,
   and `brain.js` destroys the previous instance on re-mount (`live3d`).
   Honors reduced-motion (static until interacted).
@@ -167,7 +173,7 @@ public.
 4. Optional: downgrade SprintHost to a domain-only plan, hosting is no longer
    needed there.
 
-### Active task — v4.3.0 procedural 3D brain upgrade (in progress)
+### v4.3.0 procedural 3D brain upgrade — DONE in working tree, awaiting push + visual QA
 
 - User wanted a real MSD-style clickable 3D brain. Legal OBJ sources exist
   (BodyParts3D / Anatomography, CC BY-SA 2.1 JP, (c) DBCLS) but the in-editor
@@ -177,8 +183,13 @@ public.
   model file in the workspace WOULD be readable via `tools.read` paging - that
   path stays open if they ever drop an .obj/.gltf into the repo.
 - User chose: **upgrade the hand-written procedural brain now** (no external
-  mesh). `app/lib/brain3d.js` is STILL the old point-cloud version - the rewrite
-  was drafted but never written to disk. Do not assume it landed.
+  mesh). The rewrite LANDED in `app/lib/brain3d.js` (two-chunk write; the first
+  single-shot attempt was truncated and never applied - always verify writes).
+  Eval-verified: syntax ok, 0 NaN, 0 inward/degenerate normals, bounds
+  x[-161,158] y[-128,105] z[-74,73], all 12 surface regions tagged (exactly
+  SURFACE_REGIONS), 0 unknown-region faces, hit-test returns nearest visible
+  face. `brain.js` needed no changes (public API unchanged). Version bumped
+  to 4.3.0 in core.js / sw.js / index.html (4x) / settings.js chip.
 - Agreed design for the rewrite (keep the public API
   `mountBrain3D(canvas,{regions,palette,getLit,onSelect})` ->
   `{sync,kick,setAuto,isAuto,reset,destroy}` and `buildGeometry()`):
@@ -191,9 +202,12 @@ public.
   fallback to deep-nucleus hotspots; anchors for surface regions use real
   per-region centroids, deep/mid keep the schematic inward projection and show
   only when lit. Keep the camera/interaction/lifecycle block unchanged.
-- After the rewrite: eval-verify (syntax, bounds, outward normals, region
-  coverage, tri count), then bug sweep, then bump 4.3.0 (core/sw/index/settings)
-  + AGENTS.md + short RU report. No attribution needed (procedural, no mesh).
+- Remaining: user pushes to main, hard-reloads, visual QA of `#/brain` -> 3D
+  (rotate, click parts -> red highlight + card, deep structures via lit
+  hotspots, pinch zoom, reduced-motion). The model cannot see images - bugs
+  must come back as text (what was tapped -> expected -> actual). A textual
+  bug list from the user is still outstanding for the wider bug sweep.
+  No attribution needed (procedural, no mesh).
 
 ## Working from the shell
 
