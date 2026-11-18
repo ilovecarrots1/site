@@ -1,6 +1,6 @@
 /* ==========================================================================
    Brain 3D — hand-rolled procedural brain + canvas renderer. Zero deps.
-   A hologram-style point cloud: two gyrencephalic hemispheres, cerebellum
+   A soft pink point-cloud brain: two gyrencephalic hemispheres, cerebellum
    with folia, brainstem, sparse wireframe, travelling synapse sparks and
    projected region hotspots. Drag to orbit, pinch/wheel to zoom, inertia,
    auto-rotate. Honors prefers-reduced-motion (static until interacted).
@@ -30,7 +30,7 @@ export function buildGeometry() {
       const t = (i / R) * Math.PI;
       const row = [];
       for (let j = 0; j < C; j++) {
-        const p = -Math.PI / 2 + (j / (C - 1)) * Math.PI;
+        const p = (s === 1 ? 0 : Math.PI) + (j / (C - 1)) * Math.PI;
         let x = 150 * Math.sin(t) * Math.cos(p);
         let y = 100 * Math.cos(t);
         let z = 62 * Math.sin(t) * Math.sin(p);
@@ -42,7 +42,6 @@ export function buildGeometry() {
           0.028 * Math.sin(11 * p + 7 * t) +
           0.02 * Math.sin(17 * t + 9 * p + 2);
         x *= 1 + n; y *= 1 + n; z *= 1 + n;
-        z = z * s;
         if (z * s < 9) z = s * (9 + (z * s - 9) * 0.22); /* medial flatten */
         z += s * 7;                                      /* longitudinal fissure */
         if (y < -80) y = -80 + (y + 80) * 0.35;          /* flat base */
@@ -148,9 +147,9 @@ export function mountBrain3D(canvas, opts) {
     return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
   };
   const colors = [
-    rgb(pal.cortex, [139, 123, 255]),
-    rgb(pal.cerebellum, [62, 219, 211]),
-    rgb(pal.stem, [91, 140, 255]),
+    rgb(pal.cortex, [232, 144, 156]),
+    rgb(pal.cerebellum, [217, 127, 140]),
+    rgb(pal.stem, [201, 114, 126]),
   ];
   const css = colors.map((c) => `rgb(${c[0]},${c[1]},${c[2]})`);
 
