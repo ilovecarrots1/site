@@ -573,7 +573,7 @@ export function toast(message, kind = "info", timeout = 2600) {
 /* Clipboard                                                          */
 /* ------------------------------------------------------------------ */
 
-export async function copyText(text, okMessage = "Copied") {
+export async function copyText(text, okMessage = "Скопировано") {
   try {
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
