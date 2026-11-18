@@ -329,6 +329,14 @@ tirzepatide+retatrutide («тирза+ретта»), GH+any AI («гр+иа»). 
    compound). audit.js «Bloodwork → compound links resolve» was failing. Fixed:
    somatotropin→somatropin globally, removed calcium-carbonate from bloodwork-b:300.
    Eval: badBloodworkIds=[] → 12/12 restored.
+4. **Right-click on brain zones opened the browser's native context menu.** No
+   `contextmenu` handler existed on any brain surface. Added `e.preventDefault()` on the
+   3D canvas (`brain3d.js`, AbortController-scoped via `sig`) and on the schematic +
+   anatomy SVG stages (`brain.js`, loop over `[stage, stageAnat]`). The 3D canvas is also
+   covered by its own listener; side-panel text stays right-clickable for copy. Element-
+   level listeners die with the DOM on re-mount (no stacking). User report: «на пкм зоны
+   мозга … открывает в браузере хуйню эту». («Ваше имя» in the same message is NOT an app
+   string — grep over app/ found nothing; likely a paste artifact from a complaint form.)
 
 Version **4.4.1** stamped (core.js:7, sw.js:5/6, index.html ×4, settings.js chip). All
 touched files syntax-ok; RU search + engine + bloodwork link audit eval-verified. Nothing
