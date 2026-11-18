@@ -71,14 +71,38 @@
 
 /* Shell */
 .bm-shell {
-  fill: color-mix(in srgb, var(--accent) 9%, transparent);
-  stroke: color-mix(in srgb, var(--accent) 30%, transparent);
-  stroke-width: 0.8;
+  fill: url(#bm-shell-grad);
+  stroke: color-mix(in srgb, var(--accent) 34%, transparent);
+  stroke-width: 1;
 }
+.bm-cerebellum { opacity: 0.85; }
 .bm-sulcus {
   fill: none;
-  stroke: color-mix(in srgb, var(--text) 12%, transparent);
-  stroke-width: 0.7;
+  stroke: color-mix(in srgb, var(--text) 14%, transparent);
+  stroke-width: 0.8;
+  stroke-linecap: round;
+}
+.bm-gyrus {
+  fill: none;
+  stroke: color-mix(in srgb, var(--text) 8%, transparent);
+  stroke-width: 0.6;
+  stroke-linecap: round;
+}
+.bm-callosal {
+  fill: color-mix(in srgb, var(--text) 7%, transparent);
+  stroke: color-mix(in srgb, var(--text) 14%, transparent);
+  stroke-width: 0.5;
+}
+.bm-brainstem {
+  fill: none;
+  stroke: url(#bm-stem-grad);
+  stroke-width: 13;
+  stroke-linecap: round;
+}
+.bm-folium {
+  fill: none;
+  stroke: color-mix(in srgb, var(--accent) 24%, transparent);
+  stroke-width: 0.6;
   stroke-linecap: round;
 }
 .bm-inner {
@@ -86,6 +110,33 @@
   stroke: color-mix(in srgb, var(--text) 8%, transparent);
   stroke-width: 0.6;
   stroke-dasharray: 2 3;
+}
+
+/* Neuron overlay — axons, somas, travelling pulses (transform/opacity only) */
+.bm-axon {
+  stroke: color-mix(in srgb, var(--accent) 20%, transparent);
+  stroke-width: 0.5;
+  opacity: 0.55;
+}
+.bm-soma circle { fill: currentColor; opacity: 0.85; }
+.bm-soma path {
+  stroke: currentColor;
+  stroke-width: 0.5;
+  opacity: 0.45;
+  fill: none;
+}
+.bm-pulse {
+  fill: color-mix(in srgb, var(--accent) 80%, white);
+  opacity: 0;
+  animation: bm-pulse-run var(--t, 3.4s) linear infinite;
+  animation-delay: var(--d, 0s);
+  will-change: transform, opacity;
+}
+@keyframes bm-pulse-run {
+  0%   { transform: translate(var(--x1), var(--y1)); opacity: 0; }
+  10%  { opacity: 0.95; }
+  90%  { opacity: 0.95; }
+  100% { transform: translate(var(--x2), var(--y2)); opacity: 0; }
 }
 
 /* Regions */
@@ -154,17 +205,17 @@
   50%      { opacity: 0.86; }
 }
 
-/* Travelling impulses along tracts */
+/* Tracts — breathing glow (opacity only, animation budget) */
 .bm-tract {
   fill: none;
   stroke: color-mix(in srgb, var(--accent) 34%, transparent);
   stroke-width: 0.9;
   stroke-dasharray: 3 9;
-  animation: bm-flow 7s linear infinite;
+  animation: bm-breathe 5s ease-in-out infinite;
 }
-@keyframes bm-flow {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: -48; }
+@keyframes bm-breathe {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.9; }
 }
 
 /* Controls */
@@ -374,11 +425,15 @@
 
 /* Reduced / disabled motion: freeze the decorative loops */
 html[data-motion="off"] .bm-cluster circle,
-html[data-motion="off"] .bm-tract { animation: none !important; }
+html[data-motion="off"] .bm-tract,
+html[data-motion="off"] .bm-pulse { animation: none !important; }
+html[data-motion="off"] .bm-pulse { opacity: 0 !important; }
 
 @media (prefers-reduced-motion: reduce) {
   .bm-cluster circle,
-  .bm-tract { animation: none !important; }
+  .bm-tract,
+  .bm-pulse { animation: none !important; }
+  .bm-pulse { opacity: 0 !important; }
   .bm-layer { transform: none !important; }
 }
 
