@@ -36,13 +36,17 @@ import {
 } from "../data/brainmap.js";
 import { searchPapers } from "../lib/pubmed.js";
 import { mountBrain3D } from "../lib/brain3d.js";
+import {
+  OUTLINE, SURFACE_REGIONS, MEDIAL_REGIONS, SULCI_A, FOLIA_A, CALLOSUM_A, MEDIAL_LINES,
+} from "../data/brain-anatomy.js";
 
 /* --------------------------------------------------------------------------
    View state (module-local, reset on navigation)
    -------------------------------------------------------------------------- */
 
 const S = {
-  view: "3d",
+  view: "anat",
+  cut: false,
   mode: "targets",
   q: "",
   kind: null,
@@ -164,9 +168,9 @@ function mapSvg() {
 
 function tabRow() {
   const tabs = [
-    ["targets", "Targets", TARGETS.length],
-    ["compounds", "Compounds", COMPOUNDS.length],
-    ["regions", "Regions", REGIONS.length],
+    ["targets", "Мишени", TARGETS.length],
+    ["compounds", "Препараты", COMPOUNDS.length],
+    ["regions", "Регионы", REGIONS.length],
   ];
   return `<div class="bm-tabs">${tabs
     .map(
@@ -223,7 +227,7 @@ function listHtml() {
       }));
   }
 
-  if (!rows.length) return `<div class="bm-empty">Nothing matches “${esc(S.q)}”.</div>`;
+  if (!rows.length) return `<div class="bm-empty">Ничего не найдено по «${esc(S.q)}».</div>`;
 
   return `<div class="bm-list" id="bm-list">${rows
     .map(
@@ -242,13 +246,13 @@ function sideHtml() {
   return `<div class="bm-side">
     ${tabRow()}
     <label class="bm-search">${icon("search", 14)}
-      <input id="bm-q" type="search" inputmode="search" placeholder="Filter ${S.mode}" value="${esc(S.q)}" autocomplete="off" />
+      <input id="bm-q" type="search" inputmode="search" placeholder="Фильтр: ${S.mode === "targets" ? "мишени" : S.mode === "compounds" ? "препараты" : "регионы"}" value="${esc(S.q)}" autocomplete="off" />
     </label>
     ${listHtml()}
     <div class="card tight">
       <div class="tiny dim" style="line-height:1.5">
-        ${STATS.regions} regions · ${STATS.targets} targets · ${STATS.connections} receptor nodes.
-        Colour = primary transmitter system. Weight of light = receptor density.
+        ${STATS.regions} регионов · ${STATS.targets} мишеней · ${STATS.connections} рецепторных узлов.
+        Цвет — основная нейромедиаторная система. Яркость подсветки — плотность рецепторов.
       </div>
     </div>
   </div>`;
@@ -286,8 +290,8 @@ function detailHtml() {
   if (!S.kind || !S.id) {
     return `<div class="card">
       <div class="bm-empty">
-        <div style="font-size:13px;color:var(--text-2);margin-bottom:4px">Pick a target, a compound or a region</div>
-        <div class="tiny dim">Tap the map or the list on the right. Everything else stays clickable.</div>
+        <div style="font-size:13px;color:var(--text-2);margin-bottom:4px">Выбери мишень, препарат или регион</div>
+        <div class="tiny dim">Тапни по карте или по списку справа — здесь появится описание.</div>
       </div>
     </div>`;
   }
@@ -301,14 +305,14 @@ function detailHtml() {
       <div class="bm-region-head">
         <div style="flex:1 1 auto;min-width:0">
           <div class="bm-region-title">${esc(r.name)}</div>
-          <div class="bm-region-sub">${esc(r.short)} · ${esc(r.layer)} layer</div>
+          <div class="bm-region-sub">${esc(r.short)} · ${r.layer === "shell" ? "кора" : r.layer === "mid" ? "лимбический слой" : "глубокий слой"}</div>
         </div>
-        <span class="chip chip-xs">${tg.length} targets</span>
+        <span class="chip chip-xs">${tg.length} мишеней</span>
       </div>
       <p class="small" style="margin:10px 0 0">${esc(r.note)}</p>
       <div class="bm-tagrow">${systemChips(r.systems)}</div>
       <div class="divider"></div>
-      <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Targets here</div>
+      <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Мишени здесь</div>
       <div class="bm-tagrow">${tg
         .map(
           (x) =>
@@ -317,9 +321,9 @@ function detailHtml() {
               <span class="dim">${Math.round(x.weight * 100)}%</span>
             </button>`
         )
-        .join("") || `<span class="tiny dim">No mapped targets yet.</span>`}</div>
+        .join("") || `<span class="tiny dim">Пока нет размеченных мишеней.</span>`}</div>
       <div class="divider"></div>
-      <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Compounds acting here</div>
+      <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Препараты, действующие здесь</div>
       <div class="bm-tagrow">${compoundChips(drugs) || `<span class="tiny dim">—</span>`}</div>
     </div>`;
   }
@@ -333,7 +337,7 @@ function detailHtml() {
       <div class="bm-region-head">
         <div style="flex:1 1 auto;min-width:0">
           <div class="bm-region-title">${esc(t.name)}</div>
-          <div class="bm-region-sub">${esc(t.short)} · ${regs.length} regions</div>
+          <div class="bm-region-sub">${esc(t.short)} · ${regs.length} регионов</div>
         </div>
         <span class="chip chip-xs"><span class="dot" style="background:${targetColor(t)}"></span>${esc(
       (SYSTEM_BY_ID.get(t.system) || {}).name || t.system
@@ -354,7 +358,7 @@ function detailHtml() {
           .join("")}
       </div>
       <div class="divider"></div>
-      <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Compounds touching it</div>
+      <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Препараты, затрагивающие мишень</div>
       <div class="bm-tagrow">${compoundChips(comps.map((c) => c.id)) || `<span class="tiny dim">—</span>`}</div>
     </div>`;
   }
@@ -369,14 +373,14 @@ function detailHtml() {
         <div class="bm-region-title">${esc(c.name)}</div>
         <div class="bm-region-sub">${esc(c.cls || "")}${c.subcls ? " · " + esc(c.subcls) : ""}</div>
       </div>
-      <a class="chip chip-btn chip-xs" href="#/compounds/${esc(c.id)}">Open monograph</a>
+      <a class="chip chip-btn chip-xs" href="#/compounds/${esc(c.id)}">Открыть монографию</a>
     </div>
     <p class="small" style="margin:10px 0 0">${esc(c.summary || "")}</p>
     <div class="bm-tagrow">${(tgs || []).slice(0, 8).map((t) => `<span class="chip chip-xs"><span class="dot" style="background:${targetColor(
       t
     )}"></span>${esc(t.short)}</span>`).join("")}</div>
     <div class="divider"></div>
-    <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Regions engaged</div>
+    <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px">Задействованные регионы</div>
     <div class="bars" style="margin:0">
       ${regs
         .map(
@@ -388,7 +392,7 @@ function detailHtml() {
             <span class="bar-val">${Math.round(x.weight * 100)}</span>
           </div>`
         )
-        .join("") || `<div class="tiny dim">No mapped regions.</div>`}
+        .join("") || `<div class="tiny dim">Нет размеченных регионов.</div>`}
     </div>
   </div>`;
 }
@@ -396,8 +400,8 @@ function detailHtml() {
 function papersHtml() {
   if (!S.kind || !S.id) return "";
   const head = `<div class="row between" style="margin-bottom:8px;min-width:0">
-      <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase">Live literature</div>
-      <span class="live-dot tiny dim" title="Fetched from PubMed on the device"></span>
+      <div class="tiny dim" style="letter-spacing:.12em;text-transform:uppercase">Живые исследования</div>
+      <span class="live-dot tiny dim" title="Загружается с PubMed прямо на устройстве"></span>
     </div>`;
 
   if (S.pLoading && !S.papers.length) {
@@ -410,12 +414,12 @@ function papersHtml() {
 
   if (S.pError) {
     return `<div class="card">${head}
-      <div class="small dim">Live search unavailable right now — ${esc(S.pError)}. The map itself works offline.</div>
+      <div class="small dim">Живой поиск сейчас недоступен — ${esc(S.pError)}. Сама карта работает офлайн.</div>
     </div>`;
   }
 
   if (!S.papers.length) {
-    return `<div class="card">${head}<div class="small dim">No indexed papers matched this entity. Try the Research tab with a wider query.</div></div>`;
+    return `<div class="card">${head}<div class="small dim">По этому запросу статей не найдено. Попробуй вкладку «Исследования» с более широким запросом.</div></div>`;
   }
 
   return `<div class="card">${head}${S.papers
@@ -436,6 +440,30 @@ function papersHtml() {
 /* --------------------------------------------------------------------------
    Render
    -------------------------------------------------------------------------- */
+
+/* Anatomical pink brain: lateral surface or medial cutaway. */
+function anatomySvg() {
+  const regs = S.cut ? MEDIAL_REGIONS : SURFACE_REGIONS;
+  const aria = (r) => esc((REGION_MAP.get(r.id) || {}).name || r.id);
+  const shape = (r) =>
+    r.e
+      ? `<ellipse class="ba-region ba-tone-${r.tone}" data-region="${esc(r.id)}" cx="${r.e[0]}" cy="${r.e[1]}" rx="${r.e[2]}" ry="${r.e[3]}" tabindex="0" role="button" aria-label="${aria(r)}"></ellipse>`
+      : `<path class="ba-region ba-tone-${r.tone}" data-region="${esc(r.id)}" d="${r.d}" tabindex="0" role="button" aria-label="${aria(r)}"></path>`;
+  const labels = regs
+    .map((r) => {
+      const reg = REGION_MAP.get(r.id);
+      return `<text class="ba-label" data-label-for="${esc(r.id)}" x="${r.lx}" y="${r.ly}">${esc(reg ? reg.short : r.id)}</text>`;
+    })
+    .join("");
+  return `<svg id="bm-anat-svg" class="bm-svg ba-svg" viewBox="0 0 420 320" role="img" aria-label="Anatomical brain map">
+    <path class="${S.cut ? "ba-cut" : "ba-outline"}" d="${OUTLINE}"></path>
+    ${S.cut ? `<path class="ba-callosal" d="${CALLOSUM_A}"></path>` : ""}
+    ${regs.map(shape).join("")}
+    ${(S.cut ? MEDIAL_LINES : SULCI_A).map((d) => `<path class="ba-sulcus" d="${d}"></path>`).join("")}
+    ${FOLIA_A.map((d) => `<path class="ba-folium" d="${d}"></path>`).join("")}
+    ${labels}
+  </svg>`;
+}
 
 export function render(ctx) {
   S.q = "";
@@ -466,9 +494,9 @@ export function render(ctx) {
   return `<div class="page">
     <div class="page-head">
       <div style="min-width:0">
-        <div class="eyebrow tiny dim">Flagship · 3D model</div>
-        <h1 class="page-title">Brain map</h1>
-        <div class="page-sub">${STATS.regions} regions · ${STATS.targets} targets · ${STATS.compounds} compounds. One picture of where each drug lands.</div>
+        <div class="eyebrow tiny dim">Флагман · анатомия</div>
+        <h1 class="page-title">Карта мозга</h1>
+        <div class="page-sub">${STATS.regions} регионов · ${STATS.targets} мишеней · ${STATS.compounds} препаратов. Где именно действует каждое вещество.</div>
       </div>
       <div class="bm-legend" style="margin:0;padding:0;border:0;justify-content:flex-end">
         ${SYSTEMS.map((s) => `<span class="chip chip-xs"><span class="dot" style="background:${s.color}"></span>${esc(s.name)}</span>`).join("")}
@@ -479,30 +507,36 @@ export function render(ctx) {
       <div style="min-width:0">
         <div class="bm-canvas">
           <div class="bm-bar">
-            <span class="bm-bar-label" id="bm-mode-note">Tap a region · pick a target to light its network</span>
+            <span class="bm-bar-label" id="bm-mode-note">Тапни по зоне мозга — откроется её описание</span>
             <span class="spacer"></span>
+            <button type="button" class="chip chip-btn chip-xs${S.cut ? " on" : ""}" data-act="cut" id="bm-cut"${S.view === "anat" ? "" : " hidden"}>Глубокие структуры</button>
             <span class="bm-view-toggle">
+              <button type="button" class="chip chip-btn chip-xs${S.view === "anat" ? " on" : ""}" data-view="anat">Анатомия</button>
               <button type="button" class="chip chip-btn chip-xs${S.view === "3d" ? " on" : ""}" data-view="3d">3D</button>
-              <button type="button" class="chip chip-btn chip-xs${S.view === "svg" ? " on" : ""}" data-view="svg">Schematic</button>
+              <button type="button" class="chip chip-btn chip-xs${S.view === "svg" ? " on" : ""}" data-view="svg">Схема</button>
             </span>
-            <button type="button" class="chip chip-btn chip-xs" data-act="reset" id="bm-reset">Reset view</button>
+            <button type="button" class="chip chip-btn chip-xs" data-act="reset" id="bm-reset">Сброс</button>
+          </div>
+          <div class="bm-stage bm-stage-anat" id="bm-stage-anat"${S.view === "anat" ? "" : " hidden"}>
+            ${anatomySvg()}
+            <div class="bm-hint">тапни по зоне · «Глубокие структуры» — внутренние ядра и лимбическая система</div>
           </div>
           <div class="bm-stage" id="bm-stage" style="--px:0;--py:0"${S.view === "svg" ? "" : " hidden"}>
             ${mapSvg()}
             <div class="bm-ctrls">
-              <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
-              <button type="button" data-zoom="out" aria-label="Zoom out">−</button>
-              <button type="button" data-zoom="reset" aria-label="Reset zoom">⌂</button>
+              <button type="button" data-zoom="in" aria-label="Приблизить">+</button>
+              <button type="button" data-zoom="out" aria-label="Отдалить">−</button>
+              <button type="button" data-zoom="reset" aria-label="Сбросить зум">⌂</button>
             </div>
-            <div class="bm-hint">drag to pan · wheel or pinch to zoom · ← → to walk regions</div>
+            <div class="bm-hint">тяни — панорама · колесо/щипок — зум · ← → — переход по регионам</div>
           </div>
           <div class="bm-stage bm-stage-3d" id="bm-stage-3d"${S.view === "3d" ? "" : " hidden"}>
-            <canvas id="bm-3d" class="bm-3d" aria-label="Rotatable 3D brain model with region hotspots"></canvas>
+            <canvas id="bm-3d" class="bm-3d" aria-label="Вращаемая 3D-модель мозга с зонами-указателями"></canvas>
             <div class="bm-ctrls">
-              <button type="button" id="bm-auto" aria-label="Toggle auto-rotate">⟳</button>
-              <button type="button" id="bm-reset3d" aria-label="Reset orientation">⌂</button>
+              <button type="button" id="bm-auto" aria-label="Автоповорот">⟳</button>
+              <button type="button" id="bm-reset3d" aria-label="Сбросить ориентацию">⌂</button>
             </div>
-            <div class="bm-hint">drag to orbit · pinch or wheel to zoom · tap a hotspot · double-tap to reset</div>
+            <div class="bm-hint">тяни — вращение · щипок/колесо — зум · тап по точке — регион · двойной тап — сброс</div>
           </div>
         </div>
 
@@ -534,6 +568,7 @@ export function mount(root) {
 
   const stage3d = root.querySelector("#bm-stage-3d");
   const canvas3d = root.querySelector("#bm-3d");
+  const stageAnat = root.querySelector("#bm-stage-anat");
 
   function litState() {
     const lit = new Map();
@@ -560,11 +595,9 @@ export function mount(root) {
 
   let b3d = null;
   if (canvas3d) {
-    const accent =
-      getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#8b7bff";
     b3d = mountBrain3D(canvas3d, {
       regions: REGIONS.map((r) => ({ ...r, color: regionColor(r) })),
-      palette: { cortex: accent },
+      palette: { cortex: "#e8909c", cerebellum: "#d97f8c", stem: "#c9727e" },
       getLit: litState,
       onSelect: (id) => select("region", id),
     });
@@ -576,12 +609,43 @@ export function mount(root) {
       root.querySelectorAll("[data-view]").forEach((x) => x.classList.toggle("on", x === b));
       stage.hidden = S.view !== "svg";
       if (stage3d) stage3d.hidden = S.view !== "3d";
+      if (stageAnat) stageAnat.hidden = S.view !== "anat";
+      const cb = root.querySelector("#bm-cut");
+      if (cb) cb.hidden = S.view !== "anat";
       if (b3d) {
         b3d.sync();
         b3d.kick();
       }
     })
   );
+
+  /* Anatomy: tap a zone -> existing region card; cutaway toggle. */
+  if (stageAnat) {
+    stageAnat.addEventListener("click", (e) => {
+      const g = e.target.closest("[data-region]");
+      if (g) select("region", g.getAttribute("data-region"));
+    });
+    stageAnat.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      const g = e.target.closest ? e.target.closest("[data-region]") : null;
+      if (g) {
+        e.preventDefault();
+        select("region", g.getAttribute("data-region"));
+      }
+    });
+  }
+  const cutBtn = root.querySelector("#bm-cut");
+  if (cutBtn) {
+    cutBtn.addEventListener("click", () => {
+      S.cut = !S.cut;
+      cutBtn.classList.toggle("on", S.cut);
+      const cur = stageAnat && stageAnat.querySelector("svg");
+      if (cur) {
+        cur.outerHTML = anatomySvg();
+        paintAnat();
+      }
+    });
+  }
   const autoBtn = root.querySelector("#bm-auto");
   if (autoBtn && b3d) {
     autoBtn.classList.toggle("on", b3d.isAuto());
@@ -727,8 +791,25 @@ export function mount(root) {
     svg.setAttribute("data-focus", "off");
   }
 
+  function paintAnat() {
+    const a = root.querySelector("#bm-anat-svg");
+    if (!a) return;
+    const { lit } = litState();
+    a.querySelectorAll("[data-region]").forEach((g) => {
+      const id = g.getAttribute("data-region");
+      const isSel = S.kind === "region" && id === S.id;
+      g.classList.toggle("on", isSel);
+      g.classList.toggle("lit", (lit.get(id) || 0) > 0 && !isSel);
+    });
+    a.querySelectorAll("[data-label-for]").forEach((t) => {
+      const id = t.getAttribute("data-label-for");
+      t.classList.toggle("on", S.kind === "region" && id === S.id);
+    });
+  }
+
   function paintSelection() {
     clearLight();
+    paintAnat();
     if (b3d) b3d.sync();
     if (!S.kind) return;
 
@@ -784,7 +865,8 @@ export function mount(root) {
           : kind === "target"
           ? (TARGET_MAP.get(id) || {}).name
           : (COMPOUND_BY_ID.get(id) || {}).name;
-      modeNote.textContent = `${kind}: ${label || id}`;
+      const kindRu = kind === "region" ? "регион" : kind === "target" ? "мишень" : "препарат";
+      modeNote.textContent = `${kindRu}: ${label || id}`;
     }
 
     history.replaceState(null, "", `#/brain?${kind}=${encodeURIComponent(id)}`);
@@ -906,6 +988,7 @@ export function mount(root) {
       S.kind = null;
       S.id = null;
       clearLight();
+      paintAnat();
       if (b3d) {
         b3d.reset();
         b3d.sync();
@@ -915,7 +998,7 @@ export function mount(root) {
       side.innerHTML = sideHtml();
       bindSide();
       bindDetail();
-      if (modeNote) modeNote.textContent = "Tap a region · pick a target to light its network";
+      if (modeNote) modeNote.textContent = "Тапни по зоне мозга — откроется её описание";
     });
   }
 
