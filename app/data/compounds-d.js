@@ -499,7 +499,7 @@ export const COMPOUNDS_D = [
         "Rebound insomnia and cholinergic rebound on abrupt withdrawal",
       ],
     },
-    flags: ["sedative", "hypotensive", "qt-risk", "cyp3a4-substrate", "anticholinergic", "weight-gain", "addictive"],
+    flags: ["sedative", "hypotensive", "qt-risk", "cyp3a4-substrate", "anticholinergic", "weight-gain", "dependence-risk"],
     warnings: [
       "QT prolongation: avoid combining with other QT-prolonging drugs, correct potassium and magnesium, get an ECG if the dose rises",
       "CYP3A4 inhibitors (ketoconazole, clarithromycin, grapefruit) raise levels sharply; inducers (carbamazepine, rifampicin) push them down",
