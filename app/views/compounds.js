@@ -192,12 +192,12 @@ function systemsForCompound(c) {
 
 function tabBar(active) {
   const tabs = [
-    ["overview", "Overview"],
-    ["mechanism", "Mechanism"],
-    ["pk", "Kinetics"],
-    ["doses", "Doses"],
-    ["safety", "Safety"],
-    ["research", "Research"],
+    ["overview", "Обзор"],
+    ["mechanism", "Механизм"],
+    ["pk", "Кинетика"],
+    ["doses", "Дозы"],
+    ["safety", "Безопасность"],
+    ["research", "Исследования"],
   ];
   return `<div class="tabs" id="cd-tabs" role="tablist">
     ${tabs.map(([key, label]) => `<button role="tab" aria-selected="${active === key}" class="${active === key ? "on" : ""}" data-tab="${key}">${esc(label)}</button>`).join("")}
@@ -216,7 +216,7 @@ function panelOverview(c) {
     ${
       (c.moa || []).length
         ? `<section>
-            <div class="eyebrow" style="margin-bottom:7px">Mechanism of action</div>
+            <div class="eyebrow" style="margin-bottom:7px">Механизм действия</div>
             <div class="row wrap" style="gap:6px">${c.moa.map((m) => `<span class="chip chip-accent">${esc(m)}</span>`).join("")}</div>
           </section>`
         : ""
@@ -225,9 +225,9 @@ function panelOverview(c) {
     ${
       (c.effects?.good?.length || c.effects?.bad?.length)
         ? `<div class="effect-cols">
-            <div class="effect-box good"><h4>${icon("check", 12)} Sought effects</h4>
+            <div class="effect-box good"><h4>${icon("check", 12)} Желаемые эффекты</h4>
               <ul>${(c.effects.good || []).map((x) => `<li>${esc(x)}</li>`).join("") || "<li class='dim'>—</li>"}</ul></div>
-            <div class="effect-box bad"><h4>${icon("alert", 12)} Undesired effects</h4>
+            <div class="effect-box bad"><h4>${icon("alert", 12)} Нежелательные эффекты</h4>
               <ul>${(c.effects.bad || []).map((x) => `<li>${esc(x)}</li>`).join("") || "<li class='dim'>—</li>"}</ul></div>
           </div>`
         : ""
@@ -236,19 +236,19 @@ function panelOverview(c) {
     ${
       findings.length
         ? `<section>
-            <div class="eyebrow" style="margin-bottom:7px">Against your stack</div>
+            <div class="eyebrow" style="margin-bottom:7px">Против твоего стека</div>
             <div class="stack" style="gap:8px">${findings.slice(0, 4).map(findingRow).join("")}</div>
-            <a class="btn ghost sm" style="margin-top:9px" href="#/lab/interactions">Open full checker ${icon("chevronRight", 13)}</a>
+            <a class="btn ghost sm" style="margin-top:9px" href="#/lab/interactions">Открыть полную проверку ${icon("chevronRight", 13)}</a>
           </section>`
         : stack.length
-          ? `<div>${callout("ok", "No known interaction with your current stack", "That is not proof of safety — absence of data is not data. Unlisted combinations are simply unstudied.")}</div>`
+          ? `<div>${callout("ok", "С текущим стеком известных взаимодействий нет", "Это не доказательство безопасности — отсутствие данных не есть данные. Не перечисленные комбинации просто не изучены.")}</div>`
           : ""
     }
 
     ${
       sys.length
         ? `<section>
-            <div class="eyebrow" style="margin-bottom:7px">Systems involved</div>
+            <div class="eyebrow" style="margin-bottom:7px">Задействованные системы</div>
             <div class="row wrap" style="gap:6px">
               ${sys.map((s) => `<a class="chip chip-btn" href="#/brain/${esc(s.id)}" style="--dot:${s.color}"><span class="dot" style="background:${s.color}"></span>${esc(s.name)}</a>`).join("")}
             </div>
@@ -259,7 +259,7 @@ function panelOverview(c) {
     ${
       (c.tags || []).length
         ? `<section>
-            <div class="eyebrow" style="margin-bottom:7px">Tags</div>
+            <div class="eyebrow" style="margin-bottom:7px">Теги</div>
             <div class="row wrap" style="gap:5px">${c.tags.map((t) => `<a class="chip" href="#/compounds?tag=${encodeURIComponent(t)}">${esc(t)}</a>`).join("")}</div>
           </section>`
         : ""
@@ -267,10 +267,10 @@ function panelOverview(c) {
 
     <div class="card tight" style="background:var(--bg-1)">
       <div class="row wrap" style="gap:10px 18px">
-        <div><div class="stat-label">Half-life</div><div class="mono" style="font-size:13px">${c.pk.halfLife ? fmt.duration(c.pk.halfLife) : "—"}</div></div>
-        <div><div class="stat-label">T-max</div><div class="mono" style="font-size:13px">${c.pk.tmax ? fmt.duration(c.pk.tmax) : "—"}</div></div>
-        <div><div class="stat-label">Duration</div><div class="mono" style="font-size:13px">${c.pk.duration ? fmt.duration(c.pk.duration) : "—"}</div></div>
-        <div><div class="stat-label">Class</div><div class="mono" style="font-size:13px">${esc(c.cls)}</div></div>
+        <div><div class="stat-label">Полувыведение</div><div class="mono" style="font-size:13px">${c.pk.halfLife ? fmt.duration(c.pk.halfLife) : "—"}</div></div>
+        <div><div class="stat-label">T-макс</div><div class="mono" style="font-size:13px">${c.pk.tmax ? fmt.duration(c.pk.tmax) : "—"}</div></div>
+        <div><div class="stat-label">Длительность</div><div class="mono" style="font-size:13px">${c.pk.duration ? fmt.duration(c.pk.duration) : "—"}</div></div>
+        <div><div class="stat-label">Класс</div><div class="mono" style="font-size:13px">${esc(c.cls)}</div></div>
       </div>
     </div>
   </div>`;
@@ -283,7 +283,7 @@ function panelMechanism(c) {
     ${
       (c.moa || []).length
         ? `<div class="card">
-            <div class="card-head"><h3 style="font-size:14px">Mechanism chain</h3><span class="spacer"></span>${liveBadge("animated")}</div>
+            <div class="card-head"><h3 style="font-size:14px">Цепочка механизма</h3><span class="spacer"></span>${liveBadge("анимация")}</div>
             ${mechFlow(
               (c.moa || []).slice(0, 4).map((m, i) => ({
                 icon: i === 0 ? "target" : i === 1 ? "dna" : i === 2 ? "activity" : "sparkles",
@@ -296,7 +296,7 @@ function panelMechanism(c) {
     ${
       (c.moa || []).length
         ? `<div class="card tight">
-            <div class="eyebrow" style="margin-bottom:6px">Primary actions</div>
+            <div class="eyebrow" style="margin-bottom:6px">Основные действия</div>
             <ul class="md-list" style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.6">
               ${c.moa.map((m) => `<li>${esc(m)}</li>`).join("")}
             </ul>
@@ -307,7 +307,7 @@ function panelMechanism(c) {
     ${
       targets.length
         ? `<div class="card flush">
-            <div style="padding:12px 14px;border-bottom:1px solid var(--line-soft)"><div class="eyebrow">Molecular targets</div></div>
+            <div style="padding:12px 14px;border-bottom:1px solid var(--line-soft)"><div class="eyebrow">Молекулярные мишени</div></div>
             <div class="list">
               ${targets
                 .map(
@@ -321,14 +321,14 @@ function panelMechanism(c) {
                 .join("")}
             </div>
           </div>`
-        : `<div class="card">${emptyState("target", "No molecular targets recorded", "This entry describes mechanism at the systems level only.")}</div>`
+        : `<div class="card">${emptyState("target", "Молекулярные мишени не записаны", "Эта запись описывает механизм только на уровне систем.")}</div>`
     }
 
     ${(() => {
       const sys = systemsForCompound(c);
       if (!sys.length) return "";
       return `<div class="card">
-        <div class="eyebrow" style="margin-bottom:8px">Where this sits in the pathway</div>
+        <div class="eyebrow" style="margin-bottom:8px">Где это находится в пути</div>
         <div class="stack" style="gap:8px">
           ${sys
             .map((s) => {
@@ -336,7 +336,7 @@ function panelMechanism(c) {
               return `<a class="card tight hoverable" href="#/brain/${esc(s.id)}" style="text-decoration:none;color:inherit;background:var(--bg-1)">
                 <div class="row between"><div class="row" style="gap:6px"><span class="dot" style="width:7px;height:7px;border-radius:50%;background:${s.color}"></span>
                 <strong style="font-size:13px">${esc(s.name)}</strong></div>${icon("chevronRight", 14)}</div>
-                ${pts.length ? `<div class="tiny dim" style="margin-top:5px;line-height:1.5">${pts.map((p) => `${esc(p.point)}: ${esc(p.target)}`).join(" · ")}</div>` : `<div class="tiny dim" style="margin-top:5px">Acts on this system through a downstream mechanism.</div>`}
+                ${pts.length ? `<div class="tiny dim" style="margin-top:5px;line-height:1.5">${pts.map((p) => `${esc(p.point)}: ${esc(p.target)}`).join(" · ")}</div>` : `<div class="tiny dim" style="margin-top:5px">Действует на эту систему через нижестоящий механизм.</div>`}
               </a>`;
             })
             .join("")}
