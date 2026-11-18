@@ -90,7 +90,7 @@ function run() {
       noDoseNote.push(`${c.id}: no dose rows`);
       continue;
     }
-    const ok = doses.every((d) => d && typeof d.note === "string" && /education|reference|not a recommendation|guideline|lower than/i.test(d.note));
+    const ok = doses.every((d) => d && typeof d.note === "string" && /education only|not a recommendation/i.test(d.note));
     if (!ok) noDoseNote.push(c.id);
     if (!(Number(c.pk && c.pk.halfLife) > 0)) noPk.push(c.id);
   }
@@ -157,7 +157,7 @@ function run() {
     check(
       "Compounds have mechanism data",
       emptyCompounds.length === 0,
-      emptyCompounds.length ? `${emptyCompounds.length}: ${emptyCompounds.slice(0, 10).map((c) => c.id).join(", ")}` : "all 148 have moa or targets",
+      emptyCompounds.length ? `${emptyCompounds.length}: ${emptyCompounds.slice(0, 10).map((c) => c.id).join(", ")}` : `all ${COMPOUNDS.length} have moa or targets`,
       "info"
     )
   );
