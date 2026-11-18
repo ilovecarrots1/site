@@ -168,7 +168,7 @@
   to   { opacity: 1; transform: none; }
 }
 
-/* Only the first handful of a page animate: a 148-card grid must not. */
+/* Only the first handful of a page animate: a 210-card grid must not. */
 #view > * { animation: nd-rise var(--t-3) var(--e-out) both; }
 #view > *:nth-child(1) { animation-delay: 0ms; }
 #view > *:nth-child(2) { animation-delay: 34ms; }
