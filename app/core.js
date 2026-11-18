@@ -653,13 +653,13 @@ export function emptyState(iconName, title, text, actionHtml = "") {
 
 export function disclaimer(compact = false) {
   if (compact) {
-    return `<p class="disclaimer-mini">${icon("info", 14)} Educational reference only — not medical advice.</p>`;
+    return `<p class="disclaimer-mini">${icon("info", 14)} Только образовательный справочник — не медицинская рекомендация.</p>`;
   }
   return `<div class="disclaimer">${icon("shield", 18)}
-    <div><strong>Educational reference, not medical advice.</strong>
-    NeuroDifference summarises published pharmacology for study and harm-reduction literacy.
-    Doses are literature reference points, never a prescription. Anything you put in your body —
-    especially prescriptions, peptides, or combinations — belongs in a conversation with a clinician or pharmacist.</div>
+    <div><strong>Образовательный справочник, не медицинская рекомендация.</strong>
+    NeuroDifference обобщает опубликованную фармакологию для обучения и грамотности снижения вреда.
+    Дозы — справочные точки из литературы, никогда не назначение. Всё, что ты кладёшь в свой организм —
+    особенно рецептурное, пептиды или комбинации — должно обсуждаться с врачом или фармацевтом.</div>
   </div>`;
 }
 
