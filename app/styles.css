@@ -1292,12 +1292,8 @@ body::after {
   border-radius: 50%;
   border: 1px solid currentColor;
   pointer-events: none;
-  animation: liveRing 2.1s ease-out infinite;
 }
-@keyframes liveRing {
-  0% { transform: scale(1); opacity: 0.7; }
-  100% { transform: scale(2.6); opacity: 0; }
-}
+/* Ring pulse lives in skin.css (nd-pulse) — one animation per element. */
 
 /* --- Cards: depth + hover spotlight -------------------------------- */
 .card { box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset, 0 14px 34px -30px #000; }
