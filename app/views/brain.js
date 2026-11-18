@@ -35,12 +35,14 @@ import {
   regionColor,
 } from "../data/brainmap.js";
 import { searchPapers } from "../lib/pubmed.js";
+import { mountBrain3D } from "../lib/brain3d.js";
 
 /* --------------------------------------------------------------------------
    View state (module-local, reset on navigation)
    -------------------------------------------------------------------------- */
 
 const S = {
+  view: "3d",
   mode: "targets",
   q: "",
   kind: null,
@@ -464,7 +466,7 @@ export function render(ctx) {
   return `<div class="page">
     <div class="page-head">
       <div style="min-width:0">
-        <div class="eyebrow tiny dim">Flagship · 2.5D map</div>
+        <div class="eyebrow tiny dim">Flagship · 3D model</div>
         <h1 class="page-title">Brain map</h1>
         <div class="page-sub">${STATS.regions} regions · ${STATS.targets} targets · ${STATS.compounds} compounds. One picture of where each drug lands.</div>
       </div>
@@ -479,9 +481,13 @@ export function render(ctx) {
           <div class="bm-bar">
             <span class="bm-bar-label" id="bm-mode-note">Tap a region · pick a target to light its network</span>
             <span class="spacer"></span>
+            <span class="bm-view-toggle">
+              <button type="button" class="chip chip-btn chip-xs${S.view === "3d" ? " on" : ""}" data-view="3d">3D</button>
+              <button type="button" class="chip chip-btn chip-xs${S.view === "svg" ? " on" : ""}" data-view="svg">Schematic</button>
+            </span>
             <button type="button" class="chip chip-btn chip-xs" data-act="reset" id="bm-reset">Reset view</button>
           </div>
-          <div class="bm-stage" id="bm-stage" style="--px:0;--py:0">
+          <div class="bm-stage" id="bm-stage" style="--px:0;--py:0"${S.view === "svg" ? "" : " hidden"}>
             ${mapSvg()}
             <div class="bm-ctrls">
               <button type="button" data-zoom="in" aria-label="Zoom in">+</button>
@@ -489,6 +495,14 @@ export function render(ctx) {
               <button type="button" data-zoom="reset" aria-label="Reset zoom">⌂</button>
             </div>
             <div class="bm-hint">drag to pan · wheel or pinch to zoom · ← → to walk regions</div>
+          </div>
+          <div class="bm-stage bm-stage-3d" id="bm-stage-3d"${S.view === "3d" ? "" : " hidden"}>
+            <canvas id="bm-3d" class="bm-3d" aria-label="Rotatable 3D brain model with region hotspots"></canvas>
+            <div class="bm-ctrls">
+              <button type="button" id="bm-auto" aria-label="Toggle auto-rotate">⟳</button>
+              <button type="button" id="bm-reset3d" aria-label="Reset orientation">⌂</button>
+            </div>
+            <div class="bm-hint">drag to orbit · pinch or wheel to zoom · tap a hotspot · double-tap to reset</div>
           </div>
         </div>
 
@@ -515,6 +529,68 @@ export function mount(root) {
   const papers = root.querySelector("#bm-papers");
   const modeNote = root.querySelector("#bm-mode-note");
   if (!stage || !svg || !cam) return;
+
+  /* ---- 3D model ---------------------------------------------------------- */
+
+  const stage3d = root.querySelector("#bm-stage-3d");
+  const canvas3d = root.querySelector("#bm-3d");
+
+  function litState() {
+    const lit = new Map();
+    let focus = false;
+    if (S.kind === "region") {
+      const r = REGION_MAP.get(S.id);
+      if (r) {
+        lit.set(r.id, 2);
+        targetsForRegion(r.id).forEach((x) =>
+          x.target.regions.forEach(([rid, w]) => {
+            if (rid !== r.id && w >= 0.6 && !lit.has(rid)) lit.set(rid, 1);
+          })
+        );
+      }
+    } else if (S.kind === "target") {
+      focus = true;
+      regionsForTarget(S.id).forEach((x) => lit.set(x.region.id, x.weight >= 0.8 ? 2 : 1));
+    } else if (S.kind === "compound") {
+      focus = true;
+      compoundRegions(S.id).forEach((x) => lit.set(x.region.id, x.weight >= 0.8 ? 2 : 1));
+    }
+    return { lit, focus };
+  }
+
+  let b3d = null;
+  if (canvas3d) {
+    const accent =
+      getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#8b7bff";
+    b3d = mountBrain3D(canvas3d, {
+      regions: REGIONS.map((r) => ({ ...r, color: regionColor(r) })),
+      palette: { cortex: accent },
+      getLit: litState,
+      onSelect: (id) => select("region", id),
+    });
+  }
+
+  root.querySelectorAll("[data-view]").forEach((b) =>
+    b.addEventListener("click", () => {
+      S.view = b.getAttribute("data-view");
+      root.querySelectorAll("[data-view]").forEach((x) => x.classList.toggle("on", x === b));
+      stage.hidden = S.view !== "svg";
+      if (stage3d) stage3d.hidden = S.view !== "3d";
+      if (b3d) {
+        b3d.sync();
+        b3d.kick();
+      }
+    })
+  );
+  const autoBtn = root.querySelector("#bm-auto");
+  if (autoBtn && b3d) {
+    autoBtn.classList.toggle("on", b3d.isAuto());
+    autoBtn.addEventListener("click", () => {
+      autoBtn.classList.toggle("on", b3d.setAuto(!b3d.isAuto()));
+    });
+  }
+  const reset3d = root.querySelector("#bm-reset3d");
+  if (reset3d && b3d) reset3d.addEventListener("click", () => b3d.reset());
 
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   let raf = 0;
@@ -653,6 +729,7 @@ export function mount(root) {
 
   function paintSelection() {
     clearLight();
+    if (b3d) b3d.sync();
     if (!S.kind) return;
 
     if (S.kind === "region") {
@@ -829,6 +906,10 @@ export function mount(root) {
       S.kind = null;
       S.id = null;
       clearLight();
+      if (b3d) {
+        b3d.reset();
+        b3d.sync();
+      }
       detail.innerHTML = detailHtml();
       papers.innerHTML = papersHtml();
       side.innerHTML = sideHtml();
