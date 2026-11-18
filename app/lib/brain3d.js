@@ -221,4 +221,87 @@ export function buildGeometry() {
   return { verts, faces, sparks, centroids };
 }
 
-/* __MOUNT__ */
+/* --------------------------------------------------------------------------
+   Renderer
+   -------------------------------------------------------------------------- */
+
+export function mountBrain3D(canvas, opts) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  const geo = buildGeometry();
+  const NV = geo.verts.length;
+  const NF = geo.faces.length;
+  const reduced =
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const motionOff = () =>
+    reduced || document.documentElement.getAttribute("data-motion") === "off";
+
+  const pal = opts.palette || {};
+  const rgb = (c, fb) => {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(c || "").trim());
+    if (!m) return fb;
+    const n = parseInt(m[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  };
+  const colors = [
+    rgb(pal.cortex, [232, 144, 156]),
+    rgb(pal.cerebellum, [217, 127, 140]),
+    rgb(pal.stem, [201, 114, 126]),
+  ];
+  /* selection red follows the active skin's --bad token */
+  let bad = [255, 84, 112];
+  try {
+    const v = getComputedStyle(document.documentElement).getPropertyValue("--bad").trim();
+    bad = rgb(v, bad);
+  } catch (e) { /* keep fallback */ }
+
+  /* shade cache: [part][litLevel][bucket] -> css rgb string */
+  const BUCKETS = 32;
+  const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  const shadeCache = colors.map((base) => {
+    const tints = [base, mix(base, bad, 0.32), mix(base, bad, 0.84)];
+    return tints.map((tc) => {
+      const arr = [];
+      for (let b = 0; b < BUCKETS; b++) {
+        const sh = 0.22 + 0.78 * (b / (BUCKETS - 1));
+        arr.push(`rgb(${Math.round(clamp(tc[0] * sh, 0, 255))},${Math.round(clamp(tc[1] * sh, 0, 255))},${Math.round(clamp(tc[2] * sh, 0, 255))})`);
+      }
+      return arr;
+    });
+  });
+
+  /* Hotspot anchors: surface regions sit on their real centroid; deep / mid
+     nuclei keep the schematic inward projection and show only when lit. */
+  const anchors = (opts.regions || []).map((r) => {
+    const c = geo.centroids[r.id];
+    if (c && c.n > 0) {
+      return { id: r.id, short: r.short || r.name, X: c.x, Y: c.y, Z: c.z, color: r.color || "#8b7bff", surface: true };
+    }
+    const X = (r.x - 210) * 0.66;
+    const Y = -(r.y - 152) * 0.66;
+    const q = Math.max(0, 1 - (X / 145) ** 2 - (Y / 82) ** 2);
+    let Z = 112 * Math.sqrt(q);
+    if (r.layer === "deep") Z *= 0.25;
+    else if (r.layer === "mid") Z *= 0.6;
+    return { id: r.id, short: r.short || r.name, X, Y, Z: Z + 8, color: r.color || "#8b7bff", surface: false };
+  });
+
+  /* Camera state */
+  let yaw = 0.62, pitch = 0.16, zoom = 1;
+  let vyaw = 0, vpitch = 0;
+  let auto = !motionOff();
+  let lit = new Map();
+  let focus = false;
+  let dirty = true, raf = 0, visible = true;
+  let W = 0, H = 0, dpr = 1;
+
+  const proj = new Array(NV);
+  for (let i = 0; i < NV; i++) proj[i] = { x: 0, y: 0, z: 0 };
+  const fdepth = new Float64Array(NF);
+  const order = new Array(NF);
+  for (let i = 0; i < NF; i++) order[i] = i;
+  const anchorScreen = new Map();
+  let hitFaces = [];
+
+/* __TAIL__ */
