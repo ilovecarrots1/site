@@ -99,7 +99,7 @@ export const MARKERS_B = [
     ref: { low: 6, high: 23 },
     better: "mid",
     note: "Must be drawn 07:00–09:00; late shifts change the whole reference interval.",
-    compounds: ["mk-677", "somatotropin", "ashwagandha", "lithium", "mirtazapine", "testosterone-cypionate"],
+    compounds: ["mk-677", "somatropin", "ashwagandha", "lithium", "mirtazapine", "testosterone-cypionate"],
   },
   {
     id: "acth",
@@ -123,7 +123,7 @@ export const MARKERS_B = [
     ref: { low: 100, high: 300 },
     better: "mid",
     note: "The practical readout of growth hormone exposure — GH itself is too pulsatile to test.",
-    compounds: ["somatotropin", "mk-677", "ipamorelin", "cjc-1295", "sermorelin", "tesamorelin", "hexarelin", "ghrp-2", "ghrp-6", "igf-1-lr3", "hgh-fragment-176-191"],
+    compounds: ["somatropin", "mk-677", "ipamorelin", "cjc-1295", "sermorelin", "tesamorelin", "hexarelin", "ghrp-2", "ghrp-6", "igf-1-lr3", "hgh-fragment-176-191"],
   },
   {
     id: "dht",
@@ -297,7 +297,7 @@ export const MARKERS_B = [
     ref: { low: 8.6, high: 10.3 },
     better: "mid",
     note: "Correct for albumin; a normal total with low albumin can hide free calcium that is high.",
-    compounds: ["abaloparatide", "liothyronine", "testosterone-cypionate", "calcium-carbonate"],
+    compounds: ["abaloparatide", "liothyronine", "testosterone-cypionate"],
   },
   {
     id: "phosphate",
@@ -309,7 +309,7 @@ export const MARKERS_B = [
     ref: { low: 2.5, high: 4.5 },
     better: "mid",
     note: "Falls with refeeding and with insulin; rises in kidney failure.",
-    compounds: ["insulin", "somatotropin"],
+    compounds: ["insulin", "somatropin"],
   },
 
   /* ---------------- blood count ---------------- */
@@ -397,7 +397,7 @@ export const MARKERS_B = [
     ref: { low: 140, high: 280 },
     better: "low",
     note: "Any cell damage releases it — exercise, haemolysis, liver, muscle.",
-    compounds: ["stanozolol", "trenbolone-acetate", "somatotropin"],
+    compounds: ["stanozolol", "trenbolone-acetate", "somatropin"],
   },
   {
     id: "uric-acid",
