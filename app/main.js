@@ -36,6 +36,7 @@ import { PATHWAYS } from "./data/atlas.js";
 import { ORGANS } from "./data/organs.js";
 import { CONDITIONS } from "./data/conditions.js";
 import { subscribePlate, wireSubscribe } from "./views/ui.js";
+import { applyI18n, setLang } from "./lib/i18n.js";
 
 /* ------------------------------------------------------------------ */
 /* Navigation model                                                    */
@@ -161,6 +162,8 @@ function bottomNavHtml() {
   </nav>`;
 }
 
+let shellScrollWired = false;
+
 function mountShell(root) {
   root.innerHTML = `<div class="bgfx" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="app">
@@ -177,10 +180,13 @@ function mountShell(root) {
   document.getElementById("btn-more")?.addEventListener("click", openDrawer);
   document.getElementById("btn-search")?.addEventListener("click", openSearch);
 
-  const onScroll = debounce(() => {
-    document.documentElement.setAttribute("data-scrolled", String(window.scrollY > 8));
-  }, 60);
-  window.addEventListener("scroll", onScroll, { passive: true });
+  if (!shellScrollWired) {
+    shellScrollWired = true;
+    const onScroll = debounce(() => {
+      document.documentElement.setAttribute("data-scrolled", String(window.scrollY > 8));
+    }, 60);
+    window.addEventListener("scroll", onScroll, { passive: true });
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -659,6 +665,7 @@ function renderRoute() {
     window.scrollTo(0, 0);
   }
   document.documentElement.setAttribute("data-scrolled", String(window.scrollY > 8));
+  applyI18n();
 }
 
 /* ------------------------------------------------------------------ */
@@ -799,6 +806,7 @@ function boot() {
     /* ignore */
   }
   store.load();
+  setLang(store.data.settings.lang || "ru");
   // Counts today as day 1 of the streak instead of leaving the profile
   // marked active with a streak of 0.
   touchStreak();
@@ -809,6 +817,11 @@ function boot() {
 
   settingsView.applyAppearance();
   window.addEventListener("nd:appearance", () => settingsView.applyAppearance());
+  window.addEventListener("nd:lang", () => {
+    const rootEl = document.getElementById("root");
+    if (rootEl) mountShell(rootEl);
+    renderRoute();
+  });
 
   const root = document.getElementById("root");
   mountShell(root);
