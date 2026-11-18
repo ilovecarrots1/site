@@ -23,6 +23,7 @@ import {
   CORPUS_CALLOSUM,
   NEURON_LINKS,
   NEURON_SOMAS,
+  NEURON_MAP,
   NEURON_PULSES,
   LAYERS,
   STATS,
@@ -120,8 +121,8 @@ function mapSvg() {
 
   /* Neuron overlay: axons, travelling pulses, somas with dendrite crosses. */
   const axons = NEURON_LINKS.map(([a, b]) => {
-    const A = REGION_MAP.get(a);
-    const B = REGION_MAP.get(b);
+    const A = NEURON_MAP.get(a);
+    const B = NEURON_MAP.get(b);
     if (!A || !B) return "";
     return `<line class="bm-axon" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"></line>`;
   }).join("");
