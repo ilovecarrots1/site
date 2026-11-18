@@ -246,6 +246,9 @@ export const NEURON_SOMAS = Array.from(
   new Set(NEURON_LINKS.flat())
 ).map((id) => REGION_MAP.get(id)).filter(Boolean);
 
+/* Lookup for the neuron layer: somas are not part of REGIONS. */
+export const NEURON_MAP = new Map([...REGIONS, ...NEURON_SOMAS].map((r) => [r.id, r]));
+
 export const NEURON_PULSES = NEURON_LINKS.flatMap(([a, b], i) => {
   const A = REGION_MAP.get(a);
   const B = REGION_MAP.get(b);
