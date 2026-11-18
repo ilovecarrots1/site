@@ -518,3 +518,61 @@ html { scroll-behavior: smooth; }
 }
 [data-motion="off"] .card:hover { transform: none; }
 [data-motion="off"] .btn:active, [data-motion="off"] .chip-btn:active { transform: none; }
+
+/* ==========================================================================
+   v4.2 — static interface upgrade. Visible without hover:
+   floating pill nav, tinted card surfaces, pill chips, stronger buttons.
+   No new keyframes; transform/opacity budget unchanged.
+   ========================================================================== */
+
+/* Bottom nav → floating pill bar with an active pill. */
+.bottom-nav {
+  left: 10px;
+  right: 10px;
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  height: var(--nav-h);
+  padding-bottom: 0;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--line));
+  background: color-mix(in srgb, var(--bg-1) 90%, transparent);
+  box-shadow: 0 14px 34px -16px rgba(0, 0, 0, 0.75), 0 1px 0 rgba(255, 255, 255, 0.03) inset;
+}
+.nav-item { margin: 5px 3px; padding-top: 0; border-radius: 13px; }
+.nav-item.active { background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.nav-item.active::before { display: none; }
+
+/* Cards: faint accent-tinted surface, stronger edge. */
+.card {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-2) 95%, var(--accent)), var(--bg-1));
+  border-color: color-mix(in srgb, var(--accent) 12%, var(--line));
+}
+
+/* Chips → pills; active chip gets a real accent fill. */
+.chip { height: 24px; padding: 0 10px; border-radius: 99px; }
+.chip-btn.on {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* Buttons: clearer hierarchy. */
+.btn { border-radius: 12px; }
+.btn.sm { border-radius: 10px; }
+.btn.primary { box-shadow: 0 10px 26px -12px var(--accent), 0 1px 0 rgba(255, 255, 255, 0.14) inset; }
+.btn.soft { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.btn.ghost { border-color: color-mix(in srgb, var(--accent) 14%, var(--line)); }
+.btn-group button.on { background: color-mix(in srgb, var(--accent) 16%, var(--bg-3)); }
+
+/* Hero: stronger edge + gradient headline (static, guarded). */
+.hero-card { border-color: color-mix(in srgb, var(--accent) 34%, var(--line)); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .hero-card h1, .hero-card h2 {
+    background: linear-gradient(115deg, var(--text) 35%, color-mix(in srgb, var(--accent) 85%, var(--text)));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
+
+/* Eyebrows pick up the accent so sections read as branded. */
+.eyebrow { color: color-mix(in srgb, var(--accent) 62%, var(--text-3)); }
+
