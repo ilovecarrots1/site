@@ -263,7 +263,7 @@ function buildIndex() {
   const items = [];
   for (const c of COMPOUNDS) {
     items.push({
-      kind: "Препарат",
+      kind: "Препараты",
       title: c.name,
       sub: `${c.cls} · ${c.evidence}`, 
       href: `#/compounds/${c.id}`,
@@ -273,7 +273,7 @@ function buildIndex() {
   }
   for (const s of SYSTEMS) {
     items.push({
-      kind: "Система",
+      kind: "Системы",
       title: s.name,
       sub: s.tagline || "нейромедиаторная система",
       href: `#/brain/${s.id}`,
@@ -283,7 +283,7 @@ function buildIndex() {
   }
   for (const { course, lesson } of LESSONS_ALL) {
     items.push({
-      kind: "Урок",
+      kind: "Уроки",
       title: lesson.title,
       sub: course.title,
       href: `#/learn/${course.id}/${lesson.id}`,
@@ -372,14 +372,14 @@ function openSearch() {
     current = searchAll(input.value);
     active = 0;
     if (!current.length) {
-      results.innerHTML = `<div class="sr-empty">No match. Try a compound name, a transmitter, or “interactions”.</div>`;
+      results.innerHTML = `<div class="sr-empty">Ничего не найдено. Попробуй название препарата, нейромедиатор или «взаимодействия».</div>`;
       return;
     }
     let html = "";
     let lastKind = "";
     current.forEach((item, i) => {
       if (item.kind !== lastKind) {
-        html += `<div class="sr-group">${esc(item.kind)}s</div>`;
+        html += `<div class="sr-group">${esc(item.kind === "Page" ? "Страницы" : item.kind)}</div>`;
         lastKind = item.kind;
       }
       html += `<a class="sr-item ${i === active ? "active" : ""}" href="${item.href}" data-i="${i}">
@@ -433,12 +433,12 @@ function openSearch() {
 function notFound(segs) {
   return {
     nav: "",
-    title: "Not found",
+    title: "Не найдено",
     view: {
       render: () =>
-        `<div class="page-head"><div class="eyebrow">404</div><h1>Nothing at that address</h1>
-         <p>“${esc(segs.join("/"))}” is not a route in this app.</p></div>
-         <a class="btn primary" href="#/">${icon("home", 15)} Back home</a>`,
+        `<div class="page-head"><div class="eyebrow">404</div><h1>По этому адресу ничего нет</h1>
+         <p>«${esc(segs.join("/"))}» — не маршрут этого приложения.</p></div>
+         <a class="btn primary" href="#/">${icon("home", 15)} На главную</a>`,
     },
   };
 }
@@ -446,58 +446,58 @@ function notFound(segs) {
 function matchRoute(segs) {
   const [a, b, c] = segs;
 
-  if (!a) return { nav: "home", title: "Home", view: homeView };
+  if (!a) return { nav: "home", title: "Главная", view: homeView };
   if (a === "compounds") {
-    if (!b) return { nav: "compounds", title: "Compounds", view: compoundsView.list };
+    if (!b) return { nav: "compounds", title: "Препараты", view: compoundsView.list };
     const key = String(b).toLowerCase();
     const cmp = COMPOUND_BY_ID.get(key);
     return { nav: "compounds", title: cmp ? cmp.name : "Compound", view: compoundsView.detail, params: { id: key } };
   }
   if (a === "brain" || a === "systems") {
-    if (!b) return { nav: "brain", title: "Brain map", view: { render: brainView.render, mount: brainView.mount } };
+    if (!b) return { nav: "brain", title: "Карта мозга", view: { render: brainView.render, mount: brainView.mount } };
     const key = String(b).toLowerCase();
     const sys = SYSTEM_BY_ID.get(key);
     return { nav: "brain", title: sys ? sys.name : "System", view: neuroView.system, params: { id: key } };
   }
   if (a === "dev" && (b === "audit" || !b)) {
-    return { nav: "settings", title: "Data audit", view: { render: auditView.render, mount: auditView.mount } };
+    return { nav: "settings", title: "Аудит данных", view: { render: auditView.render, mount: auditView.mount } };
   }
   if (a === "emergency" || a === "redflags") {
-    return { nav: "emergency", title: "Red flags", view: { render: emergencyView.render, mount: emergencyView.mount } };
+    return { nav: "emergency", title: "Красные флаги", view: { render: emergencyView.render, mount: emergencyView.mount } };
   }
   if (a === "symptoms" || a === "symptom") {
-    return { nav: "symptoms", title: "Symptom finder", view: { render: symptomsView.render, mount: symptomsView.mount } };
+    return { nav: "symptoms", title: "Поиск по симптомам", view: { render: symptomsView.render, mount: symptomsView.mount } };
   }
   if (a === "stack") {
-    return { nav: "stack", title: "Stack builder", view: { render: stackView.render, mount: stackView.mount } };
+    return { nav: "stack", title: "Сборка стека", view: { render: stackView.render, mount: stackView.mount } };
   }
   if (a === "pk" || a === "timeline") {
-    return { nav: "pk", title: "PK timeline", view: { render: pkView.render, mount: pkView.mount } };
+    return { nav: "pk", title: "PK-кривые", view: { render: pkView.render, mount: pkView.mount } };
   }
   if (a === "bloodwork") {
     const view = { render: bloodworkView.render, mount: bloodworkView.mount };
-    if (!b) return { nav: "bloodwork", title: "Bloodwork", view };
-    return { nav: "bloodwork", title: "Marker", view, params: { id: String(b).toLowerCase() } };
+    if (!b) return { nav: "bloodwork", title: "Анализы", view };
+    return { nav: "bloodwork", title: "Показатель", view, params: { id: String(b).toLowerCase() } };
   }
   if (a === "conditions") {
     const view = { render: conditionsView.render, mount: conditionsView.mount };
-    if (!b) return { nav: "conditions", title: "Conditions", view };
-    return { nav: "conditions", title: "Condition", view, params: { id: String(b).toLowerCase() } };
+    if (!b) return { nav: "conditions", title: "Состояния", view };
+    return { nav: "conditions", title: "Состояние", view, params: { id: String(b).toLowerCase() } };
   }
-  if (a === "compare") return { nav: "compare", title: "Compare", view: compareView.compare };
+  if (a === "compare") return { nav: "compare", title: "Сравнение", view: compareView.compare };
 
   if (a === "atlas") {
-    if (!b) return { nav: "atlas", title: "Biochemical atlas", view: { render: atlasView.index, mount: atlasView.mount } };
+    if (!b) return { nav: "atlas", title: "Биохимический атлас", view: { render: atlasView.index, mount: atlasView.mount } };
     if (b === "target" && c)
       return {
         nav: "atlas",
-        title: "Target",
+        title: "Мишень",
         view: { render: atlasView.target, mount: atlasView.mount },
         params: { id: String(c).toLowerCase(), kind: "target" },
       };
     return {
       nav: "atlas",
-      title: "Pathway",
+      title: "Путь",
       view: { render: atlasView.pathway, mount: atlasView.mount },
       params: { id: String(b).toLowerCase(), kind: "pathway" },
     };
@@ -505,35 +505,35 @@ function matchRoute(segs) {
   if (a === "organs" || a === "organ") {
     return {
       nav: "organs",
-      title: "Organ map",
+      title: "Карта органов",
       view: { render: organsView.organs, mount: organsView.mount },
       params: b ? { id: String(b).toLowerCase() } : {},
     };
   }
   if (a === "map" || a === "network") {
-    return { nav: "map", title: "Convergence map", view: { render: mapView.map, mount: mapView.mount } };
+    return { nav: "map", title: "Карта конвергенции", view: { render: mapView.map, mount: mapView.mount } };
   }
   if (a === "calc" || a === "calculator") {
-    return { nav: "calc", title: "Peptide calculator", view: { render: calculatorView.calculator, mount: calculatorView.mount } };
+    return { nav: "calc", title: "Калькулятор пептидов", view: { render: calculatorView.calculator, mount: calculatorView.mount } };
   }
 
   if (a === "lab") {
-    if (b === "interactions") return { nav: "interactions", title: "Interactions", view: labView.interactions };
-    if (b === "taper") return { nav: "taper", title: "Taper planner", view: taperView.taper };
-    return { nav: "lab", title: "Dose lab", view: labView.lab };
+    if (b === "interactions") return { nav: "interactions", title: "Взаимодействия", view: labView.interactions };
+    if (b === "taper") return { nav: "taper", title: "План снижения", view: taperView.taper };
+    return { nav: "lab", title: "Лаборатория доз", view: labView.lab };
   }
   if (a === "learn") {
-    if (!b) return { nav: "learn", title: "Learn", view: learnView.index };
+    if (!b) return { nav: "learn", title: "Обучение", view: learnView.index };
     const course = COURSES.find((x) => x.id === b);
     if (!c) return { nav: "learn", title: course ? course.title : "Course", view: learnView.course, params: { courseId: b } };
     return { nav: "learn", title: course ? course.title : "Lesson", view: learnView.lesson, params: { courseId: b, lessonId: c } };
   }
-  if (a === "cards" || a === "flashcards") return { nav: "cards", title: "Flashcards", view: learnView.cards };
-  if (a === "evidence" || a === "studies") return { nav: "evidence", title: "Evidence", view: evidenceView.evidence };
-  if (a === "research" || a === "pubmed") return { nav: "research", title: "Research", view: researchView.research };
-  if (a === "ask") return { nav: "ask", title: "Ask", view: askView.ask };
-  if (a === "notes") return { nav: "notes", title: "Notebook", view: notesView.notesView };
-  if (a === "settings") return { nav: "settings", title: "Settings", view: settingsView.settings };
+  if (a === "cards" || a === "flashcards") return { nav: "cards", title: "Карточки", view: learnView.cards };
+  if (a === "evidence" || a === "studies") return { nav: "evidence", title: "Доказательность", view: evidenceView.evidence };
+  if (a === "research" || a === "pubmed") return { nav: "research", title: "Исследования", view: researchView.research };
+  if (a === "ask") return { nav: "ask", title: "Спроси индекс", view: askView.ask };
+  if (a === "notes") return { nav: "notes", title: "Блокнот", view: notesView.notesView };
+  if (a === "settings") return { nav: "settings", title: "Настройки", view: settingsView.settings };
   return notFound(segs);
 }
 
@@ -652,7 +652,7 @@ function renderRoute() {
 
   const titleEl = document.getElementById("topbar-title");
   if (titleEl) titleEl.textContent = match.title;
-  document.title = match.title === "Home" ? "NeuroDifference — evidence · compounds · pathways" : `${match.title} · NeuroDifference`;
+  document.title = match.title === "Главная" ? "NeuroDifference — доказательность · препараты · пути" : `${match.title} · NeuroDifference`;
 
   if (lastPath !== hashKey) {
     lastPath = hashKey;
@@ -736,9 +736,9 @@ function wireServiceWorker() {
     const bar = document.createElement("div");
     bar.className = "update-bar";
     bar.innerHTML =
-      '<span class="update-bar-txt"><b>New version ready</b><span class="tiny dim">Reload to pick up the fresh build</span></span>' +
-      '<button type="button" class="btn primary xs" data-update="go">Reload</button>' +
-      '<button type="button" class="icon-btn" data-update="later" aria-label="Later">' + icon("x", 14) + "</button>";
+      '<span class="update-bar-txt"><b>Готова новая версия</b><span class="tiny dim">Перезагрузи, чтобы подхватить свежую сборку</span></span>' +
+      '<button type="button" class="btn primary xs" data-update="go">Обновить</button>' +
+      '<button type="button" class="icon-btn" data-update="later" aria-label="Позже">' + icon("x", 14) + "</button>";
     document.body.appendChild(bar);
     bar.addEventListener("click", (ev) => {
       const b = ev.target.closest("[data-update]");
