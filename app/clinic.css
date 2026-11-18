@@ -37,6 +37,27 @@
 }
 .bm-stage:active { cursor: grabbing; }
 .bm-stage[hidden] { display: none; }
+.bm-bar [hidden] { display: none; }
+
+/* Anatomical pink brain (v4.2): real lobe placement, click -> region card. */
+.bm-stage-anat { touch-action: manipulation; cursor: default; }
+.ba-svg { width: 100%; height: auto; display: block; }
+.ba-outline { fill: #e8a2ac; }
+.ba-cut { fill: #f2c3ca; }
+.ba-region { stroke: rgba(96, 24, 36, 0.35); stroke-width: 0.8; cursor: pointer; transition: opacity var(--t-2, 0.15s) var(--e-out, ease); }
+.ba-region:hover { opacity: 0.85; }
+.ba-region:focus-visible { outline: none; stroke: #ffffff; stroke-width: 1.6; }
+.ba-tone-0 { fill: #eba6b0; }
+.ba-tone-1 { fill: #e2949f; }
+.ba-tone-2 { fill: #f0b6be; }
+.ba-tone-3 { fill: #d98793; }
+.ba-region.lit { fill: color-mix(in srgb, var(--accent) 45%, #f0b6be); }
+.ba-region.on { fill: var(--bad); stroke: #ffffff; stroke-width: 1.4; }
+.ba-label { font-size: 7px; font-weight: 700; letter-spacing: 0.04em; fill: #5c1f2a; text-anchor: middle; pointer-events: none; }
+.ba-label.on { fill: #ffffff; }
+.ba-sulcus { fill: none; stroke: rgba(120, 35, 48, 0.45); stroke-width: 1.1; stroke-linecap: round; pointer-events: none; }
+.ba-folium { fill: none; stroke: rgba(120, 35, 48, 0.4); stroke-width: 0.7; pointer-events: none; }
+.ba-callosal { fill: #f7dde2; stroke: rgba(120, 35, 48, 0.3); stroke-width: 0.8; pointer-events: none; }
 
 /* 3D stage — the hologram sits on a soft accent glow, no blurred divs. */
 .bm-stage-3d {
