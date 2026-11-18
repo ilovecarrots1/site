@@ -121,7 +121,11 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(req)
         .then((res) => {
-          if (res && res.ok) {
+          // Only the app shell (root / index.html) is cached as the offline
+          // fallback. Deep links and the secret experimental page must NOT
+          // overwrite the main shell cache.
+          const p = url.pathname;
+          if (res && res.ok && (p.endsWith("/") || p.endsWith("/index.html"))) {
             const copy = res.clone();
             caches.open(VERSION).then((c) => c.put("./index.html", copy)).catch(() => {});
           }
