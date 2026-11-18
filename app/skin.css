@@ -455,3 +455,66 @@ html { scroll-behavior: smooth; }
   50%      { transform: scale(1.55); opacity: 0.45; }
 }
 .live-dot::after { animation: nd-pulse 2.1s var(--e-out) infinite; }
+
+/* ==========================================================================
+   v4.1 — global polish pass. Depth, glow, tactility.
+   Transitions: transform/opacity/colors only. No new keyframes needed.
+   ========================================================================== */
+
+::selection { background: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--text); }
+
+* { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--accent) 32%, var(--bg-3)) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent) 30%, var(--bg-3)); border-radius: 99px; }
+*::-webkit-scrollbar-track { background: transparent; }
+
+/* Cards: hover lift + accent border, no layout shift. */
+.card {
+  transition: transform var(--t-3) var(--e-out), border-color var(--t-3) var(--e-out);
+}
+.card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--accent) 32%, var(--line));
+}
+
+/* Hero: deeper accent wash. */
+.hero-card {
+  border-color: color-mix(in srgb, var(--accent) 26%, var(--line));
+  background:
+    radial-gradient(120% 120% at 85% -10%, color-mix(in srgb, var(--accent) 14%, transparent) 0%, transparent 55%),
+    radial-gradient(90% 90% at 0% 110%, color-mix(in srgb, #3edbd3 8%, transparent) 0%, transparent 55%),
+    var(--bg-2);
+}
+
+/* Tactile controls. */
+.btn, .chip-btn, .chip, .list-row, .tab, button.chip {
+  transition: transform var(--t-2) var(--e-out), border-color var(--t-2) var(--e-out),
+    background-color var(--t-2) var(--e-out), color var(--t-2) var(--e-out);
+}
+.btn:active, .chip-btn:active, button.chip:active { transform: scale(0.97); }
+.chip:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+.list-row:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+/* Inputs: soft accent ring on focus. */
+.input:focus, .select:focus, .textarea:focus {
+  border-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent);
+  outline: none;
+}
+
+/* Tables: row highlight. */
+.table-wrap tbody tr { transition: background-color var(--t-2) var(--e-out); }
+.table-wrap tbody tr:hover { background: color-mix(in srgb, var(--accent) 5%, transparent); }
+
+/* Titles: tighter, more deliberate. */
+.page-title { letter-spacing: -0.02em; }
+
+/* Bottom nav: active glow. */
+.bottom-nav [aria-current="page"] { color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .btn, .chip-btn, .chip, .list-row, .table-wrap tbody tr { transition: none !important; }
+  .card:hover { transform: none; }
+}
+[data-motion="off"] .card:hover { transform: none; }
+[data-motion="off"] .btn:active, [data-motion="off"] .chip-btn:active { transform: none; }
