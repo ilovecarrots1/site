@@ -6,6 +6,10 @@ import { COMPOUNDS_C } from "./compounds-c.js";
 import { COMPOUNDS_D } from "./compounds-d.js";
 import { COMPOUNDS_E } from "./compounds-e.js";
 import { COMPOUNDS_F } from "./compounds-f.js";
+import { COMPOUNDS_G } from "./compounds-g.js";
+import { COMPOUNDS_H } from "./compounds-h.js";
+import { COMPOUNDS_I } from "./compounds-i.js";
+import { COMPOUNDS_J } from "./compounds-j.js";
 
 /** Every dose row must carry the same message: a reference point, not advice. */
 export const DOSE_DISCLAIMER = "Reference point for education only — not a recommendation.";
@@ -20,7 +24,7 @@ function doseNote(note) {
 }
 
 export const COMPOUNDS = Array.from(
-  [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COMPOUNDS_D, ...COMPOUNDS_E, ...COMPOUNDS_F].reduce((map, c) => {
+  [...COMPOUNDS_A, ...COMPOUNDS_B, ...COMPOUNDS_C, ...COMPOUNDS_D, ...COMPOUNDS_E, ...COMPOUNDS_F, ...COMPOUNDS_G, ...COMPOUNDS_H, ...COMPOUNDS_I, ...COMPOUNDS_J].reduce((map, c) => {
     // Later entries win, so a newer, richer record replaces an older stub with the same id.
     if (c && c.id && c.name) map.set(String(c.id).toLowerCase(), c);
     return map;
