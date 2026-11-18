@@ -7,10 +7,10 @@ import { EXTRA_SUBSTANCES_G, PAIR_RULES_G, FLAG_RULES_G, PHENOMENA } from "./int
 export { PHENOMENA };
 
 export const SEVERITY = {
-  critical: { label: "Avoid", rank: 4, tone: "critical" },
-  major: { label: "High risk", rank: 3, tone: "major" },
-  moderate: { label: "Moderate", rank: 2, tone: "moderate" },
-  minor: { label: "Minor", rank: 1, tone: "minor" },
+  critical: { label: "Избегать", rank: 4, tone: "critical" },
+  major: { label: "Высокий риск", rank: 3, tone: "major" },
+  moderate: { label: "Умеренный", rank: 2, tone: "moderate" },
+  minor: { label: "Слабый", rank: 1, tone: "minor" },
 };
 
 /** Substances commonly stacked that are not in the compound encyclopedia. */
