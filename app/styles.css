@@ -1257,9 +1257,9 @@ body::after {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: gtextSlide 12s ease-in-out infinite alternate;
+  animation: gtextBreathe 7s ease-in-out infinite alternate;
 }
-@keyframes gtextSlide { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+@keyframes gtextBreathe { from { opacity: 0.85; } to { opacity: 1; } }
 
 .glow-text { text-shadow: 0 0 18px var(--accent-soft), 0 0 42px rgba(139, 123, 255, 0.22); }
 
@@ -1273,19 +1273,30 @@ body::after {
   text-transform: uppercase;
   color: var(--ok);
 }
+.live-dot { position: relative; }
 .live-dot::before {
   content: "";
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: 0 0 0 0 currentColor;
-  animation: livePulse 2.1s ease-out infinite;
 }
-@keyframes livePulse {
-  0% { box-shadow: 0 0 0 0 rgba(111, 179, 255, 0.55); }
-  70% { box-shadow: 0 0 0 7px rgba(111, 179, 255, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(111, 179, 255, 0); }
+.live-dot::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  margin-top: -3.5px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  pointer-events: none;
+  animation: liveRing 2.1s ease-out infinite;
+}
+@keyframes liveRing {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.6); opacity: 0; }
 }
 
 /* --- Cards: depth + hover spotlight -------------------------------- */
@@ -1362,7 +1373,6 @@ body::after {
     radial-gradient(circle at 32% 28%, #fff 0%, rgba(255, 255, 255, 0.5) 12%, transparent 40%),
     conic-gradient(from 0deg, var(--accent), #5b8cff, #3edbd3, var(--accent));
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset, 0 10px 30px -10px var(--accent), 0 0 44px -12px #5b8cff;
-  animation: orbSpin 14s linear infinite;
 }
 .orb::before {
   content: "";
@@ -1373,7 +1383,6 @@ body::after {
   animation: orbHalo 3.4s ease-out infinite;
 }
 .orb.sm { width: 38px; height: 38px; }
-@keyframes orbSpin { to { filter: hue-rotate(24deg); } }
 @keyframes orbHalo {
   0% { transform: scale(0.86); opacity: 0.85; }
   70% { transform: scale(1.22); opacity: 0; }
@@ -1384,6 +1393,7 @@ body::after {
 .meter { position: relative; overflow: hidden; }
 .meter > i {
   position: relative;
+  transform-origin: left center;
   background: linear-gradient(90deg, var(--accent), #7ee7d6);
   box-shadow: 0 0 14px -2px var(--accent);
   animation: meterFill 0.9s var(--ease) both;
@@ -1395,7 +1405,7 @@ body::after {
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
   animation: meterShine 2.8s ease-in-out infinite;
 }
-@keyframes meterFill { from { width: 0 !important; } }
+@keyframes meterFill { from { transform: scaleX(0); } }
 @keyframes meterShine { 0% { transform: translateX(-100%); } 60%, 100% { transform: translateX(320%); } }
 
 /* --- Stat tiles ---------------------------------------------------- */
@@ -1564,12 +1574,19 @@ body::after {
 .mech-node .mn-t { font-size: 12.5px; font-weight: 600; line-height: 1.4; }
 .mech-node .mn-s { font-size: 11.5px; color: var(--text-3); line-height: 1.45; margin-top: 1px; }
 .mech-link { width: 2px; height: 14px; margin-left: 24px; background: linear-gradient(180deg, var(--accent-line), transparent); }
-.mech-link.anim {
+.mech-link.anim { position: relative; overflow: hidden; }
+.mech-link.anim::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -8px;
+  width: 2px;
+  height: 30px;
   background-image: linear-gradient(180deg, var(--accent) 45%, transparent 45%);
   background-size: 2px 8px;
   animation: mechFlow 1.1s linear infinite;
 }
-@keyframes mechFlow { to { background-position-y: 8px; } }
+@keyframes mechFlow { to { transform: translateY(8px); } }
 
 /* --- Bar visualisation --------------------------------------------- */
 .bars { display: flex; flex-direction: column; gap: 9px; }
@@ -1579,11 +1596,12 @@ body::after {
   display: block;
   height: 100%;
   border-radius: 99px;
+  transform-origin: left center;
   background: linear-gradient(90deg, var(--bc, var(--accent)), color-mix(in srgb, var(--bc, var(--accent)) 45%, #fff));
   box-shadow: 0 0 12px -3px var(--bc, var(--accent));
   animation: barGrow 0.7s var(--ease) both;
 }
-@keyframes barGrow { from { width: 0 !important; } }
+@keyframes barGrow { from { transform: scaleX(0); } }
 
 /* --- Ticker (ambient facts) ---------------------------------------- */
 .ticker {
@@ -1653,11 +1671,13 @@ body::after {
 /* --- Motion prefs -------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   body::before, body::after { animation: none !important; }
-  .orb, .orb::before, .gtext, .live-dot::before, .meter > i::after, .sub-plate::after,
+  .orb, .orb::before, .gtext, .live-dot::before, .live-dot::after, .meter > i, .meter > i::after,
+  .bar-track > i, .mech-link.anim::after, .sub-plate::after,
   .ticker-track, .brain-svg .tract, .skeleton::after, .rise { animation: none !important; }
 }
 [data-motion="off"] .orb, [data-motion="off"] .orb::before, [data-motion="off"] .gtext,
-[data-motion="off"] .ticker-track, [data-motion="off"] body::before { animation: none !important; }
+[data-motion="off"] .live-dot::after, [data-motion="off"] .meter > i, [data-motion="off"] .bar-track > i,
+[data-motion="off"] .mech-link.anim::after, [data-motion="off"] .ticker-track, [data-motion="off"] body::before { animation: none !important; }
 
 /* ==================================================================
    v2.3 — Atlas · organ map · convergence map · peptide calculator
