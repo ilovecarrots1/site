@@ -10,20 +10,75 @@ import { SYSTEMS, SYSTEM_BY_ID } from "./neuro.js";
 
 export const VIEWBOX = { w: 420, h: 320 };
 
-/* Cortical shell. Two paths: cerebrum + cerebellum. */
+/* Cortical shell — lateral view, frontal pole left, occipital right,
+   cerebellum and brainstem below. Same 420×320 space as the region table. */
 export const SILHOUETTE =
-  "M198 24 C120 24 62 82 60 150 C58 214 108 258 176 262 C214 264 246 250 264 226 C300 230 344 214 350 176 C356 138 330 112 300 108 C292 66 250 24 198 24 Z";
-export const CEREBELLUM = "M264 226 C288 232 320 226 336 208 C348 194 344 176 330 172 C316 186 292 200 264 204 Z";
+  "M46 152 C44 112 64 70 102 46 C136 26 182 18 220 26 C258 34 292 54 312 86 C328 112 334 142 326 166 C319 184 306 196 290 202 C272 208 254 210 238 212 C224 226 204 236 182 240 C156 244 128 242 106 232 C84 222 66 204 56 184 C50 172 46 162 46 152 Z";
+export const CEREBELLUM =
+  "M272 208 C288 198 314 196 334 204 C352 212 362 228 356 246 C350 264 330 274 308 272 C290 270 276 260 270 246 C264 232 264 218 272 208 Z";
 
-/* A few sulci so the shell reads as a brain, not a blob. */
+/* Brainstem: midbrain → pons → medulla → cord. Rendered as a thick stroked path. */
+export const BRAINSTEM = "M226 196 C250 206 272 222 288 242 C300 258 312 278 318 302";
+
+/* Corpus callosum — the C-shaped commissural band under the cingulate. */
+export const CORPUS_CALLOSUM =
+  "M148 132 C150 106 172 90 200 88 C228 86 250 98 258 120 C260 126 258 132 254 136 C248 118 230 106 206 106 C182 106 162 116 154 138 C150 138 148 136 148 132 Z";
+
+/* Major fissures and sulci — lateral, central, pre/postcentral, frontal,
+   intraparietal, temporal, parieto-occipital, calcarine. */
 export const SULCI = [
-  "M120 90 C140 106 132 132 108 146",
-  "M168 58 C178 84 168 104 150 118",
-  "M244 60 C236 88 246 108 262 120",
-  "M96 178 C124 186 148 202 158 226",
-  "M206 78 C222 96 226 118 218 138",
-  "M270 140 C286 152 294 168 292 186",
+  "M96 168 C124 162 152 156 180 150 C196 146 210 140 220 132",
+  "M156 34 C150 58 144 82 134 104",
+  "M132 42 C126 62 120 82 112 100",
+  "M180 30 C174 54 168 78 160 100",
+  "M84 92 C108 84 134 78 158 76",
+  "M78 124 C100 118 122 114 142 112",
+  "M204 52 C222 68 238 86 250 106",
+  "M112 196 C140 190 168 184 196 178",
+  "M272 52 C266 78 258 104 248 128",
+  "M262 138 C280 146 296 156 308 168",
+  "M140 226 C170 220 200 214 228 206",
+  "M64 132 C72 128 80 126 88 126",
 ];
+
+/* Cerebellar folia — fine parallel arcs. */
+export const CEREBELLUM_FOLIA = [
+  "M278 216 C296 210 320 210 340 218",
+  "M274 228 C296 222 324 222 348 230",
+  "M276 240 C298 234 326 234 350 242",
+  "M282 252 C302 246 326 246 344 252",
+  "M292 262 C308 258 324 258 336 262",
+];
+
+/* Gyrus texture: deterministic short folds scattered inside cortical zones.
+   hash() is hoisted from below — same seed, same brain on every render. */
+const GYRUS_ZONES = [
+  { cx: 96, cy: 104, rx: 34, ry: 40, n: 7 },
+  { cx: 168, cy: 62, rx: 56, ry: 24, n: 8 },
+  { cx: 240, cy: 84, rx: 42, ry: 32, n: 7 },
+  { cx: 292, cy: 136, rx: 28, ry: 32, n: 6 },
+  { cx: 160, cy: 208, rx: 54, ry: 20, n: 7 },
+  { cx: 100, cy: 184, rx: 26, ry: 26, n: 5 },
+  { cx: 210, cy: 160, rx: 30, ry: 22, n: 5 },
+];
+export const GYRI = GYRUS_ZONES.flatMap((z, zi) => {
+  const out = [];
+  for (let i = 0; i < z.n; i++) {
+    const a = hash(zi * 53 + i * 11) * Math.PI * 2;
+    const rad = 0.25 + 0.65 * Math.sqrt(hash(zi * 71 + i * 17 + 5));
+    const x = z.cx + Math.cos(a) * z.rx * rad;
+    const y = z.cy + Math.sin(a) * z.ry * rad;
+    const len = 10 + hash(zi * 31 + i * 7 + 9) * 16;
+    const dir = hash(zi * 97 + i * 3 + 1) * Math.PI * 2;
+    const dx = Math.cos(dir) * len;
+    const dy = Math.sin(dir) * len * 0.6;
+    const bend = (hash(zi * 13 + i * 29 + 4) - 0.5) * 14;
+    out.push(
+      `M${(x - dx / 2).toFixed(1)} ${(y - dy / 2).toFixed(1)} q${(dx / 2 + bend * 0.4).toFixed(1)} ${(dy / 2 - bend).toFixed(1)} ${dx.toFixed(1)} ${dy.toFixed(1)}`
+    );
+  }
+  return out;
+});
 
 export const LAYERS = [
   { id: "shell", label: "Cortex", note: "outer shell — translucency 0.9" },
@@ -153,6 +208,54 @@ export const REGIONS = [
 ];
 
 export const REGION_MAP = new Map(REGIONS.map((r) => [r.id, r]));
+
+/* --------------------------------------------------------------------------
+   Neuron network — the living overlay inside the same brain.
+   Axons are straight lines between region somas; pulses travel along them
+   with transform/opacity only (animation budget).
+   -------------------------------------------------------------------------- */
+
+export const NEURON_LINKS = [
+  ["vta", "nucleus-accumbens"],
+  ["vta", "prefrontal-cortex"],
+  ["vta", "amygdala"],
+  ["substantia-nigra", "striatum"],
+  ["raphe", "prefrontal-cortex"],
+  ["raphe", "hippocampus"],
+  ["raphe", "amygdala"],
+  ["locus-coeruleus", "prefrontal-cortex"],
+  ["locus-coeruleus", "thalamus"],
+  ["basal-forebrain", "hippocampus"],
+  ["basal-forebrain", "prefrontal-cortex"],
+  ["striatum", "thalamus"],
+  ["thalamus", "prefrontal-cortex"],
+  ["hippocampus", "amygdala"],
+  ["amygdala", "hypothalamus"],
+  ["hypothalamus", "vta"],
+  ["hypothalamus", "locus-coeruleus"],
+  ["pons", "locus-coeruleus"],
+  ["pons", "raphe"],
+  ["medulla", "spinal-cord"],
+  ["cerebellum", "thalamus"],
+  ["hippocampus", "prefrontal-cortex"],
+  ["nucleus-accumbens", "striatum"],
+  ["habenula", "vta"],
+];
+
+export const NEURON_SOMAS = Array.from(
+  new Set(NEURON_LINKS.flat())
+).map((id) => REGION_MAP.get(id)).filter(Boolean);
+
+export const NEURON_PULSES = NEURON_LINKS.flatMap(([a, b], i) => {
+  const A = REGION_MAP.get(a);
+  const B = REGION_MAP.get(b);
+  if (!A || !B) return [];
+  return [{
+    x1: A.x, y1: A.y, x2: B.x, y2: B.y,
+    d: +((i % 9) * 0.45).toFixed(2),
+    t: +(2.6 + hash(i * 7 + 2) * 2.4).toFixed(2),
+  }];
+});
 
 export function regionColor(r) {
   const s = SYSTEM_BY_ID.get((r.systems || [])[0]);
