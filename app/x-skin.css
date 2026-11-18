@@ -257,4 +257,188 @@ html[data-lab="1"] .nav-item.active::before {
 }
 html[data-lab="1"] .nav-item.active::after { display: none !important; }
 
-/* __LAB_CHUNK_2__ */
+/* --- 7. Cards: flat dossier panels + blue corner brackets ----------- */
+html[data-lab="1"] .card {
+  background: var(--bg-2) !important;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-1);
+}
+html[data-lab="1"] .card.tight { padding: 12px; }
+html[data-lab="1"] .card.glow {
+  border-color: var(--accent-line);
+  box-shadow: 0 0 0 1px var(--accent-soft), var(--shadow-2);
+}
+/* corner ticks live in the padding zone (inset 6px, 10px arms) so they
+   never sit over copy; pointer-events none, static, opacity transition */
+html[data-lab="1"] .card::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  background:
+    linear-gradient(var(--accent-line), var(--accent-line)) left top / 10px 1px no-repeat,
+    linear-gradient(var(--accent-line), var(--accent-line)) left top / 1px 10px no-repeat,
+    linear-gradient(var(--accent-line), var(--accent-line)) right top / 10px 1px no-repeat,
+    linear-gradient(var(--accent-line), var(--accent-line)) right top / 1px 10px no-repeat,
+    linear-gradient(var(--accent-line), var(--accent-line)) left bottom / 10px 1px no-repeat,
+    linear-gradient(var(--accent-line), var(--accent-line)) left bottom / 1px 10px no-repeat,
+    linear-gradient(var(--accent-line), var(--accent-line)) right bottom / 10px 1px no-repeat,
+    linear-gradient(var(--accent-line), var(--accent-line)) right bottom / 1px 10px no-repeat;
+}
+html[data-lab="1"] .card.hoverable::before { opacity: 0.45; }
+html[data-lab="1"] .card.hoverable:hover::before { opacity: 1; }
+html[data-lab="1"] .card.flush::before,
+html[data-lab="1"] .hero-card::before { display: none; }
+html[data-lab="1"] .card > * { position: relative; z-index: 1; }
+html[data-lab="1"] .card.hoverable {
+  overflow: hidden;
+  transition: border-color 0.16s, transform 0.16s var(--ease), box-shadow 0.16s;
+}
+html[data-lab="1"] .card.hoverable:hover {
+  border-color: var(--accent-line);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-2);
+}
+/* neutralise aurora / prism decorative pseudos so nothing overlaps text */
+html[data-lab="1"] .card.spot::after,
+html[data-lab="1"] a.card::after,
+html[data-lab="1"] .compound-card::after,
+html[data-lab="1"] .hero-card::after,
+html[data-lab="1"] .sub-plate::after { display: none !important; }
+html[data-lab="1"] .card-head h3 { font-size: 14.5px; letter-spacing: -0.01em; }
+
+/* compound card: class colour becomes a square instrument tick */
+html[data-lab="1"] .compound-card {
+  background: var(--bg-2) !important;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--dot, var(--accent));
+}
+html[data-lab="1"] .compound-card:hover {
+  border-color: var(--accent-line);
+  border-left-color: var(--dot, var(--accent));
+  transform: translateY(-2px);
+}
+html[data-lab="1"] .cc-name { font-weight: 680; letter-spacing: -0.015em; }
+html[data-lab="1"] .cc-cls {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  color: var(--text-3);
+  text-transform: uppercase;
+}
+html[data-lab="1"] .cc-sum { color: var(--text-2); }
+
+/* --- 8. Buttons: rectangular instrument keys ------------------------ */
+html[data-lab="1"] .btn {
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--bg-3);
+  font-weight: 620;
+  letter-spacing: -0.005em;
+}
+html[data-lab="1"] .btn:hover { background: #242b34; border-color: #333c47; }
+html[data-lab="1"] .btn.primary {
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-color: transparent;
+  color: var(--accent-ink);
+  box-shadow: 0 0 0 1px var(--accent-line), 0 8px 20px -12px var(--accent);
+}
+html[data-lab="1"] .btn.primary::after { display: none !important; }
+html[data-lab="1"] .btn.primary:hover { filter: brightness(1.06); }
+html[data-lab="1"] .btn.ghost { background: transparent; border-color: var(--line); color: var(--text-2); }
+html[data-lab="1"] .btn.ghost:hover { color: var(--text); background: var(--bg-2); border-color: #333c47; }
+html[data-lab="1"] .btn.soft { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+html[data-lab="1"] .btn.danger { background: rgba(248, 81, 73, 0.1); border-color: rgba(248, 81, 73, 0.34); color: #ff8b84; }
+html[data-lab="1"] .btn.sm { border-radius: 7px; }
+html[data-lab="1"] .btn.xs { border-radius: 6px; }
+html[data-lab="1"] .btn-group {
+  border-radius: 8px;
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+}
+html[data-lab="1"] .btn-group button { border-radius: 6px; }
+
+/* --- 9. Chips / tags / counters: square hairline tags --------------- */
+html[data-lab="1"] .chip {
+  border-radius: 5px;
+  border: 1px solid var(--line);
+  background: var(--bg-3);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+html[data-lab="1"] .chip .dot { width: 5px; height: 5px; border-radius: 1px; }
+html[data-lab="1"] .chip-good { color: #56d364; background: rgba(63, 185, 80, 0.1); border-color: rgba(63, 185, 80, 0.3); }
+html[data-lab="1"] .chip-ok { color: #79c0ff; background: rgba(88, 166, 255, 0.1); border-color: rgba(88, 166, 255, 0.3); }
+html[data-lab="1"] .chip-warn { color: #e3b341; background: rgba(210, 153, 34, 0.1); border-color: rgba(210, 153, 34, 0.3); }
+html[data-lab="1"] .chip-bad { color: #ffa657; background: rgba(240, 136, 62, 0.1); border-color: rgba(240, 136, 62, 0.3); }
+html[data-lab="1"] .chip-crit { color: #ff7b72; background: rgba(248, 81, 73, 0.1); border-color: rgba(248, 81, 73, 0.32); }
+html[data-lab="1"] .chip-accent { color: var(--accent); background: var(--accent-soft); border-color: var(--accent-line); }
+html[data-lab="1"] .chip-btn.on {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+  box-shadow: none;
+}
+html[data-lab="1"] .chip.chip-btn:hover { transform: translateY(-1px); border-color: #3a4552; }
+html[data-lab="1"] .tag { font-family: var(--mono); font-size: 10.5px; color: var(--text-3); }
+html[data-lab="1"] .pill-count {
+  border-radius: 5px;
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+}
+html[data-lab="1"] .dot-badge { border-radius: 2px; background: var(--accent); }
+
+/* --- 10. Inputs ----------------------------------------------------- */
+html[data-lab="1"] .input,
+html[data-lab="1"] .select,
+html[data-lab="1"] .textarea {
+  border-radius: 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+html[data-lab="1"] .input:focus,
+html[data-lab="1"] .select:focus,
+html[data-lab="1"] .textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+html[data-lab="1"] .switch { border-radius: 99px; }
+html[data-lab="1"] .switch.on { background: var(--accent-soft); border-color: var(--accent-line); }
+html[data-lab="1"] .switch.on::after { background: var(--accent); }
+html[data-lab="1"] .range::-webkit-slider-thumb { background: var(--accent); }
+
+/* --- 11. Meters / bars: segmented instrument fills ------------------ */
+html[data-lab="1"] .meter {
+  height: 6px;
+  border-radius: 2px;
+  background: var(--bg-3);
+  border: 1px solid var(--line-soft);
+}
+html[data-lab="1"] .meter > i {
+  border-radius: 1px;
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
+  box-shadow: 0 0 10px -2px var(--accent);
+}
+html[data-lab="1"] .meter.good > i { background: linear-gradient(90deg, #2ea043, var(--good)); }
+html[data-lab="1"] .meter.warn > i { background: linear-gradient(90deg, #a97a12, var(--warn)); }
+/* static segment ticks over the track (no extra animation) */
+html[data-lab="1"] .meter::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, transparent 0 5px, rgba(11, 13, 16, 0.55) 5px 6px);
+}
+html[data-lab="1"] .bar-track { height: 7px; border-radius: 2px; background: var(--bg-3); border: 1px solid var(--line-soft); }
+html[data-lab="1"] .bar-track > i { border-radius: 1px; }
+
+/* __LAB_CHUNK_3__ */
