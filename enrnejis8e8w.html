@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- ==================================================================
+     NeuroDifference — SECRET EXPERIMENTAL BUILD ("LAB INSTRUMENT" skin)
+     Same app, same main.js / routes / data / functions. ONLY the visuals
+     are regenerated via app/x-skin.css, scoped to html[data-lab="1"].
+     The production index.html never loads x-skin.css and never sets
+     data-lab, so the main version is completely untouched.
+     URL: https://neurodifference.ru/enrnejis8e8w.html  (noindex)
+     ================================================================== -->
+<html lang="en" data-lab="1" data-accent="blue" data-density="comfortable" data-motion="on" data-skin="aurora">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>NeuroDifference — LAB · experimental</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <meta
+      name="description"
+      content="Experimental visual build of NeuroDifference. An evidence-graded map of neuropharmacology: compound monographs, transmitter systems, a brain atlas, pharmacokinetic curves, interaction checks and spaced-repetition lessons."
+    />
+    <meta name="theme-color" content="#0b0d10" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="NeuroDifference LAB" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="NeuroDifference — LAB" />
+    <meta property="og:description" content="Experimental visual build. Evidence-graded neuropharmacology: compounds, pathways, interactions, kinetics." />
+    <meta property="og:site_name" content="NeuroDifference" />
+
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Non-blocking: the app renders instantly on the system font stack and
+         swaps in Inter once (if) the network delivers it. Offline = system UI. -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      media="print"
+      onload="this.media='all'; this.onload=null"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      />
+    </noscript>
+
+    <link rel="stylesheet" href="./app/styles.css?v=4.4.1" />
+    <link rel="stylesheet" href="./app/skin.css?v=4.4.1" />
+    <link rel="stylesheet" href="./app/clinic.css?v=4.4.1" />
+    <!-- Experimental skin LAST so it wins the cascade. Scoped to data-lab. -->
+    <link rel="stylesheet" href="./app/x-skin.css?v=4.4.1" />
+  </head>
+  <body>
+    <div id="root">
+      <noscript>
+        <div style="padding: 32px; font-family: system-ui, sans-serif; color: #e6e8eb; background: #0b0d10; min-height: 100dvh">
+          <h1 style="font-size: 20px; margin-bottom: 8px">NeuroDifference needs JavaScript</h1>
+          <p style="color: #a9b2bf; font-size: 14px; line-height: 1.6; max-width: 46ch">
+            This app renders everything on the device and stores your progress in local storage. Enable JavaScript to use it.
+          </p>
+        </div>
+      </noscript>
+    </div>
+    <script type="module" src="./app/main.js?v=4.4.1"></script>
+  </body>
+</html>
