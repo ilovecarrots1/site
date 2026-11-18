@@ -167,6 +167,34 @@ public.
 4. Optional: downgrade SprintHost to a domain-only plan, hosting is no longer
    needed there.
 
+### Active task — v4.3.0 procedural 3D brain upgrade (in progress)
+
+- User wanted a real MSD-style clickable 3D brain. Legal OBJ sources exist
+  (BodyParts3D / Anatomography, CC BY-SA 2.1 JP, (c) DBCLS) but the in-editor
+  tools cannot fetch them: `fetch_content` caps every response at ~24 KB, there
+  is no shell, and the real meshes are 60 KB-32 MB (binary .bin, Git-LFS .obj,
+  STL zips). The Anatomography web API returns PNG images only. A user-uploaded
+  model file in the workspace WOULD be readable via `tools.read` paging - that
+  path stays open if they ever drop an .obj/.gltf into the repo.
+- User chose: **upgrade the hand-written procedural brain now** (no external
+  mesh). `app/lib/brain3d.js` is STILL the old point-cloud version - the rewrite
+  was drafted but never written to disk. Do not assume it landed.
+- Agreed design for the rewrite (keep the public API
+  `mountBrain3D(canvas,{regions,palette,getLit,onSelect})` ->
+  `{sync,kick,setAuto,isAuto,reset,destroy}` and `buildGeometry()`):
+  solid lambert-shaded surface instead of point cloud; cortex two hemispheres
+  (R=24,C=32) with gyrification + carved Sylvian/central/superior-temporal
+  fissures; cerebellum folia; tapered brainstem tagged pons/medulla/spinal-cord;
+  per-face `region` via `regionAt(x,y,z,part)`; back-face cull + painter sort;
+  shade cache [part][litLevel][24 buckets]; selection tints faces toward the
+  skin `--bad` token; click = point-in-triangle hit-test on visible faces,
+  fallback to deep-nucleus hotspots; anchors for surface regions use real
+  per-region centroids, deep/mid keep the schematic inward projection and show
+  only when lit. Keep the camera/interaction/lifecycle block unchanged.
+- After the rewrite: eval-verify (syntax, bounds, outward normals, region
+  coverage, tri count), then bug sweep, then bump 4.3.0 (core/sw/index/settings)
+  + AGENTS.md + short RU report. No attribution needed (procedural, no mesh).
+
 ## Working from the shell
 
 The project lives in the Acode Terminal home (`~/neuro`, shown in Files as
