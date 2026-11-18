@@ -8,6 +8,7 @@ import { PAIR_RULES, FLAG_RULES } from "../data/interactions.js";
 import { deckStats } from "../srs.js";
 import { pubmedKey, setPubmedKey } from "../lib/pubmed.js";
 import { pageHead, callout, subscribePlate } from "./ui.js";
+import { LANGS, setLang } from "../lib/i18n.js";
 
 const ACCENTS = [
   ["violet", "Фиолетовый", "#8b7bff"],
@@ -145,6 +146,12 @@ export const settings = {
 
         <section class="card">
           <div class="card-head"><h3>Внешний вид</h3><span class="spacer"></span><span class="tag">применяется сразу</span></div>
+          <div class="block">
+            <div class="eyebrow" style="margin-bottom:7px">Язык / Language</div>
+            <div class="btn-group" id="set-lang">
+              ${LANGS.map(([key, label]) => `<button class="chip chip-btn ${(st.lang || "ru") === key ? "on" : ""}" data-lang="${key}">${label}</button>`).join("")}
+            </div>
+          </div>
           <div class="block">
             <div class="eyebrow" style="margin-bottom:7px">Скин</div>
             <div class="skin-pick" id="set-skin">
@@ -319,6 +326,15 @@ export const settings = {
       applyAppearance();
       window.dispatchEvent(new CustomEvent("nd:appearance"));
     };
+
+    root.querySelector("#set-lang")?.addEventListener("click", (ev) => {
+      const b = ev.target.closest("[data-lang]");
+      if (!b) return;
+      const l = b.dataset.lang;
+      store.set("settings.lang", l);
+      setLang(l);
+      window.dispatchEvent(new CustomEvent("nd:lang"));
+    });
 
     root.querySelector("#set-skin")?.addEventListener("click", (ev) => {
       const b = ev.target.closest("[data-skin]");
