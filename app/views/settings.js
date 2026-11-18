@@ -6,6 +6,7 @@ import { SYSTEMS } from "../data/neuro.js";
 import { TOTAL_LESSONS, FLASHCARDS } from "../data/learn.js";
 import { PAIR_RULES, FLAG_RULES } from "../data/interactions.js";
 import { deckStats } from "../srs.js";
+import { pubmedKey, setPubmedKey } from "../lib/pubmed.js";
 import { pageHead, callout, subscribePlate } from "./ui.js";
 
 const ACCENTS = [
@@ -244,6 +245,15 @@ export const settings = {
         </section>
 
         <section class="card">
+          <div class="card-head"><h3>Research</h3><span class="spacer"></span><span class="tag">optional</span></div>
+          ${settingRow({
+            title: "PubMed API key",
+            sub: "Your own NCBI E-utilities key raises live search from 3 to 10 requests per second. Stored only on this device — never sent anywhere except NCBI. Everything works without it.",
+            control: `<div class=\"row\" style=\"gap:6px\"><input class=\"input mono\" id=\"set-pubmed-key\" type=\"password\" spellcheck=\"false\" autocomplete=\"off\" placeholder=\"NCBI key (optional)\" value=\"${esc(pubmedKey())}\" style=\"width:190px\"><button class=\"btn soft sm\" id=\"set-pubmed-save\">Save</button></div>`,
+          })}
+        </section>
+
+        <section class="card">
           <div class="card-head"><h3>About</h3></div>
           <div class="block stack" style="gap:8px">
             <p class="small muted" style="line-height:1.6">NeuroDifference is a personal study tool: an evidence-graded compound encyclopedia, a transmitter atlas, a pharmacokinetic sandbox and a spaced-repetition course set. It is not a medical device.</p>
@@ -299,6 +309,12 @@ export const settings = {
 
   mount(root, ctx) {
     const rerender = () => ctx.rerender();
+
+    root.querySelector("#set-pubmed-save")?.addEventListener("click", () => {
+      const input = root.querySelector("#set-pubmed-key");
+      setPubmedKey(input ? input.value : "");
+      toast(pubmedKey() ? "PubMed key saved on this device" : "PubMed key removed — anonymous rate");
+    });
     const bump = () => {
       applyAppearance();
       window.dispatchEvent(new CustomEvent("nd:appearance"));
