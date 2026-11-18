@@ -462,4 +462,152 @@ export function mountBrain3D(canvas, opts) {
     ctx.globalAlpha = 1;
   }
 
-/* __TAIL2__ */
+  /* ---- loop control ------------------------------------------------------ */
+
+  function frame(now) {
+    raf = 0;
+    if (!canvas.isConnected) { ac.abort(); ro.disconnect(); io.disconnect(); return; }
+    if (!visible || document.hidden) return;
+    const idle = motionOff();
+    if (auto && !idle && !dragging) yaw += 0.0032;
+    if (!dragging && (Math.abs(vyaw) > 0.0004 || Math.abs(vpitch) > 0.0004)) {
+      yaw += vyaw;
+      pitch = clamp(pitch + vpitch, -1.15, 1.15);
+      vyaw *= 0.94; vpitch *= 0.94;
+      dirty = true;
+    }
+    if (dirty || (auto && !idle) || (!idle && geo.sparks.length)) {
+      draw(now || 0);
+      dirty = false;
+    }
+    if (auto && !idle) raf = requestAnimationFrame(frame);
+    else if (Math.abs(vyaw) > 0.0004 || Math.abs(vpitch) > 0.0004) raf = requestAnimationFrame(frame);
+    else if (!idle && geo.sparks.length) raf = requestAnimationFrame(frame);
+  }
+  function kick() {
+    if (!raf && visible && !document.hidden && canvas.isConnected) raf = requestAnimationFrame(frame);
+  }
+
+  /* ---- interaction ------------------------------------------------------- */
+
+  const ac = new AbortController();
+  const sig = { signal: ac.signal };
+  const ptrs = new Map();
+  let dragging = false, moved = 0, lastX = 0, lastY = 0, pinch = 0;
+
+  canvas.addEventListener("pointerdown", (e) => {
+    canvas.setPointerCapture(e.pointerId);
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size === 1) {
+      dragging = true; moved = 0; lastX = e.clientX; lastY = e.clientY; vyaw = 0; vpitch = 0;
+    } else if (ptrs.size === 2) {
+      const [a, b] = [...ptrs.values()];
+      pinch = Math.hypot(a.x - b.x, a.y - b.y);
+    }
+    kick();
+  }, sig);
+
+  canvas.addEventListener("pointermove", (e) => {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (ptrs.size === 2) {
+      const [a, b] = [...ptrs.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (pinch > 0) { zoom = clamp(zoom * (d / pinch), 0.55, 2.4); dirty = true; }
+      pinch = d; kick(); return;
+    }
+    if (!dragging) return;
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    moved += Math.abs(dx) + Math.abs(dy);
+    lastX = e.clientX; lastY = e.clientY;
+    yaw += dx * 0.0052;
+    pitch = clamp(pitch + dy * 0.0042, -1.15, 1.15);
+    vyaw = dx * 0.0052; vpitch = dy * 0.0042;
+    dirty = true; kick();
+  }, sig);
+
+  function pip(px, py, f) {
+    const d1 = (px - f.bx) * (f.ay - f.by) - (f.ax - f.bx) * (py - f.by);
+    const d2 = (px - f.cx) * (f.by - f.cy) - (f.bx - f.cx) * (py - f.cy);
+    const d3 = (px - f.ax) * (f.cy - f.ay) - (f.cx - f.ax) * (py - f.ay);
+    const neg = d1 < 0 || d2 < 0 || d3 < 0;
+    const pos = d1 > 0 || d2 > 0 || d3 > 0;
+    return !(neg && pos);
+  }
+
+  function endPtr(e) {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.delete(e.pointerId);
+    if (ptrs.size < 2) pinch = 0;
+    if (ptrs.size === 0) {
+      dragging = false;
+      if (moved < 7) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left, y = e.clientY - rect.top;
+        /* nearest surface face under the cursor */
+        let best = null, bestD = Infinity;
+        for (const f of hitFaces) {
+          if (f.d < bestD && pip(x, y, f)) { bestD = f.d; best = f.region; }
+        }
+        /* fall back to a deep-nucleus hotspot */
+        if (!best) {
+          let bd = 18;
+          for (const [id, p] of anchorScreen) {
+            if (!p.front) continue;
+            const d = Math.hypot(p.x - x, p.y - y);
+            if (d < bd) { bd = d; best = id; }
+          }
+        }
+        if (best && opts.onSelect) opts.onSelect(best);
+      }
+      kick();
+    }
+  }
+  canvas.addEventListener("pointerup", endPtr, sig);
+  canvas.addEventListener("pointercancel", endPtr, sig);
+
+  canvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    zoom = clamp(zoom * (e.deltaY < 0 ? 1.1 : 0.9), 0.55, 2.4);
+    dirty = true; kick();
+  }, { passive: false, signal: ac.signal });
+
+  canvas.addEventListener("dblclick", () => {
+    yaw = 0.62; pitch = 0.16; zoom = 1; vyaw = 0; vpitch = 0; dirty = true; kick();
+  }, sig);
+
+  /* ---- lifecycle --------------------------------------------------------- */
+
+  const ro = new ResizeObserver(resize);
+  ro.observe(canvas);
+  const io = new IntersectionObserver((entries) => {
+    visible = entries[0].isIntersecting;
+    if (visible) { dirty = true; kick(); }
+  }, { threshold: 0.02 });
+  io.observe(canvas);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) { dirty = true; kick(); }
+  }, sig);
+
+  resize();
+  sync();
+
+  return {
+    sync, kick,
+    setAuto(b) { auto = !!b; dirty = true; kick(); },
+    isAuto() { return auto; },
+    reset() {
+      yaw = 0.62; pitch = 0.16; zoom = 1; vyaw = 0; vpitch = 0;
+      dirty = true; kick();
+    },
+    destroy() {
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      ac.abort();
+      ro.disconnect();
+      io.disconnect();
+    },
+  };
+}
+
+export default { buildGeometry, mountBrain3D };
