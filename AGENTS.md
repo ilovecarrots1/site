@@ -350,63 +350,13 @@ Remaining: push to main, hard-reload, QA `#/lab/interactions` — type «тир�
 `#/dev/audit` 12/12 (210/218/66). Then continue EN dictionary expansion + the wider textual
 bug list (still outstanding).
 
-### Secret experimental build — "LAB INSTRUMENT" skin — APPLIED, awaiting push + visual QA
+### Secret experimental build — REMOVED at user request
 
-User request: a secret test page at `https://neurodifference.ru/enrnejis8e8w.html` —
-SAME app, functions/routes/data untouched, but the ENTIRE visual language radically
-regenerated. Only the COLORS were taken from an old product prompt (ignore its
-Next.js/TS/shop stack). Main version must not be affected.
-
-**Isolation strategy = separate entry + additive scoped stylesheet, zero functional edits:**
-- `enrnejis8e8w.html` (repo root) — byte-clone of the `index.html` shell PLUS
-  `data-lab="1"` on `<html>`, `<meta name="robots" content="noindex,nofollow">`,
-  title "…LAB · experimental", and ONE extra `<link ./app/x-skin.css?v=4.4.1>`
-  loaded AFTER styles/skin/clinic. Same `./app/main.js?v=4.4.1`, same manifest/fonts.
-  `index.html` itself was NOT touched (grep confirms no x-skin / data-lab there).
-- `app/x-skin.css` (NEW, 610 ln / 24.6 KB, braces 159/159 balanced) — every rule
-  scoped to `html[data-lab="1"]`. Palette tokens redefined with `!important` so they
-  beat even an inline custom `--accent` that `applyAppearance()` may set. main.js
-  boot only manages data-skin/accent/density/motion + data-scrolled + layer-open;
-  it NEVER touches `data-lab`, so the flag survives boot. main never loads x-skin.
-- `sw.js` navigate handler BUGFIX: it used to cache EVERY successful navigation as
-  `./index.html` (so visiting the secret page would overwrite the main offline
-  shell). Now it only caches when `url.pathname` ends with `/` or `/index.html`.
-  Online the secret page is served network-first as-is; x-skin.css is cached by the
-  assets SWR handler on first fetch (NOT added to SHELL — main stays lean). VERSION
-  stays nd-v4.4.1 (logic fix rides along; byte-change triggers SW update). sw.js
-  syntax eval-ok.
-
-**Design language ("technical dossier / instrument panel"):** flat panels
-(#14171C / #191D24) with 1px hairlines #262B33, sharp 10–12px corners (was soft
-14–26px pills), monospace JetBrains-Mono overlines/counters/labels (CAPS .06–.09em),
-blueprint grid background (.bgfx::before) + faint instrument glows (transform drift
-kept) + one grain/scanline tile. Single instrument blue #58A6FF; green #3FB950 =
-human/ok, orange #D29922 = preclinical/warn, red #F85149 = critical. Cards get blue
-CORNER BRACKETS (::before, inset 6px / 10px arms, in the padding zone so never over
-copy, pointer-events none, z-index 0 under `.card>*{z-index:1}`); compound-card class
-colour becomes a 3px left tick. Buttons rectangular hairline keys, primary solid blue
-+ dark ink (aurora gloss ::after killed). Chips square 5px mono tags, square dots.
-Meters/bars square 2px tracks + static segment ticks. Sidebar = technical rail, active
-item left blue bar; bottom-nav flattened from aurora floating pill to an instrument
-segment bar (active = square top tick, ≤5 items kept). Hero = blueprint readout panel;
-orb = blue/teal/green conic dial (orbHalo scale/opacity kept). live-dot = blue SQUARE
-pulse. Callouts/disclaimer/toast = sharp panels + coloured left bar. Overlay/drawer/
-sheet = flat hairline panels + static backdrop blur. Aurora/prism decorative pseudos
-(.card.spot::after, a.card::after, .compound-card::after, .hero-card::after,
-.sub-plate::after, .btn.primary::after) explicitly neutralised so nothing overlaps.
-
-**Invariants honoured:** transform/opacity animations only, one animation per element,
-one grain tile, no blurred ANIMATED divs (blur on topbar/nav/scrim is static), no fixed
-heights on text containers, mobile-first 320px (grid-auto minmax(min(100%,230px)),
-@360 tweaks), reduced-motion + `html[data-lab][data-motion="off"]` guards kill
-animations/transitions and force `.nd-reveal` visible. `--bad` used (never --danger).
-Dose-disclaimer / PubMed / bloodwork / compound-id invariants untouched (no data edits).
-
-Remaining: user pushes to main, hard-reloads, opens `/enrnejis8e8w.html` and visually
-QAs the radical reskin across routes + mobile 320px + reduced-motion. Main `/` must
-look exactly as before (4.4.1). The model cannot see images — visual bugs must come
-back as text (route → what looked wrong → expected). If the user approves the lab
-look, it can later be promoted to a selectable skin; for now it is secret-only.
+A secret test page `enrnejis8e8w.html` + `app/x-skin.css` ("LAB INSTRUMENT" reskin,
+scoped to `html[data-lab]`, same main.js/functions) was built, then the user rejected
+the look («хуйня, удаляй») and BOTH files were DELETED. The `sw.js` navigate-handler
+tweak made for it was reverted to the original form. `index.html` was never touched.
+Net result: the repo is back to plain v4.4.1. Do not resurrect this skin unless asked.
 
 ## Working from the shell
 
