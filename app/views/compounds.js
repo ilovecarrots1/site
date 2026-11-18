@@ -32,14 +32,14 @@ function applyFilters() {
 function resultsHtml() {
   const items = applyFilters();
   if (!items.length) {
-    return `<div class="card">${emptyState("search", "No compounds match", "Try a shorter query, or clear the filters.", `<button class="btn ghost sm" data-act="reset">${icon("refresh", 14)} Reset filters</button>`)}</div>`;
+    return `<div class="card">${emptyState("search", "Ничего не найдено", "Попробуй короче запрос или сбрось фильтры.", `<button class="btn ghost sm" data-act="reset">${icon("refresh", 14)} Сбросить фильтры</button>`)}</div>`;
   }
   return `<div class="grid grid-auto" style="gap:10px">${items.map(compoundCard).join("")}</div>`;
 }
 
 function countLabel() {
   const n = applyFilters().length;
-  return `${n} of ${COMPOUNDS.length} compounds`;
+  return `${n} из ${COMPOUNDS.length} препаратов`;
 }
 
 export const list = {
@@ -51,35 +51,35 @@ export const list = {
     if (ctx && ctx.query && ctx.query.q) listState.q = String(ctx.query.q);
     return `
     ${pageHead(
-      "Compounds",
-      "Every entry is graded by the strength of human evidence, not by popularity. Doses are literature reference points.",
-      `<button class="btn ghost sm" data-act="random">${icon("sparkles", 14)} Random</button>`
+      "Препараты",
+      "Каждая запись оценена по силе доказательств на людях, а не по популярности. Дозы — справочные точки из литературы.",
+      `<button class="btn ghost sm" data-act="random">${icon("sparkles", 14)} Случайный</button>`
     )}
 
     <div class="card" style="padding:12px;margin-bottom:14px">
       <div class="stack" style="gap:10px">
         <div class="search-input">
           ${icon("search", 16)}
-          <input class="input" id="cmp-q" type="search" placeholder="Search name, alias, mechanism, target…" value="${esc(listState.q)}" autocomplete="off" enterkeyhint="search">
-          <button class="clear ${listState.q ? "show" : ""}" data-act="clear-q" aria-label="Clear search">${icon("x", 15)}</button>
+          <input class="input" id="cmp-q" type="search" placeholder="Поиск: название, алиас, механизм, мишень…" value="${esc(listState.q)}" autocomplete="off" enterkeyhint="search">
+          <button class="clear ${listState.q ? "show" : ""}" data-act="clear-q" aria-label="Очистить поиск">${icon("x", 15)}</button>
         </div>
         <div class="scroll-x">
           <div class="row wrap" style="gap:5px" id="cmp-class">
-            <button class="chip chip-btn ${!listState.cls ? "on" : ""}" data-cls="">All classes</button>
+            <button class="chip chip-btn ${!listState.cls ? "on" : ""}" data-cls="">Все классы</button>
             ${cls.map((c) => `<button class="chip chip-btn ${listState.cls === c ? "on" : ""}" data-cls="${esc(c)}"><span class="dot" style="background:${classColor(c)}"></span>${esc(c)}</button>`).join("")}
           </div>
         </div>
         <div class="row wrap" style="gap:8px">
-          ${listState.tag ? `<button class="chip chip-btn on" data-act="clear-tag">${icon("x", 12)} tag: ${esc(listState.tag)}</button>` : ""}
+          ${listState.tag ? `<button class="chip chip-btn on" data-act="clear-tag">${icon("x", 12)} тег: ${esc(listState.tag)}</button>` : ""}
           <div class="btn-group" id="cmp-ev">
-            <button class="${!listState.ev ? "on" : ""}" data-ev="">Any evidence</button>
+            <button class="${!listState.ev ? "on" : ""}" data-ev="">Любая доказательность</button>
             ${EV_ORDER.map((e) => `<button class="${listState.ev === e ? "on" : ""}" data-ev="${e}">${esc(EVIDENCE[e].short)}</button>`).join("")}
           </div>
-          <select class="select" id="cmp-sort" style="width:auto;min-width:140px" aria-label="Sort">
-            <option value="name" ${listState.sort === "name" ? "selected" : ""}>Name A–Z</option>
-            <option value="evidence" ${listState.sort === "evidence" ? "selected" : ""}>Strongest evidence</option>
-            <option value="class" ${listState.sort === "class" ? "selected" : ""}>Class</option>
-            <option value="halflife" ${listState.sort === "halflife" ? "selected" : ""}>Shortest half-life</option>
+          <select class="select" id="cmp-sort" style="width:auto;min-width:140px" aria-label="Сортировка">
+            <option value="name" ${listState.sort === "name" ? "selected" : ""}>Имя А–Я</option>
+            <option value="evidence" ${listState.sort === "evidence" ? "selected" : ""}>Сильнейшая доказательность</option>
+            <option value="class" ${listState.sort === "class" ? "selected" : ""}>Класс</option>
+            <option value="halflife" ${listState.sort === "halflife" ? "selected" : ""}>Короткое полувыведение</option>
           </select>
           <span class="tiny dim" id="cmp-count" style="margin-left:auto;align-self:center">${countLabel()}</span>
         </div>
