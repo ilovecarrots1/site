@@ -202,7 +202,7 @@ export function wireSubscribe(root) {
   });
 }
 
-export function liveBadge(text = "live") {
+export function liveBadge(text = "живьём") {
   return `<span class="live-dot">${esc(text)}</span>`;
 }
 
@@ -305,7 +305,7 @@ export function lineChart(series, { width = 340, height = 140, yLabel = "", xTic
     .map((t) => `<text class="chart-axis" x="${sx(t.x).toFixed(1)}" y="${height - 5}" text-anchor="middle">${esc(t.label)}</text>`)
     .join("");
 
-  return `<div class="chart-box"><svg class="chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(yLabel || "chart")}">
+  return `<div class="chart-box"><svg class="chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(yLabel || "график")}">
     ${gridLines}${paths}${xLabels}
     <line class="chart-grid" x1="${padL}" y1="${padT + h}" x2="${width - padR}" y2="${padT + h}"/>
     ${yLabel ? `<text class="chart-axis" x="${padL}" y="7" text-anchor="start">${esc(yLabel)}</text>` : ""}
