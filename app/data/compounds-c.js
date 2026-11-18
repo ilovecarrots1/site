@@ -46,7 +46,7 @@ export const COMPOUNDS_C = [
     effects: { good: ["Antidepressant and anti-OCD effect", "Activating — useful for fatigue-predominant depression"], bad: ["Agitation and insomnia", "Sexual dysfunction", "GI upset", "Persistent interactions after stopping"] },
     flags: ["serotonergic", "cyp2d6-inhibitor", "cyp2c19-inhibitor", "activating", "bleeding-risk", "long-half-life"],
     warnings: [
-      "Strong CYP2D6 inhibitor: raises levels of tamoxifen's active metabolite (reducing efficacy), codeine (blocking activation), and many antipsychotics",
+      "Strong CYP2D6 inhibitor: blocks conversion of tamoxifen to its active metabolite endoxifen (reducing tamoxifen efficacy), blocks codeine activation, and raises levels of many antipsychotics",
       "Washout of 5 weeks is required before starting an MAOI",
       "More activating than other SSRIs — avoid evening dosing for most people",
     ],
