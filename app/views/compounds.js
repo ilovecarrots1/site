@@ -357,28 +357,28 @@ function panelPK(c) {
     }
   }
   const series = half > 0 ? [{ color: "var(--accent)", points: data }] : [];
-  const ticks = half > 0 ? [0, half, half * 2, half * 3, half * 4].filter((t) => t <= Math.min(half * 6, 240)).map((t) => ({ x: t, label: `${Math.round(t * 10) / 10}h` })) : [];
+  const ticks = half > 0 ? [0, half, half * 2, half * 3, half * 4].filter((t) => t <= Math.min(half * 6, 240)).map((t) => ({ x: t, label: `${Math.round(t * 10) / 10} ч` })) : [];
 
   return `
   <div class="stack" style="gap:14px">
     <div class="card flush">
       <div class="list">
-        ${kvRow("Onset", c.pk.onset ? fmt.duration(c.pk.onset) : "—")}
-        ${kvRow("T-max", c.pk.tmax ? fmt.duration(c.pk.tmax) : "—")}
-        ${kvRow("Half-life", c.pk.halfLife ? fmt.duration(c.pk.halfLife) : "—")}
-        ${kvRow("Duration", c.pk.duration ? fmt.duration(c.pk.duration) : "—")}
-        ${kvRow("Metabolism", c.pk.metabolism || "—")}
-        ${kvRow("Excretion", c.pk.excretion || "—")}
+        ${kvRow("Начало действия", c.pk.onset ? fmt.duration(c.pk.onset) : "—")}
+        ${kvRow("T-макс", c.pk.tmax ? fmt.duration(c.pk.tmax) : "—")}
+        ${kvRow("Полувыведение", c.pk.halfLife ? fmt.duration(c.pk.halfLife) : "—")}
+        ${kvRow("Длительность", c.pk.duration ? fmt.duration(c.pk.duration) : "—")}
+        ${kvRow("Метаболизм", c.pk.metabolism || "—")}
+        ${kvRow("Выведение", c.pk.excretion || "—")}
       </div>
     </div>
 
     ${
       half > 0
         ? `<div class="card">
-            <div class="card-head"><h3 style="font-size:14px">Single-dose decay</h3><span class="spacer"></span><span class="tiny dim mono">t½ ${fmt.duration(half)}</span></div>
-            ${lineChart(series, { height: 150, yLabel: "relative plasma level", xTicks: ticks, yMax: 1 })}
-            <p class="tiny dim" style="margin-top:8px;line-height:1.5">Schematic first-order decay — absorption simplified. Real curves depend on formulation, food and hepatic blood flow.</p>
-            <a class="btn soft sm" style="margin-top:10px" href="#/lab?compound=${esc(c.id)}">${icon("flask", 14)} Simulate doses in the lab</a>
+            <div class="card-head"><h3 style="font-size:14px">Спад одной дозы</h3><span class="spacer"></span><span class="tiny dim mono">t½ ${fmt.duration(half)}</span></div>
+            ${lineChart(series, { height: 150, yLabel: "относительный уровень в плазме", xTicks: ticks, yMax: 1 })}
+            <p class="tiny dim" style="margin-top:8px;line-height:1.5">Схематичный спад первого порядка — всасывание упрощено. Реальные кривые зависят от формы, еды и печёночного кровотока.</p>
+            <a class="btn soft sm" style="margin-top:10px" href="#/lab?compound=${esc(c.id)}">${icon("flask", 14)} Смоделировать дозы в лаборатории</a>
           </div>`
         : ""
     }
@@ -386,11 +386,11 @@ function panelPK(c) {
     ${
       half >= 2
         ? `<div class="card tight">
-            <div class="eyebrow" style="margin-bottom:7px">Timing implications</div>
+            <div class="eyebrow" style="margin-bottom:7px">Что это значит по времени</div>
             <ul class="md-list" style="margin:0;padding-left:18px;font-size:13px;line-height:1.65">
-              <li>Steady state after about <strong>${fmt.duration(half * 5)}</strong> of regular dosing.</li>
-              <li>Almost eliminated (≈97%) in about <strong>${fmt.duration(half * 5)}</strong> after the last dose.</li>
-              <li>${half >= 24 ? "Long half-life: effects accumulate quietly — side effects may appear days into a course." : "Short half-life: levels swing widely between doses; timing matters more than total dose."}</li>
+              <li>Равновесная концентрация примерно через <strong>${fmt.duration(half * 5)}</strong> регулярного приёма.</li>
+              <li>Почти полностью выводится (≈97%) примерно за <strong>${fmt.duration(half * 5)}</strong> после последней дозы.</li>
+              <li>${half >= 24 ? "Длинное полувыведение: эффекты накапливаются тихо — побочки могут появиться через дни курса." : "Короткое полувыведение: уровни сильно качаются между дозами; время приёма важнее суммарной дозы."}</li>
             </ul>
           </div>`
         : ""
@@ -411,8 +411,8 @@ function panelDoses(c) {
   <div class="stack" style="gap:14px">
     ${callout(
       "warn",
-      "Reference ranges, not recommendations",
-      "These are values reported in the clinical literature for context. Individual dosing depends on weight, age, liver and kidney function, genetics and other drugs."
+      "Справочные диапазоны, не рекомендации",
+      "Это величины из клинической литературы для контекста. Индивидуальная доза зависит от веса, возраста, функции печени и почек, генетики и других препаратов."
     )}
 
     ${
@@ -423,7 +423,7 @@ function panelDoses(c) {
                 .map(
                   (d) => `<div class="list-row" style="align-items:flex-start">
                     <div class="grow">
-                      <div class="title">${esc(d.route || "oral")} <span class="mono" style="font-size:12px;color:var(--accent)">${esc(fmtNum(d.low))}${d.high && d.high !== d.low ? `–${esc(fmtNum(d.high))}` : ""} ${esc(d.unit || "mg")}</span></div>
+                      <div class="title">${esc(d.route || "внутрь")} <span class="mono" style="font-size:12px;color:var(--accent)">${esc(fmtNum(d.low))}${d.high && d.high !== d.low ? `–${esc(fmtNum(d.high))}` : ""} ${esc(d.unit || "mg")}</span></div>
                       ${d.note ? `<div class="sub" style="margin-top:3px;line-height:1.5">${esc(d.note)}</div>` : ""}
                     </div>
                   </div>`
@@ -431,14 +431,14 @@ function panelDoses(c) {
                 .join("")}
             </div>
           </div>`
-        : `<div class="card">${emptyState("pill", "No dose data recorded", "This compound is documented here for mechanism and risk, not for dosing.")}</div>`
+        : `<div class="card">${emptyState("pill", "Данных о дозах нет", "Это вещество описано здесь ради механизма и рисков, а не ради дозирования.")}</div>`
     }
 
     <div class="card tight">
-      <div class="eyebrow" style="margin-bottom:6px">Dose-response caution</div>
+      <div class="eyebrow" style="margin-bottom:6px">Осторожно с дозой</div>
       <p class="small muted" style="line-height:1.6">
-        Most of these compounds have a wider margin than the clinical drugs beside them — but “natural” is a marketing category, not a safety property.
-        Contaminants, mislabelling and unmeasured potency cause most supplement-related harm.
+        У большинства этих веществ запас шире, чем у клинических препаратов рядом — но «натуральный» это маркетинговая категория, а не свойство безопасности.
+        Загрязнители, неверная маркировка и неизмеренная потенция дают большую часть вреда от добавок.
       </p>
     </div>
   </div>`;
@@ -455,24 +455,24 @@ function panelSafety(c) {
     ${
       (c.warnings || []).length
         ? `<div class="stack" style="gap:8px">
-            ${c.warnings.map((w, i) => callout(i === 0 ? "danger" : "warn", i === 0 ? "Important" : "Caution", w)).join("")}
+            ${c.warnings.map((w, i) => callout(i === 0 ? "danger" : "warn", i === 0 ? "Важно" : "Осторожно", w)).join("")}
           </div>`
-        : `<div>${callout("ok", "No specific warnings recorded", "Absence of recorded warnings is not evidence of safety. Unlisted risks are unstudied risks.")}</div>`
+        : `<div>${callout("ok", "Особых предупреждений не записано", "Отсутствие записанных предупреждений не есть доказательство безопасности. Не перечисленные риски — неизученные риски.")}</div>`
     }
 
     ${
       (c.flags || []).length
         ? `<div class="card tight">
-            <div class="eyebrow" style="margin-bottom:7px">Pharmacological flags</div>
-            <div class="row wrap" style="gap:5px">${c.flags.map((f) => `<span class="chip" title="Used by the interaction engine">${esc(f)}</span>`).join("")}</div>
-            <p class="tiny dim" style="margin-top:9px;line-height:1.5">Flags drive the interaction engine: overlap on two matching flags produces a signal even for combinations nobody has formally studied.</p>
+            <div class="eyebrow" style="margin-bottom:7px">Фармакологические флаги</div>
+            <div class="row wrap" style="gap:5px">${c.flags.map((f) => `<span class="chip" title="Используется движком взаимодействий">${esc(f)}</span>`).join("")}</div>
+            <p class="tiny dim" style="margin-top:9px;line-height:1.5">Флаги питают движок взаимодействий: совпадение двух флагов даёт сигнал даже для комбинаций, которые никто формально не изучал.</p>
           </div>`
         : ""
     }
 
     <div class="row wrap" style="gap:8px">
-      <a class="btn soft sm" href="#/lab/interactions?add=${esc(c.id)}">${icon("shield", 14)} Check interactions</a>
-      <button class="btn ghost sm" data-act="stack">${icon("plus", 14)} ${inStack(c.id) ? "In your stack" : "Add to stack"}</button>
+      <a class="btn soft sm" href="#/lab/interactions?add=${esc(c.id)}">${icon("shield", 14)} Проверить взаимодействия</a>
+      <button class="btn ghost sm" data-act="stack">${icon("plus", 14)} ${inStack(c.id) ? "В твоём стеке" : "В стек"}</button>
     </div>
   </div>`;
 }
@@ -483,12 +483,12 @@ function panelResearch(c) {
   <div class="stack" style="gap:14px">
     <div class="card">
       <div class="card-head">
-        <h3 style="font-size:14px">Live from PubMed</h3>
+        <h3 style="font-size:14px">Живьём с PubMed</h3>
         <span class="spacer"></span>
         ${liveBadge("api")}
       </div>
       <p class="tiny dim" style="line-height:1.55;margin-bottom:10px">
-        Fetched from NCBI the moment you opened this tab. Nothing here is bundled into the app or written to storage.
+        Загружено с NCBI в момент открытия вкладки. Ничто здесь не вшито в приложение и не пишется в хранилище.
       </p>
       <div data-live="${esc(q)}" data-token="">
         <div class="stack" style="gap:9px">
@@ -501,17 +501,17 @@ function panelResearch(c) {
     </div>
 
     <div class="card tight">
-      <div class="eyebrow" style="margin-bottom:7px">Search it yourself</div>
+      <div class="eyebrow" style="margin-bottom:7px">Поищи сам</div>
       <div class="stack" style="gap:8px">
         <a class="btn soft sm" href="${PM_LINK.search(q)}" target="_blank" rel="noopener noreferrer">${icon("external", 14)} PubMed: “${esc(q)}”</a>
-        <a class="btn ghost sm" href="${PM_LINK.search(`"${c.name}" AND (review[pt] OR meta-analysis[pt])`)}" target="_blank" rel="noopener noreferrer">${icon("book", 14)} Reviews for ${esc(c.name)}</a>
-        <a class="btn ghost sm" href="#/research?compound=${encodeURIComponent(q)}">${icon("microscope", 14)} Open the Research tab</a>
+        <a class="btn ghost sm" href="${PM_LINK.search(`"${c.name}" AND (review[pt] OR meta-analysis[pt])`)}" target="_blank" rel="noopener noreferrer">${icon("book", 14)} Обзоры по ${esc(c.name)}</a>
+        <a class="btn ghost sm" href="#/research?compound=${encodeURIComponent(q)}">${icon("microscope", 14)} Открыть вкладку «Исследования»</a>
       </div>
     </div>
 
     <div class="card tight">
-      <div class="row" style="gap:8px;margin-bottom:6px">${evidenceChip(c.evidence)}<span class="eyebrow">Evidence grade</span></div>
-      <p class="small muted" style="line-height:1.6">${esc(EVIDENCE[c.evidence]?.label || "Unrated")} — assigned from the quality and consistency of human data, weighting controlled trials over mechanistic plausibility.</p>
+      <div class="row" style="gap:8px;margin-bottom:6px">${evidenceChip(c.evidence)}<span class="eyebrow">Грейд доказательности</span></div>
+      <p class="small muted" style="line-height:1.6">${esc(EVIDENCE[c.evidence]?.label || "Без оценки")} — присвоен по качеству и согласованности данных на людях, с приоритетом контролируемых исследований над механистической правдоподобностью.</p>
     </div>
   </div>`;
 }
@@ -534,20 +534,20 @@ async function hydrateLive(host, c) {
     const res = await searchPapers(q, { retmax: 4 });
     if (box.dataset.token !== token) return;
     if (!res.papers.length) {
-      box.innerHTML = `<p class="small dim" style="line-height:1.6">PubMed returned no records for “${esc(q)}”. That usually means the stored query is too specific — try the plain compound name.</p>
-        <a class="btn ghost xs" href="#/research?compound=${encodeURIComponent(c.name)}" style="margin-top:8px">${icon("search", 13)} Search “${esc(c.name)}”</a>`;
+      box.innerHTML = `<p class="small dim" style="line-height:1.6">PubMed не вернул записей по «${esc(q)}». Обычно это значит, что сохранённый запрос слишком узкий — попробуй просто название вещества.</p>
+        <a class="btn ghost xs" href="#/research?compound=${encodeURIComponent(c.name)}" style="margin-top:8px">${icon("search", 13)} Искать «${esc(c.name)}»</a>`;
       return;
     }
     box.innerHTML = `<div class="stack" style="gap:10px">${res.papers.map((p, i) => paperCard(p, i)).join("")}</div>
       <div class="row between wrap" style="gap:8px;margin-top:11px">
-        <span class="tiny dim">${res.total.toLocaleString()} records · ${res.ms} ms · live, not stored</span>
-        <a class="btn ghost xs" href="#/research?compound=${encodeURIComponent(q)}">Open in Research ${icon("arrowRight", 13)}</a>
+        <span class="tiny dim">записей: ${res.total.toLocaleString()} · ${res.ms} мс · живьём, не хранится</span>
+        <a class="btn ghost xs" href="#/research?compound=${encodeURIComponent(q)}">Открыть в «Исследованиях» ${icon("arrowRight", 13)}</a>
       </div>`;
   } catch (err) {
     if (box.dataset.token !== token) return;
-    box.innerHTML = `<p class="small" style="color:var(--warn);line-height:1.6">${icon("wifiOff", 14)} Could not reach NCBI${err && err.message ? ` — ${esc(err.message)}` : ""}.</p>
+    box.innerHTML = `<p class="small" style="color:var(--warn);line-height:1.6">${icon("wifiOff", 14)} Не удалось связаться с NCBI${err && err.message ? ` — ${esc(err.message)}` : ""}.</p>
       <div class="row wrap" style="gap:8px;margin-top:9px">
-        <button class="btn soft xs" data-live-retry>${icon("refresh", 13)} Retry</button>
+        <button class="btn soft xs" data-live-retry>${icon("refresh", 13)} Повторить</button>
         <a class="btn ghost xs" href="${PM_LINK.search(q)}" target="_blank" rel="noopener noreferrer">${icon("external", 13)} PubMed</a>
       </div>`;
   }
@@ -586,7 +586,7 @@ export const detail = {
   render(ctx) {
     const c = getCompound(ctx.params.id);
     if (!c) {
-      return `<div class="card">${emptyState("search", "Compound not found", `No entry for “${ctx.params.id}”.`, `<a class="btn ghost sm" href="#/compounds">${icon("arrowLeft", 14)} Back to compounds</a>`)}</div>`;
+      return `<div class="card">${emptyState("search", "Препарат не найден", `Нет записи «${ctx.params.id}».`, `<a class="btn ghost sm" href="#/compounds">${icon("arrowLeft", 14)} К препаратам</a>`)}</div>`;
     }
     if (detailState.id !== c.id) {
       detailState.id = c.id;
@@ -597,10 +597,10 @@ export const detail = {
 
     return `
     <div class="row" style="margin-bottom:14px">
-      ${backLink("#/compounds", "Compounds")}
+      ${backLink("#/compounds", "Препараты")}
       <span class="spacer"></span>
-      <button class="icon-btn ${saved ? "accent" : ""}" data-act="save" aria-label="Save entry" title="Save entry">${icon("star", 18)}</button>
-      <button class="icon-btn" data-act="copy" aria-label="Copy summary" title="Copy summary">${icon("copy", 17)}</button>
+      <button class="icon-btn ${saved ? "accent" : ""}" data-act="save" aria-label="Сохранить запись" title="Сохранить запись">${icon("star", 18)}</button>
+      <button class="icon-btn" data-act="copy" aria-label="Копировать сводку" title="Копировать сводку">${icon("copy", 17)}</button>
     </div>
 
     <header class="detail-head">
@@ -611,12 +611,12 @@ export const detail = {
         ${evidenceChip(c.evidence)}
       </div>
       <h1 class="detail-title">${esc(c.name)}</h1>
-      ${(c.aliases || []).length ? `<p class="detail-alias">also: ${c.aliases.map(esc).join(" · ")}</p>` : ""}
+      ${(c.aliases || []).length ? `<p class="detail-alias">также: ${c.aliases.map(esc).join(" · ")}</p>` : ""}
       <div class="row wrap" style="gap:8px;margin-top:4px">
-        <button class="btn ${inStack(c.id) ? "soft" : "primary"} sm" data-act="stack">${icon(inStack(c.id) ? "check" : "plus", 14)} ${inStack(c.id) ? "In stack" : "Add to stack"}</button>
-        <a class="btn ghost sm" href="#/lab?compound=${esc(c.id)}">${icon("flask", 14)} Lab</a>
-        <a class="btn ghost sm" href="#/lab/interactions?add=${esc(c.id)}">${icon("shield", 14)} Interactions</a>
-        ${partner ? `<a class="btn ghost sm" href="#/compare?ids=${esc(c.id)},${esc(partner.id)}">${icon("grid", 14)} Compare</a>` : ""}
+        <button class="btn ${inStack(c.id) ? "soft" : "primary"} sm" data-act="stack">${icon(inStack(c.id) ? "check" : "plus", 14)} ${inStack(c.id) ? "В стеке" : "В стек"}</button>
+        <a class="btn ghost sm" href="#/lab?compound=${esc(c.id)}">${icon("flask", 14)} Лаборатория</a>
+        <a class="btn ghost sm" href="#/lab/interactions?add=${esc(c.id)}">${icon("shield", 14)} Взаимодействия</a>
+        ${partner ? `<a class="btn ghost sm" href="#/compare?ids=${esc(c.id)},${esc(partner.id)}">${icon("grid", 14)} Сравнить</a>` : ""}
       </div>
     </header>
 
@@ -656,7 +656,7 @@ export const detail = {
         store.update((s) => {
           s.stack = has ? s.stack.filter((x) => x !== c.id) : [...s.stack, c.id];
         });
-        toast(has ? `${c.name} removed from stack` : `${c.name} added to stack`, has ? "info" : "success");
+        toast(has ? `${c.name} убран из стека` : `${c.name} добавлен в стек`, has ? "info" : "success");
         ctx.rerender();
       }
       if (ev.target.closest('[data-act="save"]')) {
@@ -666,12 +666,12 @@ export const detail = {
           s.saved = has ? s.saved.filter((x) => x !== c.id) : [...s.saved, c.id];
         });
         if (!has) awardXP(2);
-        toast(has ? "Removed from saved" : "Saved", has ? "info" : "success");
+        toast(has ? "Убрано из сохранённого" : "Сохранено", has ? "info" : "success");
         ctx.rerender();
       }
       if (ev.target.closest('[data-act="copy"]')) {
-        const text = `${c.name} (${c.cls})\n${c.summary}\n\nMechanism: ${(c.moa || []).join("; ")}\nHalf-life: ${c.pk.halfLife ? fmt.duration(c.pk.halfLife) : "unknown"}\n\nSource: NeuroDifference (educational, not medical advice)`;
-        copyText(text, "Entry copied");
+        const text = `${c.name} (${c.cls})\n${c.summary}\n\nМеханизм: ${(c.moa || []).join("; ")}\nПолувыведение: ${c.pk.halfLife ? fmt.duration(c.pk.halfLife) : "неизвестно"}\n\nИсточник: NeuroDifference (образовательно, не медицинская рекомендация)`;
+        copyText(text, "Запись скопирована");
       }
     });
   },
