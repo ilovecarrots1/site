@@ -462,7 +462,7 @@ export const settings = {
       store.reset();
       applyAppearance();
       window.dispatchEvent(new CustomEvent("nd:appearance"));
-      toast("Everything reset", "info");
+      toast("Всё сброшено", "info");
       location.hash = "#/";
       rerender();
     });
@@ -474,7 +474,7 @@ export const settings = {
           s.stack = (s.stack || []).filter((x) => x !== id);
         });
         const c = COMPOUND_BY_ID.get(id);
-        toast(`${c ? c.name : "Item"} removed from stack`, "info");
+        toast(`${c ? c.name : "Элемент"} убран из стека`, "info");
         rerender();
       })
     );
