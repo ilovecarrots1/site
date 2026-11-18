@@ -10,7 +10,7 @@ import { COMPOUNDS_F } from "./compounds-f.js";
 /** Every dose row must carry the same message: a reference point, not advice. */
 export const DOSE_DISCLAIMER = "Reference point for education only — not a recommendation.";
 
-const HAS_DISCLAIMER = /education only|not a recommendation|reference point|guideline|lower than/i;
+const HAS_DISCLAIMER = /education only|not a recommendation/i;
 
 function doseNote(note) {
   const n = String(note || "").trim();
