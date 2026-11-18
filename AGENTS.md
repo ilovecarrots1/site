@@ -298,6 +298,50 @@ h-scroll), reduced-motion + data-motion off, `#/dev/audit` 12/12 (210/218).
 Then expand EN dictionary to remaining views. The model cannot see images —
 visual bugs must come back as text.
 
+### v4.4.1 — interaction-checker bug sweep — APPLIED, awaiting push + QA
+
+User: «багов пизда, люди жалуются» — `#/lab/interactions` «не находит» semax+selank,
+tirzepatide+retatrutide («тирза+ретта»), GH+any AI («гр+иа»). Three root causes fixed:
+
+1. **Cyrillic search was dead.** `searchCompounds`/`resolveCompound` matched only Latin
+   name/aliases/cls/tags; `resolveCompound` stripped `[^a-z0-9]`, so «семакс/тирза/гр/иа» → 0.
+   Added a RU layer in `compounds.js`: `RU_TRANSLIT` (Cyrillic→Latin; translit variant only
+   if ≥3 chars to avoid 2-letter noise like «иа»→«ia»), `RU_ALIASES` (RU names + slang →
+   canonical id: семакс, селанк, тирза/тирзепатид, ретта/ретатрутид, сема/оземпик,
+   гр/гх/соматропин→somatropin, ибутаморен/мк677, игф, анастрозол/летрозол/экземестан,
+   ипаморелин/серморелин/гхрп/бпк/тб, кофеин/никотин/мелатонин/креатин/литий/кетамин/
+   ашваганда/омега3/инсулин), `RU_CLASS_TOKENS` (иа/ингибитор ароматазы→"Aromatase inhibitor",
+   аас/анаболики/стероиды→"Anabolic steroid", секретагоги→"Growth hormone secretagogue",
+   глп1/инкретины→"GLP-1 agonist"). Both functions score across query variants + alias-id
+   boost (130) + class boost (95). Canonical names/ids stay English; dose invariant untouched.
+   Eval: 18 RU/slang queries resolve; «иа» lists all 3 AIs; Latin still works.
+2. **Missing class rules.** No FLAG rule linked incretin/gh-axis/ai, so even Latin-added
+   pairs returned «Известных взаимодействий нет». Added 3 to `FLAG_RULES_BASE`
+   (`interactions.js`): `incretin+incretin` (major — redundant GLP-1/GIP/glucagon, GI →
+   dehydration/AKI + hypo risk), `gh-axis+gh-axis` (moderate — additive IGF-1, insulin
+   resistance/oedema/arthralgia), `gh-axis+ai` (moderate — metabolic + bone strain). Added
+   `gh-axis` flag to `igf-1-lr3` (`compounds-f.js`) so IGF+GH fires too. Flag rules 63→66;
+   pairs stay 218; compounds stay 210. Eval: tirz+reta & sema+tirz → major; GH+AI,
+   mk677+letrozole, GH+GH, IGF+GH → moderate; **semax+selank → [] (correct — no documented
+   interaction, honest empty-state, NOT a bug; search fix lets users add it).**
+3. **Bloodwork audit was broken (NOT 12/12).** bloodwork-a/b referenced `somatotropin`
+   (15×) but the compound id is `somatropin`; plus a dangling `calcium-carbonate` (no such
+   compound). audit.js «Bloodwork → compound links resolve» was failing. Fixed:
+   somatotropin→somatropin globally, removed calcium-carbonate from bloodwork-b:300.
+   Eval: badBloodworkIds=[] → 12/12 restored.
+
+Version **4.4.1** stamped (core.js:7, sw.js:5/6, index.html ×4, settings.js chip). All
+touched files syntax-ok; RU search + engine + bloodwork link audit eval-verified. Nothing
+pushed. Harness note: `readFull` must paginate by LINES (limit≤300) — a 50KB byte-truncated
+read gives no `Use offset` banner; and strip must remove `<harness>…</harness>` blocks
+non-greedily (not to-end-of-string) or multi-page files get cut. Large compound-e/f reads
+are unreliable; test logic with synthetic records carrying real ids/cls/flags instead.
+
+Remaining: push to main, hard-reload, QA `#/lab/interactions` — type «тирза», «ретта», «гр»,
+«иа», «семакс», «селанк» (Cyrillic now resolves), confirm tirz+reta major / GH+AI moderate,
+`#/dev/audit` 12/12 (210/218/66). Then continue EN dictionary expansion + the wider textual
+bug list (still outstanding).
+
 ## Working from the shell
 
 The project lives in the Acode Terminal home (`~/neuro`, shown in Files as
