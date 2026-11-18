@@ -304,4 +304,162 @@ export function mountBrain3D(canvas, opts) {
   const anchorScreen = new Map();
   let hitFaces = [];
 
-/* __TAIL__ */
+  /* fixed camera-space light: upper-left, toward the viewer */
+  const Ll = Math.hypot(-0.35, 0.62, -0.70);
+  const LX = -0.35 / Ll, LY = 0.62 / Ll, LZ = -0.70 / Ll;
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = Math.max(80, rect.width);
+    H = Math.max(80, rect.height);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    dirty = true;
+    kick();
+  }
+
+  function sync() {
+    const st = (opts.getLit && opts.getLit()) || { lit: new Map(), focus: false };
+    lit = st.lit || new Map();
+    focus = !!st.focus;
+    dirty = true;
+    kick();
+  }
+
+  function draw(now) {
+    const cy = Math.cos(yaw), sy = Math.sin(yaw);
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const scale = (Math.min(W, H * 1.3) / 340) * zoom;
+    const cxp = W / 2, cyp = H / 2 + 8 * zoom;
+    const CAM = 560;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    /* project every vertex */
+    for (let i = 0; i < NV; i++) {
+      const p = geo.verts[i];
+      const x1 = p.x * cy + p.z * sy;
+      const z1 = -p.x * sy + p.z * cy;
+      const y2 = p.y * cp - z1 * sp;
+      const z2 = p.y * sp + z1 * cp;
+      const f = CAM / (CAM + z2);
+      const pr = proj[i];
+      pr.x = cxp + x1 * f * scale;
+      pr.y = cyp - y2 * f * scale;
+      pr.z = z2;
+    }
+
+    /* shade + cull faces, gather visible */
+    let nv = 0;
+    for (let i = 0; i < NF; i++) {
+      const fc = geo.faces[i];
+      const nx1 = fc.nx * cy + fc.nz * sy;
+      const nz1 = -fc.nx * sy + fc.nz * cy;
+      const ny2 = fc.ny * cp - nz1 * sp;
+      const nz2 = fc.ny * sp + nz1 * cp;
+      if (nz2 >= 0) continue;                          /* back-face */
+      const diff = Math.max(0, nx1 * LX + ny2 * LY + nz2 * LZ);
+      const cx1 = fc.cx * cy + fc.cz * sy;
+      const cz1 = -fc.cx * sy + fc.cz * cy;
+      fdepth[i] = fc.cy * sp + cz1 * cp;
+      fc._d = diff;
+      /* baked AO + silhouette rim darkening define the folds */
+      const rim = Math.pow(1 - Math.abs(nz2), 3);
+      fc._k = fc.ao * (1 - 0.22 * rim);
+      order[nv++] = i;
+    }
+    const vis = order.slice(0, nv);
+    vis.sort((a, b) => fdepth[b] - fdepth[a]);
+
+    /* fill far -> near */
+    hitFaces = [];
+    ctx.lineJoin = "round";
+    ctx.lineWidth = 0.6;
+    for (let k = 0; k < nv; k++) {
+      const i = vis[k];
+      const fc = geo.faces[i];
+      const level = lit.get(fc.region) || 0;
+      let diff = fc._d * fc._k;
+      if (focus && level === 0) diff *= 0.78;
+      const bucket = clamp(Math.round(diff * (BUCKETS - 1)), 0, BUCKETS - 1);
+      const A = proj[fc.a], B = proj[fc.b], Cc = proj[fc.c];
+      const col = shadeCache[fc.part][level][bucket];
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = col;
+      ctx.strokeStyle = col;   /* hairline seam hides raster gaps */
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y);
+      ctx.lineTo(B.x, B.y);
+      ctx.lineTo(Cc.x, Cc.y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      if (fc.region) hitFaces.push({ ax: A.x, ay: A.y, bx: B.x, by: B.y, cx: Cc.x, cy: Cc.y, d: fdepth[i], region: fc.region });
+    }
+
+    /* synapse sparks */
+    const t = now * 0.001;
+    if (!motionOff()) {
+      ctx.fillStyle = "#ffffff";
+      for (const s of geo.sparks) {
+        s.t += s.v;
+        if (s.t > 1) s.t -= 1;
+        const A = proj[s.a], B = proj[s.b];
+        const x = A.x + (B.x - A.x) * s.t;
+        const y = A.y + (B.y - A.y) * s.t;
+        ctx.globalAlpha = 0.5 * Math.sin(s.t * Math.PI);
+        ctx.beginPath();
+        ctx.arc(x, y, 1.0 * scale, 0, TAU);
+        ctx.fill();
+      }
+    }
+
+    /* region hotspots + labels (decluttered: text only when lit / zoomed) */
+    anchorScreen.clear();
+    ctx.textAlign = "center";
+    ctx.font = "600 10px system-ui, sans-serif";
+    for (const a of anchors) {
+      const x1 = a.X * cy + a.Z * sy;
+      const z1 = -a.X * sy + a.Z * cy;
+      const y2 = a.Y * cp - z1 * sp;
+      const z2 = a.Y * sp + z1 * cp;
+      const f = CAM / (CAM + z2);
+      const sx = cxp + x1 * f * scale;
+      const syc = cyp - y2 * f * scale;
+      const front = z2 < 6;
+      const level = lit.get(a.id) || 0;
+      anchorScreen.set(a.id, { x: sx, y: syc, front });
+      const showDot = level > 0 || (a.surface && front);
+      if (!showDot) continue;
+
+      let alpha = level > 0 ? (front ? 0.9 : 0.25) : 0.5;
+      if (focus && !level) alpha *= 0.4;
+      if (level === 2) alpha = 1;
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = level === 2 ? "#ffffff" : a.color;
+      ctx.beginPath();
+      ctx.arc(sx, syc, level === 2 ? 3.4 : 2.2, 0, TAU);
+      ctx.fill();
+
+      if (level > 0) {
+        const pulse = motionOff() ? 0.5 : (t * 1.4 + a.X * 0.01) % 1;
+        ctx.globalAlpha = alpha * (1 - pulse) * 0.7;
+        ctx.strokeStyle = level === 2 ? "#ffffff" : a.color;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(sx, syc, 5 + pulse * 11, 0, TAU);
+        ctx.stroke();
+      }
+      const showLabel = level > 0 || (a.surface && front && zoom > 1.5 && !focus);
+      if (showLabel) {
+        ctx.globalAlpha = level > 0 ? 0.95 : 0.6;
+        ctx.fillStyle = level > 0 ? "#ffffff" : a.color;
+        ctx.fillText(a.short, sx, syc + 13);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+/* __TAIL2__ */
