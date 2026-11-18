@@ -2,8 +2,8 @@
    Bump VERSION on every release: the old cache name is deleted on activate so
    a stale shell can never outlive a deploy. */
 
-const VERSION = "nd-v4.4.0";
-const V = "4.4.0";
+const VERSION = "nd-v4.4.1";
+const V = "4.4.1";
 
 const SHELL = [
   "./",
