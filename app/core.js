@@ -4,7 +4,7 @@
 
 import { t } from "./lib/i18n.js";
 
-export const VERSION = "4.4.0";
+export const VERSION = "4.4.1";
 
 /* ------------------------------------------------------------------ */
 /* DOM + string helpers                                                */
