@@ -571,6 +571,13 @@ export function mount(root) {
   const canvas3d = root.querySelector("#bm-3d");
   const stageAnat = root.querySelector("#bm-stage-anat");
 
+  /* Right-click on a brain zone must not open the browser's native context
+     menu. Suppress it on the interactive SVG stages; the 3D canvas handles its
+     own contextmenu inside mountBrain3D. Side-panel text stays right-clickable. */
+  for (const el of [stage, stageAnat]) {
+    if (el) el.addEventListener("contextmenu", (e) => e.preventDefault());
+  }
+
   function litState() {
     const lit = new Map();
     let focus = false;
