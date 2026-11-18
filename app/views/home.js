@@ -10,10 +10,10 @@ import { pageHead, statTile, compoundCard, classColor, metric, callout, subscrib
 
 function greeting() {
   const h = new Date().getHours();
-  if (h < 5) return "Still up";
-  if (h < 12) return "Good morning";
-  if (h < 18) return "Good afternoon";
-  return "Good evening";
+  if (h < 5) return "Ещё не спишь";
+  if (h < 12) return "Доброе утро";
+  if (h < 18) return "Добрый день";
+  return "Добрый вечер";
 }
 
 function nextLesson() {
@@ -38,15 +38,15 @@ function dailySystem() {
 
 function tickerHtml() {
   const items = [
-    ["t½", `sertraline ${fmt.duration(26)}`],
-    ["Adenosine", "caffeine blocks A1/A2A — it does not add energy"],
-    ["SERT", "SSRIs keep serotonin in the cleft, not create it"],
-    ["GABA-A", "benzodiazepines raise opening frequency, not conductance"],
-    ["MAO-A", "tyramine + irreversible MAOI → hypertensive crisis"],
-    ["NMDA", "ketamine is a use-dependent channel blocker"],
-    ["CYP2D6", "~7% of people are poor metabolisers"],
-    ["Taper", "step ≈5–10% of the current dose, hold 5 half-lives"],
-    ["Peak", "oral caffeine Tmax ≈ 45 min"],
+    ["t½", `сертралин ${fmt.duration(26)}`],
+    ["Аденозин", "кофеин блокирует A1/A2A — он не добавляет энергии"],
+    ["SERT", "СИОЗС удерживают серотонин в щели, а не создают его"],
+    ["GABA-A", "бензодиазепины повышают частоту открытия, не проводимость"],
+    ["MAO-A", "тирамин + необратимый ИМАО → гипертонический криз"],
+    ["NMDA", "кетамин — use-dependent блокатор канала"],
+    ["CYP2D6", "~7% людей — медленные метаболизаторы"],
+    ["Снижение", "шаг ≈5–10% текущей дозы, пауза 5 полувыведений"],
+    ["Пик", "Tmax кофеина внутрь ≈ 45 мин"],
   ];
   const row = (list) =>
     list.map(([tag, text]) => `<span class="ticker-item"><b>${esc(tag)}</b> ${esc(text)}</span>`).join("");
@@ -71,8 +71,8 @@ export function render() {
   return `
   ${pageHead(
     `${greeting()}.`,
-    "An evidence-graded map of neuropharmacology: compounds, receptor systems, interactions and the maths behind them.",
-    `<a class="btn primary sm" href="#/compounds">${icon("search", 15)} Browse compounds</a>`,
+    "Карта нейрофармакологии с градацией доказательности: препараты, рецепторные системы, взаимодействия и математика, которая за ними стоит.",
+    `<a class="btn primary sm" href="#/compounds">${icon("search", 15)} К препаратам</a>`,
     "NeuroDifference"
   )}
 
@@ -85,35 +85,35 @@ export function render() {
           ${orb(52)}
           <div class="stack" style="gap:8px;min-width:0">
           <div class="row wrap" style="gap:6px">
-            <span class="chip chip-accent">${icon("sparkles", 12)} Level ${lvl.level}</span>
-            ${s.profile.streak ? `<span class="chip">${icon("zap", 12)} ${s.profile.streak}-day streak</span>` : ""}
+            <span class="chip chip-accent">${icon("sparkles", 12)} Уровень ${lvl.level}</span>
+            ${s.profile.streak ? `<span class="chip">${icon("zap", 12)} ${s.profile.streak} дн. подряд</span>` : ""}
             <span class="chip">${(s.profile.xp || 0).toLocaleString()} XP</span>
           </div>
-          <h2 style="font-size:19px;letter-spacing:-.025em">${next ? `${next.lesson.title}` : "You finished every lesson"}</h2>
+          <h2 style="font-size:19px;letter-spacing:-.025em">${next ? `${next.lesson.title}` : "Все уроки пройдены"}</h2>
           <p class="small muted" style="line-height:1.55;max-width:56ch">
             ${
               next
-                ? `${esc(next.course.title)} · ${next.lesson.minutes} min · <span class="mono" style="color:var(--accent)">+${next.lesson.xp} XP</span>`
-                : "Nice. Review your flashcards to keep the mechanisms sharp."
+                ? `${esc(next.course.title)} · ${next.lesson.minutes} мин · <span class="mono" style="color:var(--accent)">+${next.lesson.xp} XP</span>`
+                : "Отлично. Повтори карточки, чтобы механизмы остались свежими."
             }
           </p>
-          <div style="max-width:340px">${metric("Level progress", `${lvl.into} / ${lvl.need} XP`, lvl.progress)}</div>
+          <div style="max-width:340px">${metric("Прогресс уровня", `${lvl.into} / ${lvl.need} XP`, lvl.progress)}</div>
           </div>
         </div>
         <div class="row wrap" style="gap:8px;flex:none">
           <a class="btn primary" href="${next ? `#/learn/${next.course.id}/${next.lesson.id}` : "#/cards"}">
-            ${icon(next ? "play" : "layers", 15)} ${next ? "Continue" : "Review cards"}
+            ${icon(next ? "play" : "layers", 15)} ${next ? "Продолжить" : "Повторить карточки"}
           </a>
-          <a class="btn ghost" href="#/brain">${icon("brain", 15)} Brain map</a>
+          <a class="btn ghost" href="#/brain">${icon("brain", 15)} Карта мозга</a>
         </div>
       </div>
     </section>
 
     <div class="grid grid-4" style="gap:10px">
-      ${statTile({ label: "Compounds", value: COMPOUNDS.length, sub: `${new Set(COMPOUNDS.map((c) => c.cls)).size} classes`, iconName: "pill" })}
-      ${statTile({ label: "Systems", value: SYSTEMS.length, sub: "transmitter pathways", iconName: "activity" })}
-      ${statTile({ label: "Lessons", value: `${lessonsDone}/${TOTAL_LESSONS}`, sub: accuracy ? `${accuracy}% quiz accuracy` : "no quizzes yet", iconName: "book" })}
-      ${statTile({ label: "Cards due", value: cards.due, sub: `${cards.mature} mature · ${cards.total} total`, iconName: "layers" })}
+      ${statTile({ label: "Препараты", value: COMPOUNDS.length, sub: `${new Set(COMPOUNDS.map((c) => c.cls)).size} классов`, iconName: "pill" })}
+      ${statTile({ label: "Системы", value: SYSTEMS.length, sub: "нейромедиаторные пути", iconName: "activity" })}
+      ${statTile({ label: "Уроки", value: `${lessonsDone}/${TOTAL_LESSONS}`, sub: accuracy ? `точность квизов ${accuracy}%` : "квизов ещё не было", iconName: "book" })}
+      ${statTile({ label: "Карточек к повторению", value: cards.due, sub: `${cards.mature} зрелых · ${cards.total} всего`, iconName: "layers" })}
     </div>
   </div>
 
@@ -124,16 +124,16 @@ export function render() {
 
       <section class="block">
         <div class="block-head">
-          <div><h2>Quick actions</h2><p class="block-sub">Jump straight to the tool you need</p></div>
+          <div><h2>Быстрые действия</h2><p class="block-sub">Сразу к нужному инструменту</p></div>
         </div>
         <div class="grid grid-3" style="gap:10px">
-          ${actionCard("flask", "PK simulator", "Plot plasma curves, half-lives and accumulation", "#/lab", "violet")}
-          ${actionCard("shield", "Interaction check", "Stack combinations against a rule engine", "#/lab/interactions", "green")}
-          ${actionCard("brain", "Pathway explorer", "Trace synthesis, receptors and drug targets", "#/brain", "amber")}
-          ${actionCard("scale", "Taper planner", "Turn a half-life into a step-down schedule", "#/lab/taper", "blue")}
-          ${actionCard("grid", "Compare compounds", "Two or three monographs, fact by fact", "#/compare", "violet")}
-          ${actionCard("microscope", "Live research", "Search PubMed at request time — nothing stored", "#/research", "green")}
-          ${actionCard("message", "Ask the library", "Plain-language answers from the local data", "#/ask", "blue")}
+          ${actionCard("flask", "PK-симулятор", "Кривые концентрации, полувыведение и накопление", "#/lab", "violet")}
+          ${actionCard("shield", "Проверка взаимодействий", "Комбинации против базы правил", "#/lab/interactions", "green")}
+          ${actionCard("brain", "Проводник путей", "Синтез, рецепторы и мишени препаратов", "#/brain", "amber")}
+          ${actionCard("scale", "План снижения дозы", "Из полувыведения — в график снижения", "#/lab/taper", "blue")}
+          ${actionCard("grid", "Сравнение препаратов", "Две-три монографии, факт за фактом", "#/compare", "violet")}
+          ${actionCard("microscope", "Живые исследования", "Поиск PubMed по запросу — ничего не хранится", "#/research", "green")}
+          ${actionCard("message", "Спроси библиотеку", "Ответы простым языком из локальных данных", "#/ask", "blue")}
         </div>
       </section>
 
@@ -141,13 +141,13 @@ export function render() {
         stack.length
           ? `<section class="block">
               <div class="block-head">
-                <div><h2>Your stack</h2><p class="block-sub">${stack.length} compound${stack.length === 1 ? "" : "s"} · ${findings.length} interaction signal${findings.length === 1 ? "" : "s"}</p></div>
-                <a class="btn ghost sm" href="#/lab/interactions">Open checker ${icon("chevronRight", 14)}</a>
+                <div><h2>Твой стек</h2><p class="block-sub">${stack.length} преп. · сигналов: ${findings.length}</p></div>
+                <a class="btn ghost sm" href="#/lab/interactions">Открыть проверку ${icon("chevronRight", 14)}</a>
               </div>
               ${worst ? `<div style="margin-bottom:10px">${callout(
                 worst === "critical" ? "danger" : worst === "major" ? "warn" : "info",
-                worst === "critical" ? "This combination contains a serious interaction" : worst === "major" ? "High-risk interaction detected" : "Some interactions worth knowing",
-                `${findings.length} signal${findings.length === 1 ? "" : "s"} detected. Review the details before trusting this stack.`
+                worst === "critical" ? "В этой комбинации серьёзное взаимодействие" : worst === "major" ? "Обнаружено взаимодействие высокого риска" : "Есть взаимодействия, о которых стоит знать",
+                `Сигналов: ${findings.length}. Посмотри детали, прежде чем доверять этому стеку.`
               )}</div>` : ""}
               <div class="card flush">
                 <div class="list">
@@ -164,17 +164,17 @@ export function render() {
               </div>
             </section>`
           : `<section class="block">
-              <div class="block-head"><div><h2>Your stack</h2><p class="block-sub">Add compounds to check them together</p></div></div>
+              <div class="block-head"><div><h2>Твой стек</h2><p class="block-sub">Добавь препараты, чтобы проверить их вместе</p></div></div>
               <div class="card">
-                ${emptyState("pill", "Nothing in your stack yet", "Open any compound and tap “Add to stack” — the interaction engine will keep watching.", `<a class="btn soft sm" href="#/compounds">${icon("plus", 14)} Add a compound</a>`)}
+                ${emptyState("pill", "В стеке пока пусто", "Открой любой препарат и нажми «В стек» — движок взаимодействий будет начеку.", `<a class="btn soft sm" href="#/compounds">${icon("plus", 14)} Добавить препарат</a>`)}
               </div>
             </section>`
       }
 
       <section class="block">
         <div class="block-head">
-          <div><h2>Courses</h2><p class="block-sub">Structured, from membrane potentials to evidence literacy</p></div>
-          <a class="btn ghost sm" href="#/learn">All lessons ${icon("chevronRight", 14)}</a>
+          <div><h2>Курсы</h2><p class="block-sub">От мембранного потенциала до грамотности доказательности</p></div>
+          <a class="btn ghost sm" href="#/learn">Все уроки ${icon("chevronRight", 14)}</a>
         </div>
         <div class="grid" style="gap:10px">
           ${COURSES.map((course) => {
@@ -185,7 +185,7 @@ export function render() {
                 <div style="min-width:0">
                   <div class="row" style="gap:6px;margin-bottom:3px">
                     <span class="chip">${esc(course.level)}</span>
-                    ${done === course.lessons.length ? `<span class="chip chip-good">${icon("check", 11)} done</span>` : ""}
+                    ${done === course.lessons.length ? `<span class="chip chip-good">${icon("check", 11)} пройдено</span>` : ""}
                   </div>
                   <h3 style="font-size:14.5px">${esc(course.title)}</h3>
                 </div>
@@ -203,7 +203,7 @@ export function render() {
 
       <div class="card" style="padding:0;overflow:hidden">
         <div style="padding:14px 14px 10px;border-bottom:1px solid var(--line-soft)">
-          <div class="eyebrow" style="margin-bottom:6px">Today's compound</div>
+          <div class="eyebrow" style="margin-bottom:6px">Препарат дня</div>
           <a href="#/compounds/${esc(pick.id)}" style="color:inherit;text-decoration:none">
             <div class="row between" style="align-items:flex-start;gap:8px">
               <h3 style="font-size:16px">${esc(pick.name)}</h3>
@@ -216,22 +216,22 @@ export function render() {
           <div class="row wrap" style="gap:6px">
             ${(pick.moa || []).slice(0, 2).map((m) => `<span class="chip chip-accent">${esc(m)}</span>`).join("")}
           </div>
-          <a class="btn ghost sm block" href="#/compounds/${esc(pick.id)}">Read the entry ${icon("chevronRight", 14)}</a>
+          <a class="btn ghost sm block" href="#/compounds/${esc(pick.id)}">Читать запись ${icon("chevronRight", 14)}</a>
         </div>
       </div>
 
       <div class="card" style="--dot:${sys.color}">
-        <div class="eyebrow" style="margin-bottom:6px">Today's system</div>
+        <div class="eyebrow" style="margin-bottom:6px">Система дня</div>
         <h3 style="font-size:16px;margin-bottom:4px">${esc(sys.name)} <span class="mono tiny" style="color:${sys.color}">${esc(sys.abbr)}</span></h3>
         <p class="small muted" style="line-height:1.55;margin-bottom:10px">${esc(sys.summary)}</p>
         <div class="row wrap" style="gap:5px;margin-bottom:10px">
           ${sys.functions.slice(0, 3).map((f) => `<span class="chip">${esc(f)}</span>`).join("")}
         </div>
-        <a class="btn ghost sm block" href="#/brain/${esc(sys.id)}">Open pathway ${icon("chevronRight", 14)}</a>
+        <a class="btn ghost sm block" href="#/brain/${esc(sys.id)}">Открыть путь ${icon("chevronRight", 14)}</a>
       </div>
 
       <div class="card">
-        <div class="card-head"><h3 style="font-size:14px">Evidence key</h3></div>
+        <div class="card-head"><h3 style="font-size:14px">Ключ доказательности</h3></div>
         <div class="stack" style="gap:7px">
           ${Object.entries(EVIDENCE)
             .map(
@@ -244,7 +244,7 @@ export function render() {
         </div>
       </div>
 
-      <p class="disclaimer-mini">${icon("info", 13)} Educational reference — not medical advice.</p>
+      <p class="disclaimer-mini">${icon("info", 13)} Образовательный справочник — не медицинская рекомендация.</p>
     </aside>
   </div>`;
 }
