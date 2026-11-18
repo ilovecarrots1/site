@@ -319,6 +319,13 @@ export function mountBrain3D(canvas, opts) {
 
   function frame(now) {
     raf = 0;
+    /* Route change removed the canvas: tear the whole instance down. */
+    if (!canvas.isConnected) {
+      ac.abort();
+      ro.disconnect();
+      io.disconnect();
+      return;
+    }
     if (!visible || document.hidden) return;
     const idle = motionOff();
     if (auto && !idle && !dragging) yaw += 0.0032;
@@ -338,7 +345,7 @@ export function mountBrain3D(canvas, opts) {
     else if (!idle && geo.sparks.length) raf = requestAnimationFrame(frame);
   }
   function kick() {
-    if (!raf && visible && !document.hidden) raf = requestAnimationFrame(frame);
+    if (!raf && visible && !document.hidden && canvas.isConnected) raf = requestAnimationFrame(frame);
   }
 
   /* ---- interaction ------------------------------------------------------- */
@@ -511,6 +518,7 @@ export function mountBrain3D(canvas, opts) {
     },
     destroy() {
       if (raf) cancelAnimationFrame(raf);
+      raf = 0;
       ac.abort();
       ro.disconnect();
       io.disconnect();
