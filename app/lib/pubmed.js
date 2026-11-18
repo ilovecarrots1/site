@@ -5,10 +5,22 @@
  * memory for the duration of the session only, keyed by query, so that
  * navigating back and forth does not hammer the API.
  *
- * API key is a public read-only key for E-utilities (10 req/s instead of 3).
  */
 
-export const PUBMED_KEY = "5e323382245f1bc6f90af5cf42a73f803608";
+/* Optional user-supplied E-utilities key (10 req/s instead of 3).
+ * Lives only in the user's own localStorage — never shipped in the repo.
+ * Without a key the client still works at NCBI's anonymous rate. */
+const KEY_STORAGE = "neurodiff.pubmedKey";
+export function pubmedKey() {
+  try { return (localStorage.getItem(KEY_STORAGE) || "").trim(); } catch { return ""; }
+}
+export function setPubmedKey(value) {
+  try {
+    const k = String(value || "").trim();
+    if (k) localStorage.setItem(KEY_STORAGE, k);
+    else localStorage.removeItem(KEY_STORAGE);
+  } catch { /* storage unavailable — key simply stays unset */ }
+}
 const BASE = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils";
 const TOOL = "NeuroDifference";
 const EMAIL = "neurodiff.app@gmail.com";
@@ -68,7 +80,7 @@ function qs(obj) {
 }
 
 async function get(path, params, { signal } = {}) {
-  const url = `${BASE}/${path}?${qs({ ...params, tool: TOOL, email: EMAIL, api_key: PUBMED_KEY })}`;
+  const url = `${BASE}/${path}?${qs({ ...params, tool: TOOL, email: EMAIL, api_key: pubmedKey() })}`;
   let res;
   try {
     res = await fetch(url, { signal, mode: "cors", credentials: "omit" });
