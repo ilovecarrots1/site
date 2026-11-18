@@ -182,7 +182,7 @@ export const COMPOUNDS_A = [
       tmax: 3.5,
       onset: 1,
       duration: 13,
-      metabolism: "hydrolysis → d-amphetamine → CYP2D6",
+      metabolism: "RBC hydrolysis (LDX t½ < 1 h) → d-amphetamine (effective t½ ≈ 11 h) → CYP2D6",
       excretion: "renal, pH dependent",
     },
     doses: [{ route: "oral", low: 20, high: 70, unit: "mg", note: "once daily" }],
