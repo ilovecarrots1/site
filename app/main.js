@@ -247,6 +247,7 @@ function openDrawer() {
     </div>`;
   document.body.appendChild(host);
   wireSubscribe(host);
+  applyI18n(host);
   lockScroll(true);
   const close = () => closeLayers();
   host.addEventListener("click", (ev) => {
@@ -366,6 +367,7 @@ function openSearch() {
     <div class="overlay-results" id="ov-results"></div>
   </div>`;
   document.body.appendChild(overlay);
+  applyI18n(overlay);
   lockScroll(true);
   const close = () => closeLayers();
 
@@ -379,6 +381,7 @@ function openSearch() {
     active = 0;
     if (!current.length) {
       results.innerHTML = `<div class="sr-empty">Ничего не найдено. Попробуй название препарата, нейромедиатор или «взаимодействия».</div>`;
+      applyI18n(results);
       return;
     }
     let html = "";
@@ -395,6 +398,7 @@ function openSearch() {
       </a>`;
     });
     results.innerHTML = html;
+    applyI18n(results);
   };
 
   paint();
