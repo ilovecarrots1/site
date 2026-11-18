@@ -98,9 +98,9 @@ FTP password, provider API keys, the Telegram bot token. Keep them in
 conversation state or environment, never in a tracked file. This repo is
 public.
 
-## Where we are right now — v4.3.0
+## Where we are right now — v4.4.0
 
-- App is **v4.3.0**. `#/dev/audit` must show 12/12.
+- App is **v4.4.0**. `#/dev/audit` must show 12/12.
 - **210 compounds**: 148 legacy + 62 new in `compounds-g/h/i/j.js`
   (antidepressants/anxiolytics · hypnotics/neurosteroids · antipsychotics/
   anticonvulsants · addiction medicine/migraine/Parkinson's).
@@ -242,6 +242,61 @@ What changed vs v1:
 Remaining: user pushes to main, hard-reloads, visual QA of #/brain -> 3D.
 The model cannot see images - bugs must come back as text. The wider
 textual bug list from the user is still outstanding.
+
+### v4.4.0 — selectable EN/RU + full visual overhaul — APPLIED, awaiting push + QA
+
+Two user requests landed: «локализация НА ВЫБОР ен/ру в настройках» and
+«полное обновление интерфейса, ебануто красивое, не только кнопочки снизу».
+
+**i18n = runtime DOM overlay, NOT 24 view rewrites.** New `app/lib/i18n.js`
+(380 ln, zero deps): views keep emitting Russian source strings; when
+`lang === "en"` a RU→EN dictionary (PHRASES exact-match + PATTERNS regex for
+numbered strings) is applied to text nodes + `placeholder/aria-label/title`
+after every render. Idempotent, no-op in RU. Compound names/ids/dose notes are
+English already → never match. `data-notx` opts a subtree out; SCRIPT/STYLE/
+TEXTAREA skipped. API: `LANGS, getLang, setLang, t(ru), applyI18n(root)`.
+- `store.data.settings.lang` ("ru" default) persists in `neurodiff.state.v2`.
+- `core.js`: imports `t`, `defaultState().settings.lang="ru"`, `toast()` wraps
+  message in `t()`. Dose-disclaimer invariant untouched (audit reads data, not
+  DOM; `doseNote()`/HAS_DISCLAIMER stay English).
+- `main.js`: boot `setLang(store...lang)`; `renderRoute()` ends with
+  `applyI18n()` (whole body) + `wireReveals(host)`; `nd:lang` listener rebuilds
+  shell (`mountShell`) + `renderRoute()`; `shellScrollWired` guard so re-mount
+  doesn't stack scroll listeners. `openDrawer`/`openSearch`/search `paint()`
+  call `applyI18n` on their subtree so overlays translate too.
+- `settings.js`: «Язык / Language» segmented toggle (`#set-lang`, LANGS) at top
+  of Appearance; click → `store.set("settings.lang")` + `setLang` + `nd:lang`.
+- Coverage: shell/nav/home/settings/core evidence+disclaimers/toasts/search/
+  drawer fully EN. Deep monograph prose + some view-specific strings not yet in
+  the dictionary stay RU in EN mode (graceful fallback). Expand = add lines to
+  PHRASES/PATTERNS, no view edits. Next: sweep lab/taper/interactions/compounds
+  detail strings into the dictionary.
+
+**Visual overhaul = additive `skin.css` v4.4 block** (after v4.2). Budget
+unchanged: transform/opacity only, one grain tile, reduced-motion +
+`data-motion="off"` guarded. Surface tints scoped to `[data-skin="aurora"]` so
+scope/prism keep their identity. Added: ambient `.bgfx` opacity breathe +
+inset vignette + accent-2 blob; topbar accent horizon; `::selection` accent;
+card depth (layered sheen background, accent edge, deeper shadow, hover lift
+`translateY(-3px)` on `.hoverable`/`a.card`/`.compound-card`); hero radial glow
++ orb glow; `.btn.primary` gloss sweep (`::after` translateX, isolation:isolate,
+z-index:-1 behind text); gradient meter/bar fills; typography hierarchy
+(clamp h1, uppercase eyebrows); brand/nav glow. **Scroll reveals**: `wireReveals`
+in main.js adds `.nd-reveal` (opacity0/translateY16) to nested `.card`/
+`.compound-card` (NOT direct #view children — those keep the entrance animation,
+one animation per element), IntersectionObserver adds `.nd-in`. No inline
+styles, no JS = visible, motion-off = visible.
+
+Version bumped to **4.4.0**: core.js:7, sw.js:5/6 (+`lib/i18n.js` added to SHELL),
+index.html ×4 `?v=`, settings.js chip. Eval: main/i18n/core/settings parse ok;
+i18n functional test passes (ru no-op, phrases/numbers/emoji/search translate).
+Nothing pushed.
+
+Remaining: user pushes to main, hard-reloads, QA — Settings → Language → English
+(shell/home/settings/search flip), visual pass on mobile 320px (no overlap, no
+h-scroll), reduced-motion + data-motion off, `#/dev/audit` 12/12 (210/218).
+Then expand EN dictionary to remaining views. The model cannot see images —
+visual bugs must come back as text.
 
 ## Working from the shell
 
