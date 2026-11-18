@@ -2,7 +2,7 @@
 
 import { esc, icon, store, fmt, toast, emptyState, evidenceChip, clamp } from "../core.js";
 import { COMPOUNDS, COMPOUND_BY_ID, getCompound, resolveCompound, searchCompounds, CLASSES } from "../data/compounds.js";
-import { EXTRA_SUBSTANCES, SEVERITY, checkInteractions, worstSeverity } from "../data/interactions.js";
+import { EXTRA_SUBSTANCES, SEVERITY, checkInteractions, worstSeverity, PAIR_RULES, PHENOMENA } from "../data/interactions.js";
 import { pageHead, callout, backLink, lineChart, classColor, statTile } from "./ui.js";
 
 /* ------------------------------------------------------------------ */
@@ -356,7 +356,7 @@ function findingsHtml() {
     return `<div class="card">${emptyState(
       "shield",
       "Add at least two substances",
-      "The engine combines ~100 explicit pair rules with class-level flag rules, so unstudied combinations still surface risk.",
+      `The engine combines ${PAIR_RULES.length} explicit pair rules with class-level flag rules, so unstudied combinations still surface risk.`,
       `<a class="btn soft sm" href="#/compounds">${icon("search", 14)} Browse compounds</a>`
     )}</div>`;
   }
@@ -484,7 +484,33 @@ export const interactions = {
           </p>
         </div>
       </div>
-    </div>`;
+    </div>
+
+    <section class="block" style="margin-top:22px">
+      <div class="row between" style="margin-bottom:10px;gap:8px">
+        <div>
+          <div class="eyebrow">Reference</div>
+          <strong style="font-size:16px">Phenomena glossary</strong>
+        </div>
+        <span class="tiny dim nowrap">${PHENOMENA.length} terms</span>
+      </div>
+      <div class="search-input" style="margin-bottom:10px">
+        ${icon("search", 16)}
+        <input class="input" id="phen-q" type="search" placeholder="Filter terms — withdrawal, QT, CYP…" autocomplete="off">
+      </div>
+      <div class="stack" id="phen-list" style="gap:8px">
+        ${PHENOMENA.map(
+          (p) => `<details class="card tight phen" data-phen="${esc((p.name + " " + p.tags.join(" ") + " " + p.body).toLowerCase())}">
+            <summary class="row between" style="gap:8px;cursor:pointer">
+              <strong style="font-size:13.5px;line-height:1.4">${esc(p.name)}</strong>
+              <span class="row wrap" style="gap:4px;justify-content:flex-end">${p.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</span>
+            </summary>
+            <p class="small muted" style="line-height:1.6;margin-top:8px">${esc(p.body)}</p>
+          </details>`
+        ).join("")}
+      </div>
+      <div class="tiny dim" id="phen-none" hidden style="margin-top:8px">No matching term.</div>
+    </section>`;
   },
 
   mount(root) {
@@ -559,6 +585,19 @@ export const interactions = {
         paint();
         toast(`Loaded ${stack.length} from your stack`, "success");
       }
+    });
+
+    const phenQ = root.querySelector("#phen-q");
+    phenQ?.addEventListener("input", () => {
+      const q = phenQ.value.trim().toLowerCase();
+      let shown = 0;
+      root.querySelectorAll("[data-phen]").forEach((el) => {
+        const hit = !q || el.dataset.phen.includes(q);
+        el.style.display = hit ? "" : "none";
+        if (hit) shown++;
+      });
+      const none = root.querySelector("#phen-none");
+      if (none) none.hidden = shown > 0;
     });
   },
 };
