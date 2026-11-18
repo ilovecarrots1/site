@@ -98,9 +98,9 @@ FTP password, provider API keys, the Telegram bot token. Keep them in
 conversation state or environment, never in a tracked file. This repo is
 public.
 
-## Where we are right now — v4.1.0
+## Where we are right now — v4.2.0
 
-- App is **v4.1.0**. `#/dev/audit` must show 12/12.
+- App is **v4.2.0**. `#/dev/audit` must show 12/12.
 - **210 compounds**: 148 legacy + 62 new in `compounds-g/h/i/j.js`
   (antidepressants/anxiolytics · hypnotics/neurosteroids · antipsychotics/
   anticonvulsants · addiction medicine/migraine/Parkinson's).
@@ -111,12 +111,25 @@ public.
   cerebellum folia) + neuron layer (24 axons, 17 somas, 24 pulses). Neuron ids
   resolve via `NEURON_MAP` — somas are NOT part of `REGIONS`, never use
   `REGION_MAP` for the neuron layer.
-- `#/brain` defaults to a **3D hologram** (`app/lib/brain3d.js`, hand-rolled
-  canvas renderer, zero deps): procedural gyrencephalic hemispheres,
-  cerebellum folia, brainstem, synapse sparks, drag-orbit + inertia + pinch
-  zoom, region hotspots wired to the same selection as the SVG. Toggle
-  "3D / Schematic" in the map toolbar. Honors reduced-motion (static until
-  interacted). Global polish pass lives at the bottom of `skin.css`.
+- `#/brain` defaults to a **pink anatomical SVG** (`app/data/brain-anatomy.js`,
+  28 clickable zones: 12 lateral + 21 medial/deep via the "Глубокие структуры"
+  toggle). Click/Enter → red highlight (`var(--bad)`) → the existing region
+  card through the same `select()`. Toolbar chips: Анатомия / 3D / Схема.
+- Secondary **3D mode** (`app/lib/brain3d.js`, hand-rolled canvas, zero deps):
+  full 360° hemispheres (azimuth fix — no more half-brain), pink palette,
+  drag-orbit + inertia + pinch zoom, hotspots wired to the same selection.
+  Lifecycle: the frame loop self-destructs when the canvas leaves the DOM,
+  and `brain.js` destroys the previous instance on re-mount (`live3d`).
+  Honors reduced-motion (static until interacted).
+- **UI chrome is Russian** (nav, home, compounds, lab, taper, settings, brain,
+  ui helpers, EVIDENCE labels, SEVERITY labels, disclaimers, toasts). Drug/
+  compound names, ids and `doseNote()` stay English — the dose-disclaimer
+  invariant regex is English on purpose.
+- **v4.2 static visual pass** at the bottom of `skin.css`: floating pill
+  bottom-nav with active pill, accent-tinted card surfaces, pill chips,
+  stronger button hierarchy, gradient hero headline (guarded by @supports),
+  accent eyebrows. The live-dot ring animation lives only in `skin.css`
+  (`nd-pulse`); the old `liveRing` keyframes were removed from `styles.css`.
 - Animation budget clean: transform/opacity only. Meter/bar fills use scaleX,
   live-dot ring uses scale, mech-link dashes use translateY on a pseudo.
 - PubMed key is user-supplied (Settings → Research), localStorage only.
@@ -143,8 +156,9 @@ public.
 
 1. ~~Verify the deploy~~ **done 2026-11-17**: `/`, `/manifest.json`, `/sw.js`,
    `/app/main.js`, `/promo.html` all 200 over HTTPS. After the v4 push:
-   hard-reload, open `#/dev/audit` (12/12, 210 compounds / 218 pairs), check
-   the neuron layer on `#/brain` (axons must be visible), install the PWA.
+   hard-reload, open `#/dev/audit` (12/12, 210 compounds / 218 pairs), tap a
+   zone on `#/brain` (anatomy default, red highlight + region card), flip
+   "Глубокие структуры", check the neuron layer in Схема mode, install the PWA.
 2. Optional: deploy `tools/ai-proxy-worker.js` with `npx wrangler deploy`
    (needs a Cloudflare account and the three secrets listed in the file).
 3. Optional: Telegram digest. Create a bot with @BotFather, then send messages
