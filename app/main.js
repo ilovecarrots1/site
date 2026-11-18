@@ -43,60 +43,60 @@ import { subscribePlate, wireSubscribe } from "./views/ui.js";
 
 const NAV = [
   {
-    section: "Study",
+    section: "Обучение",
     items: [
-      { id: "home", label: "Home", href: "#/", icon: "home" },
-      { id: "compounds", label: "Compounds", href: "#/compounds", icon: "pill", count: () => COMPOUNDS.length },
-      { id: "brain", label: "Brain map", href: "#/brain", icon: "brain", count: () => SYSTEMS.length },
-      { id: "learn", label: "Learn", href: "#/learn", icon: "book" },
-      { id: "cards", label: "Flashcards", href: "#/cards", icon: "layers", count: () => deckStats(FLASHCARDS).due || "" },
+      { id: "home", label: "Главная", href: "#/", icon: "home" },
+      { id: "compounds", label: "Препараты", href: "#/compounds", icon: "pill", count: () => COMPOUNDS.length },
+      { id: "brain", label: "Карта мозга", href: "#/brain", icon: "brain", count: () => SYSTEMS.length },
+      { id: "learn", label: "Обучение", href: "#/learn", icon: "book" },
+      { id: "cards", label: "Карточки", href: "#/cards", icon: "layers", count: () => deckStats(FLASHCARDS).due || "" },
     ],
   },
   {
-    section: "Clinic",
+    section: "Клиника",
     items: [
-      { id: "conditions", label: "Conditions", href: "#/conditions", icon: "shield", count: () => CONDITIONS.length },
-      { id: "bloodwork", label: "Bloodwork", href: "#/bloodwork", icon: "trend" },
-      { id: "pk", label: "PK timeline", href: "#/pk", icon: "activity" },
-      { id: "stack", label: "Stack builder", href: "#/stack", icon: "layers" },
-      { id: "symptoms", label: "Symptom finder", href: "#/symptoms", icon: "search" },
-      { id: "emergency", label: "Red flags", href: "#/emergency", icon: "alert" },
+      { id: "conditions", label: "Состояния", href: "#/conditions", icon: "shield", count: () => CONDITIONS.length },
+      { id: "bloodwork", label: "Анализы", href: "#/bloodwork", icon: "trend" },
+      { id: "pk", label: "PK-кривые", href: "#/pk", icon: "activity" },
+      { id: "stack", label: "Сборка стека", href: "#/stack", icon: "layers" },
+      { id: "symptoms", label: "Поиск по симптомам", href: "#/symptoms", icon: "search" },
+      { id: "emergency", label: "Красные флаги", href: "#/emergency", icon: "alert" },
     ],
   },
   {
-    section: "Atlas",
+    section: "Атлас",
     items: [
-      { id: "atlas", label: "Biochemical atlas", href: "#/atlas", icon: "atom", count: () => PATHWAYS.length },
-      { id: "organs", label: "Organ map", href: "#/organs", icon: "body", count: () => ORGANS.length },
-      { id: "map", label: "Convergence map", href: "#/map", icon: "dna", count: () => COMPOUNDS.length },
-      { id: "calc", label: "Peptide calculator", href: "#/calc", icon: "calculator" },
+      { id: "atlas", label: "Биохимический атлас", href: "#/atlas", icon: "atom", count: () => PATHWAYS.length },
+      { id: "organs", label: "Карта органов", href: "#/organs", icon: "body", count: () => ORGANS.length },
+      { id: "map", label: "Карта конвергенции", href: "#/map", icon: "dna", count: () => COMPOUNDS.length },
+      { id: "calc", label: "Калькулятор пептидов", href: "#/calc", icon: "calculator" },
     ],
   },
   {
-    section: "Tools",
+    section: "Инструменты",
     items: [
-      { id: "lab", label: "Dose lab", href: "#/lab", icon: "flask" },
-      { id: "taper", label: "Taper planner", href: "#/lab/taper", icon: "scale" },
-      { id: "compare", label: "Compare", href: "#/compare", icon: "grid" },
-      { id: "interactions", label: "Interactions", href: "#/lab/interactions", icon: "shield" },
-      { id: "evidence", label: "Evidence", href: "#/evidence", icon: "file" },
-      { id: "research", label: "Research", href: "#/research", icon: "microscope" },
-      { id: "ask", label: "Ask the index", href: "#/ask", icon: "sparkles" },
-      { id: "notes", label: "Notebook", href: "#/notes", icon: "edit", count: () => (store.data.notes || []).length || "" },
+      { id: "lab", label: "Лаборатория доз", href: "#/lab", icon: "flask" },
+      { id: "taper", label: "План снижения", href: "#/lab/taper", icon: "scale" },
+      { id: "compare", label: "Сравнение", href: "#/compare", icon: "grid" },
+      { id: "interactions", label: "Взаимодействия", href: "#/lab/interactions", icon: "shield" },
+      { id: "evidence", label: "Доказательность", href: "#/evidence", icon: "file" },
+      { id: "research", label: "Исследования", href: "#/research", icon: "microscope" },
+      { id: "ask", label: "Спроси индекс", href: "#/ask", icon: "sparkles" },
+      { id: "notes", label: "Блокнот", href: "#/notes", icon: "edit", count: () => (store.data.notes || []).length || "" },
     ],
   },
   {
     section: "",
-    items: [{ id: "settings", label: "Settings", href: "#/settings", icon: "settings" }],
+    items: [{ id: "settings", label: "Настройки", href: "#/settings", icon: "settings" }],
   },
 ];
 
 const MOBILE_NAV = [
-  { id: "home", label: "Home", href: "#/", icon: "home" },
-  { id: "compounds", label: "Compounds", href: "#/compounds", icon: "pill" },
-  { id: "brain", label: "Brain", href: "#/brain", icon: "brain" },
-  { id: "learn", label: "Learn", href: "#/learn", icon: "book" },
-  { id: "more", label: "More", icon: "menu", more: true },
+  { id: "home", label: "Главная", href: "#/", icon: "home" },
+  { id: "compounds", label: "Препараты", href: "#/compounds", icon: "pill" },
+  { id: "brain", label: "Мозг", href: "#/brain", icon: "brain" },
+  { id: "learn", label: "Обучение", href: "#/learn", icon: "book" },
+  { id: "more", label: "Ещё", icon: "menu", more: true },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -104,7 +104,7 @@ const MOBILE_NAV = [
 /* ------------------------------------------------------------------ */
 
 const BRAND = `<span class="brand-mark">${icon("brain", 17)}</span>
-  <span class="brand-text"><b>NeuroDifference</b><span>evidence · compounds</span></span>`;
+  <span class="brand-text"><b>NeuroDifference</b><span>доказательность · препараты</span></span>`;
 
 function sidebarHtml() {
   const s = store.data;
@@ -125,9 +125,9 @@ function sidebarHtml() {
     <div class="side-foot">
       ${subscribePlate({ compact: true })}
       <a class="side-xp" href="#/settings" style="text-decoration:none;color:inherit;display:block">
-        <div class="lv"><b>${lvl.level}</b><span>level · ${s.profile.xp || 0} XP</span></div>
+        <div class="lv"><b>${lvl.level}</b><span>уровень · ${s.profile.xp || 0} XP</span></div>
         <div class="meter"><i style="width:${Math.round((lvl.into / (lvl.need || 1)) * 100)}%"></i></div>
-        <div class="tiny dim" style="margin-top:6px">${s.profile.streak || 0}-day streak${s.profile.streak ? " 🔥" : ""}</div>
+        <div class="tiny dim" style="margin-top:6px">${s.profile.streak || 0} дн. подряд${s.profile.streak ? " 🔥" : ""}</div>
       </a>
     </div>
   </aside>`;
@@ -135,18 +135,18 @@ function sidebarHtml() {
 
 function topbarHtml() {
   return `<header class="topbar">
-    <button class="icon-btn menu-btn" id="btn-menu" aria-label="Open menu">${icon("menu", 20)}</button>
+    <button class="icon-btn menu-btn" id="btn-menu" aria-label="Открыть меню">${icon("menu", 20)}</button>
     <a class="brand" href="#/">${BRAND}</a>
-    <div class="topbar-title" id="topbar-title">Home</div>
+    <div class="topbar-title" id="topbar-title">Главная</div>
     <div class="topbar-actions">
-      <button class="icon-btn" id="btn-search" aria-label="Search">
+      <button class="icon-btn" id="btn-search" aria-label="Поиск">
         ${icon("search", 18)}
       </button>
-      <a class="icon-btn only-desktop" href="#/cards" aria-label="Flashcards due" style="position:relative">
+      <a class="icon-btn only-desktop" href="#/cards" aria-label="Карточки к повторению" style="position:relative">
         ${icon("layers", 18)}
         <span class="dot-badge" id="nav-cards-dot" data-due-dot></span>
       </a>
-      <a class="icon-btn only-desktop" href="#/settings" aria-label="Settings">${icon("settings", 18)}</a>
+      <a class="icon-btn only-desktop" href="#/settings" aria-label="Настройки">${icon("settings", 18)}</a>
     </div>
   </header>`;
 }
@@ -224,7 +224,7 @@ function openDrawer() {
     <div class="drawer">
       <a class="brand" href="#/" data-close>${BRAND}</a>
       ${NAV.map(
-        (group) => `${group.section ? `<h4>${esc(group.section)}</h4>` : `<h4>App</h4>`}
+        (group) => `${group.section ? `<h4>${esc(group.section)}</h4>` : `<h4>Приложение</h4>`}
           ${group.items
             .map(
               (it) => `<a class="d-item" href="${it.href}" data-nav="${it.id}" data-close>
@@ -236,7 +236,7 @@ function openDrawer() {
       ).join("")}
       <div style="margin-top:auto;padding-top:14px;display:grid;gap:10px">
         ${subscribePlate({ compact: true })}
-        <button class="btn ghost sm block" data-search>${icon("search", 14)} Search everything</button>
+        <button class="btn ghost sm block" data-search>${icon("search", 14)} Искать везде</button>
       </div>
     </div>`;
   document.body.appendChild(host);
@@ -263,9 +263,9 @@ function buildIndex() {
   const items = [];
   for (const c of COMPOUNDS) {
     items.push({
-      kind: "Compound",
+      kind: "Препарат",
       title: c.name,
-      sub: `${c.cls} · ${c.evidence} evidence`,
+      sub: `${c.cls} · ${c.evidence}`, 
       href: `#/compounds/${c.id}`,
       icon: "pill",
       hay: `${c.name} ${(c.aliases || []).join(" ")} ${c.cls} ${(c.tags || []).join(" ")}`.toLowerCase(),
@@ -273,9 +273,9 @@ function buildIndex() {
   }
   for (const s of SYSTEMS) {
     items.push({
-      kind: "System",
+      kind: "Система",
       title: s.name,
-      sub: s.tagline || "transmitter system",
+      sub: s.tagline || "нейромедиаторная система",
       href: `#/brain/${s.id}`,
       icon: "activity",
       hay: `${s.name} ${s.abbr} ${(s.matchFlags || []).join(" ")}`.toLowerCase(),
@@ -283,7 +283,7 @@ function buildIndex() {
   }
   for (const { course, lesson } of LESSONS_ALL) {
     items.push({
-      kind: "Lesson",
+      kind: "Урок",
       title: lesson.title,
       sub: course.title,
       href: `#/learn/${course.id}/${lesson.id}`,
@@ -292,19 +292,19 @@ function buildIndex() {
     });
   }
   for (const [label, href, ico, sub] of [
-    ["Home", "#/", "home", "dashboard"],
-    ["Flashcards", "#/cards", "layers", "spaced repetition"],
-    ["Brain map", "#/brain", "brain", "regions and pathways"],
-    ["Biochemical atlas", "#/atlas", "atom", "pathways, enzymes and targets"],
-    ["Organ map", "#/organs", "body", "organs, hormones and diseases"],
-    ["Convergence map", "#/map", "dna", "compound threads into regions"],
-    ["Peptide calculator", "#/calc", "calculator", "reconstitution arithmetic"],
-    ["Dose lab", "#/lab", "flask", "pharmacokinetics sandbox"],
-    ["Interaction checker", "#/lab/interactions", "shield", "stack safety"],
-    ["Evidence", "#/evidence", "file", "research topics"],
-    ["Ask", "#/ask", "sparkles", "retrieval assistant"],
-    ["Notebook", "#/notes", "edit", "your notes"],
-    ["Settings", "#/settings", "settings", "appearance and data"],
+    ["Главная", "#/", "home", "дашборд"],
+    ["Карточки", "#/cards", "layers", "интервальное повторение"],
+    ["Карта мозга", "#/brain", "brain", "регионы и пути"],
+    ["Биохимический атлас", "#/atlas", "atom", "пути, ферменты и мишени"],
+    ["Карта органов", "#/organs", "body", "органы, гормоны и болезни"],
+    ["Карта конвергенции", "#/map", "dna", "нити препаратов в регионы"],
+    ["Калькулятор пептидов", "#/calc", "calculator", "арифметика разведения"],
+    ["Лаборатория доз", "#/lab", "flask", "песочница фармакокинетики"],
+    ["Проверка взаимодействий", "#/lab/interactions", "shield", "безопасность стека"],
+    ["Доказательность", "#/evidence", "file", "исследовательские темы"],
+    ["Спроси индекс", "#/ask", "sparkles", "поисковый ассистент"],
+    ["Блокнот", "#/notes", "edit", "твои заметки"],
+    ["Настройки", "#/settings", "settings", "вид и данные"],
   ]) {
     items.push({ kind: "Page", title: label, sub, href, icon: ico, hay: `${label} ${sub}`.toLowerCase() });
   }
@@ -350,12 +350,12 @@ function openSearch() {
   overlay.className = "overlay";
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
-  overlay.setAttribute("aria-label", "Search everything");
+  overlay.setAttribute("aria-label", "Поиск по всему приложению");
   overlay.innerHTML = `<div class="overlay-panel">
     <div class="overlay-search">
       ${icon("search", 17)}
-      <input id="ov-input" type="text" placeholder="Search compounds, systems, lessons…" autocomplete="off" spellcheck="false">
-      <button class="icon-btn" data-close aria-label="Close">${icon("x", 16)}</button>
+      <input id="ov-input" type="text" placeholder="Препараты, системы, уроки…" autocomplete="off" spellcheck="false">
+      <button class="icon-btn" data-close aria-label="Закрыть">${icon("x", 16)}</button>
     </div>
     <div class="overlay-results" id="ov-results"></div>
   </div>`;
@@ -638,10 +638,10 @@ function renderRoute() {
     match.view.mount?.(host, ctx);
   } catch (err) {
     console.error("[neurodiff] view failed", err);
-    host.innerHTML = `<div class="card"><h3 style="margin-bottom:6px">This view failed to render</h3>
+    host.innerHTML = `<div class="card"><h3 style="margin-bottom:6px">Не удалось отрисовать этот экран</h3>
       <p class="small dim" style="line-height:1.6">${esc(err && err.message ? err.message : String(err))}</p>
-      <div class="row" style="gap:8px;margin-top:10px"><button class="btn ghost sm" onclick="location.reload()">Reload</button>
-      <a class="btn ghost sm" href="#/">Home</a></div></div>`;
+      <div class="row" style="gap:8px;margin-top:10px"><button class="btn ghost sm" onclick="location.reload()">Перезагрузить</button>
+      <a class="btn ghost sm" href="#/">Главная</a></div></div>`;
   }
 
   // Any view can render a subscribe plate; dismissal is delegated once here.
