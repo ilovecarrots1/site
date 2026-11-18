@@ -578,12 +578,12 @@ export const interactions = {
       if (ev.target.closest('[data-act="stack"]')) {
         const stack = store.data.stack || [];
         if (!stack.length) {
-          toast("Your stack is empty", "warn");
+          toast("Твой стек пуст", "warn");
           return;
         }
         for (const id of stack) addSubstance(id);
         paint();
-        toast(`Loaded ${stack.length} from your stack`, "success");
+        toast(`Загружено ${stack.length} из твоего стека`, "success");
       }
     });
 
