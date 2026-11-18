@@ -16,7 +16,7 @@ export function pageHead(title, sub, action = "", eyebrow = "") {
   </header>`;
 }
 
-export function backLink(href, label = "Back") {
+export function backLink(href, label = "Назад") {
   return `<a class="btn ghost sm" href="${esc(href)}" data-back="1">${icon("arrowLeft", 15)} ${esc(label)}</a>`;
 }
 
@@ -84,9 +84,9 @@ export function compoundCard(c) {
 function fmtHalf(h) {
   const n = Number(h);
   if (!Number.isFinite(n)) return "—";
-  if (n < 1) return `${Math.round(n * 60)} min`;
-  if (n < 48) return `${Math.round(n * 10) / 10} h`;
-  return `${Math.round((n / 24) * 10) / 10} d`;
+  if (n < 1) return `${Math.round(n * 60)} мин`;
+  if (n < 48) return `${Math.round(n * 10) / 10} ч`;
+  return `${Math.round((n / 24) * 10) / 10} дн`;
 }
 
 export function severityChip(sev) {
@@ -103,7 +103,7 @@ export function sectionCard(title, body, action = "", sub = "") {
   </section>`;
 }
 
-export function chipRow(items, activeValue, dataAttr, { allLabel = "All" } = {}) {
+export function chipRow(items, activeValue, dataAttr, { allLabel = "Все" } = {}) {
   return `<div class="row wrap" style="gap:6px">
     <button class="chip chip-btn ${!activeValue ? "on" : ""}" data-${dataAttr}="">${esc(allLabel)}</button>
     ${items
@@ -159,19 +159,19 @@ export function subscribePlate({ compact = false, dismissible = true, force = fa
   return `<div class="sub-plate ${compact ? "compact" : ""}" data-sub-plate>
     <span class="sp-ico">${icon("gift", compact ? 15 : 18)}</span>
     <div class="sp-copy">
-      <b>Free access — nothing is locked</b>
+      <b>Бесплатный доступ — ничего не закрыто</b>
       <span>${
         note ||
-        "Every monograph, pathway and quiz is open. Subscribe on Telegram for new compounds, study drops and release notes."
+        "Все монографии, пути и квизы открыты. Подпишись на Telegram: новые препараты, учебные дропы и заметки о релизах."
       }</span>
     </div>
     <div class="sp-actions">
       <a class="btn tg ${compact ? "xs" : "sm"}" href="${TELEGRAM_URL}" target="_blank" rel="noopener noreferrer">
-        ${icon("send", compact ? 13 : 14)} Subscribe
+        ${icon("send", compact ? 13 : 14)} Подписаться
       </a>
       ${
         dismissible
-          ? `<button class="icon-btn sp-close" data-sub-close aria-label="Dismiss subscribe plate" title="Dismiss">${icon("x", 15)}</button>`
+          ? `<button class="icon-btn sp-close" data-sub-close aria-label="Скрыть плашку подписки" title="Скрыть">${icon("x", 15)}</button>`
           : ""
       }
     </div>
@@ -195,7 +195,7 @@ export function wireSubscribe(root) {
       store.update((d) => {
         d.settings.subHidden = true;
       });
-      toast("Hidden — re-enable it in Settings", "info");
+      toast("Скрыто — вернуть можно в настройках", "info");
     } catch (e) {
       /* store failures must never break the click */
     }
