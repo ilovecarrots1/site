@@ -441,4 +441,170 @@ html[data-lab="1"] .meter::after {
 html[data-lab="1"] .bar-track { height: 7px; border-radius: 2px; background: var(--bg-3); border: 1px solid var(--line-soft); }
 html[data-lab="1"] .bar-track > i { border-radius: 1px; }
 
-/* __LAB_CHUNK_3__ */
+/* --- 12. Hero readout + instrument orb ------------------------------ */
+html[data-lab="1"] .hero-card {
+  background:
+    radial-gradient(90% 120% at 100% 0%, rgba(88, 166, 255, 0.14), transparent 58%),
+    linear-gradient(var(--lab-grid) 1px, transparent 1px) 0 0 / 34px 34px,
+    linear-gradient(90deg, var(--lab-grid) 1px, transparent 1px) 0 0 / 34px 34px,
+    var(--bg-1) !important;
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius-l);
+}
+html[data-lab="1"] .orb {
+  background:
+    radial-gradient(circle at 32% 28%, #fff 0%, rgba(255, 255, 255, 0.5) 12%, transparent 40%),
+    conic-gradient(from 0deg, var(--accent), var(--lab-teal), var(--lab-green), var(--accent));
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset, 0 10px 30px -10px var(--accent), 0 0 40px -12px var(--lab-teal);
+}
+html[data-lab="1"] .orb::before { border-color: var(--accent-line); }
+
+/* --- 13. Mechanism chain / lists / key-values ----------------------- */
+html[data-lab="1"] .mech-node {
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+html[data-lab="1"] .mech-node .mn-ico {
+  border-radius: 6px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+}
+html[data-lab="1"] .mech-node .mn-s { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+html[data-lab="1"] .mech-link { background: linear-gradient(180deg, var(--accent-line), transparent); }
+html[data-lab="1"] .list-row { border-bottom: 1px solid var(--line-soft); }
+html[data-lab="1"] .list-row:hover { background: var(--bg-2); }
+html[data-lab="1"] .list-row .sub { font-family: var(--mono); font-size: 11px; color: var(--text-3); }
+html[data-lab="1"] .kv dt { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+/* --- 14. Callouts / disclaimer / empty ------------------------------ */
+html[data-lab="1"] .callout {
+  background: var(--bg-1) !important;
+  border: 1px solid var(--line) !important;
+  border-left-width: 3px !important;
+  border-radius: 8px !important;
+}
+html[data-lab="1"] .callout-danger { border-left-color: var(--critical) !important; }
+html[data-lab="1"] .callout-warn { border-left-color: var(--warn) !important; }
+html[data-lab="1"] .callout-ok { border-left-color: var(--good) !important; }
+html[data-lab="1"] .callout-info { border-left-color: var(--accent) !important; }
+html[data-lab="1"] .disclaimer {
+  border-radius: 8px;
+  background: rgba(210, 153, 34, 0.06);
+  border: 1px solid rgba(210, 153, 34, 0.22);
+  border-left: 3px solid var(--warn);
+}
+html[data-lab="1"] .empty-ic { border-radius: 8px; background: var(--bg-2); border: 1px solid var(--line); }
+
+/* --- 15. Overlays / drawer / sheet / search results ----------------- */
+html[data-lab="1"] .overlay-panel {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-3);
+}
+html[data-lab="1"] .overlay-search { border-bottom: 1px solid var(--line); }
+html[data-lab="1"] .sr-group {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+html[data-lab="1"] .sr-item { border-radius: 7px; }
+html[data-lab="1"] .sr-item.active { background: var(--accent-soft); box-shadow: inset 2px 0 0 var(--accent); }
+html[data-lab="1"] .drawer {
+  background: var(--bg-1);
+  border-right: 1px solid var(--line);
+}
+html[data-lab="1"] .drawer .d-item { border-radius: 7px; }
+html[data-lab="1"] .drawer .d-item.active { background: var(--accent-soft); color: var(--accent); box-shadow: inset 2px 0 0 var(--accent); }
+html[data-lab="1"] .drawer h4 { font-family: var(--mono); letter-spacing: 0.08em; }
+html[data-lab="1"] .sheet {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l) var(--radius-l) 0 0;
+}
+
+/* --- 16. Toast: sharp panel + blue tick ----------------------------- */
+html[data-lab="1"] .toast {
+  border-radius: 8px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  box-shadow: var(--shadow-2);
+}
+html[data-lab="1"] .toast-success { border-left-color: var(--good); }
+html[data-lab="1"] .toast-danger { border-left-color: var(--critical); }
+html[data-lab="1"] .toast-warn { border-left-color: var(--warn); }
+
+/* --- 17. Subscribe plate / live dot / update bar -------------------- */
+html[data-lab="1"] .sub-plate {
+  background: var(--bg-1);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+}
+html[data-lab="1"] .sub-plate .sp-ico {
+  border-radius: 7px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-line);
+  color: var(--accent);
+}
+html[data-lab="1"] .sub-plate .btn.tg {
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  color: var(--accent-ink);
+  border-color: transparent;
+}
+html[data-lab="1"] .live-dot { color: var(--accent); font-family: var(--mono); letter-spacing: 0.08em; }
+html[data-lab="1"] .live-dot::before { border-radius: 1px; }
+html[data-lab="1"] .live-dot::after { border-radius: 1px; }
+html[data-lab="1"] .update-bar {
+  background: var(--bg-1);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+}
+
+/* --- 18. Brain / lab stage chrome (content fills untouched) --------- */
+html[data-lab="1"] #bm-stage,
+html[data-lab="1"] #bm-stage-3d,
+html[data-lab="1"] #bm-stage-anat {
+  background: var(--bg-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+/* --- 19. Scroll reveals stay single-animation ----------------------- */
+html[data-lab="1"] .nd-reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
+html[data-lab="1"] .nd-reveal.nd-in { opacity: 1; transform: none; }
+
+/* --- 20. Motion guards: reduced-motion + data-motion off ------------ */
+@media (prefers-reduced-motion: reduce) {
+  html[data-lab="1"] .bgfx i,
+  html[data-lab="1"] .orb::before,
+  html[data-lab="1"] .live-dot::after,
+  html[data-lab="1"] .meter > i,
+  html[data-lab="1"] .mech-link.anim::after,
+  html[data-lab="1"] .view { animation: none !important; }
+  html[data-lab="1"] .nd-reveal { opacity: 1 !important; transform: none !important; }
+  html[data-lab="1"] * { transition-duration: 0.01ms !important; }
+}
+html[data-lab="1"][data-motion="off"] .bgfx i,
+html[data-lab="1"][data-motion="off"] .orb::before,
+html[data-lab="1"][data-motion="off"] .live-dot::after,
+html[data-lab="1"][data-motion="off"] .meter > i,
+html[data-lab="1"][data-motion="off"] .mech-link.anim::after,
+html[data-lab="1"][data-motion="off"] .view { animation: none !important; }
+html[data-lab="1"][data-motion="off"] .nd-reveal { opacity: 1 !important; transform: none !important; }
+html[data-lab="1"][data-motion="off"] * { transition-duration: 0.01ms !important; }
+
+/* --- 21. Mobile safeguards (320px first) ---------------------------- */
+html[data-lab="1"] .grid-auto { grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); }
+html[data-lab="1"] .view { max-width: 1180px; }
+@media (max-width: 360px) {
+  html[data-lab="1"] .page-head h1 { font-size: 23px; }
+  html[data-lab="1"] .card { padding: 13px; }
+  html[data-lab="1"] .card::before { inset: 5px; }
+}
+
+/* end of experimental LAB skin */
