@@ -2,7 +2,7 @@
  * Zero dependencies. Small utilities, state store, markdown, icons, toasts.
  */
 
-export const VERSION = "3.0.0";
+export const VERSION = "4.0.0";
 
 /* ------------------------------------------------------------------ */
 /* DOM + string helpers                                                */
