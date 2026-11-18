@@ -376,7 +376,7 @@ function findingsHtml() {
         <div class="block-head" style="margin-bottom:8px">
           <div class="row" style="gap:7px">
             <span class="chip chip-${tone}">${esc(SEVERITY[sev].label)}</span>
-            <span class="tiny dim">${list.length} finding${list.length === 1 ? "" : "s"}</span>
+            <span class="tiny dim">находок: ${list.length}</span>
           </div>
         </div>
         <div class="stack" style="gap:8px">
@@ -385,7 +385,7 @@ function findingsHtml() {
               (f) => `<div class="card tight" style="border-left:2.5px solid var(--${sev === "critical" ? "critical" : sev === "major" ? "bad" : sev === "moderate" ? "warn" : "line"});border-radius:0 12px 12px 0">
                 <div class="row between" style="align-items:flex-start;gap:8px;margin-bottom:4px">
                   <strong style="font-size:13.5px;line-height:1.35">${esc(f.title)}</strong>
-                  ${f.source === "class" ? `<span class="tag nowrap" title="Derived from class flags, not a documented pair">class rule</span>` : ""}
+                  ${f.source === "class" ? `<span class="tag nowrap" title="Выведено из флагов класса, а не из задокументированной пары">правило класса</span>` : ""}
                 </div>
                 <div class="tiny dim" style="margin-bottom:6px;font-family:var(--mono)">${esc(f.a)} × ${esc(f.b)}</div>
                 <p class="small muted" style="line-height:1.55;margin-bottom:6px">${esc(f.mechanism)}</p>
@@ -407,15 +407,15 @@ function summaryHtml() {
   if (subs.length < 2) return "";
   const findings = checkInteractions(subs);
   const worst = worstSeverity(findings);
-  if (!worst) return `<div class="card tight"><div class="row" style="gap:8px"><span style="color:var(--good)">${icon("check", 15)}</span><span class="small muted">No findings for ${subs.length} substances.</span></div></div>`;
+  if (!worst) return `<div class="card tight"><div class="row" style="gap:8px"><span style="color:var(--good)">${icon("check", 15)}</span><span class="small muted">Находок нет для ${subs.length} веществ.</span></div></div>`;
   const map = {
-    critical: ["danger", "Do not combine", "This stack contains a contraindicated pairing."],
-    major: ["warn", "High risk", "At least one pairing needs clinical supervision."],
-    moderate: ["info", "Moderate risk", "Manageable, but timing and monitoring matter."],
-    minor: ["info", "Minor signals", "Worth knowing; unlikely to be dangerous alone."],
+    critical: ["danger", "Не комбинировать", "В этом стеке есть противопоказанная пара."],
+    major: ["warn", "Высокий риск", "Как минимум одна пара требует врачебного контроля."],
+    moderate: ["info", "Умеренный риск", "Управляемо, но важны время приёма и мониторинг."],
+    minor: ["info", "Слабые сигналы", "Полезно знать; сами по себе вряд ли опасны."],
   };
   const [kind, title, body] = map[worst];
-  return callout(kind, title, `${findings.length} finding${findings.length === 1 ? "" : "s"} across ${subs.length} substances. ${body}`);
+  return callout(kind, title, `Находок: ${findings.length} на ${subs.length} веществ. ${body}`);
 }
 
 export const interactions = {
@@ -427,18 +427,18 @@ export const interactions = {
     }
 
     return `
-    <div class="row" style="margin-bottom:12px">${backLink("#/lab", "Lab")}</div>
+    <div class="row" style="margin-bottom:12px">${backLink("#/lab", "Лаборатория")}</div>
     ${pageHead(
-      "Interaction checker",
-      "Two layers: documented pair rules, then class-flag rules for everything unstudied.",
-      `<button class="btn ghost sm" data-act="stack">${icon("plus", 14)} Load my stack</button>`
+      "Проверка взаимодействий",
+      "Два слоя: задокументированные парные правила, затем правила флагов классов для всего неизученного.",
+      `<button class="btn ghost sm" data-act="stack">${icon("plus", 14)} Загрузить мой стек</button>`
     )}
 
     <div class="card" style="margin-bottom:14px">
       <div class="stack" style="gap:10px">
         <div class="search-input">
           ${icon("search", 16)}
-          <input class="input" id="int-q" type="search" placeholder="Type a compound name…" autocomplete="off" enterkeyhint="add">
+          <input class="input" id="int-q" type="search" placeholder="Введи название препарата…" autocomplete="off" enterkeyhint="add">
         </div>
         <div class="row wrap" id="int-suggest" style="gap:5px"></div>
         <div class="row wrap" id="int-chips" style="gap:6px">
@@ -447,12 +447,12 @@ export const interactions = {
               const s = substanceOf(id);
               if (!s) return "";
               const extra = EXTRA_SUBSTANCES.some((x) => x.id === id);
-              return `<button class="chip chip-btn on" data-remove="${esc(id)}" title="Remove">${esc(s.name)} ${icon("x", 11)}${extra ? "" : ""}</button>`;
+              return `<button class="chip chip-btn on" data-remove="${esc(id)}" title="Убрать">${esc(s.name)} ${icon("x", 11)}${extra ? "" : ""}</button>`;
             })
-            .join("") || `<span class="tiny dim">Nothing selected yet.</span>`}
+            .join("") || `<span class="tiny dim">Пока ничего не выбрано.</span>`}
         </div>
         <div class="divider" style="margin:2px 0"></div>
-        <div class="eyebrow">Quick add</div>
+        <div class="eyebrow">Быстрое добавление</div>
         <div class="row wrap" style="gap:5px" id="int-quick">
           ${EXTRA_SUBSTANCES.map((s) => `<button class="chip chip-btn ${check.ids.includes(s.id) ? "on" : ""}" data-add="${esc(s.id)}">${esc(s.name)}</button>`).join("")}
           ${(store.data.stack || [])
@@ -463,8 +463,8 @@ export const interactions = {
             .join("")}
         </div>
         <div class="row" style="gap:8px">
-          <button class="btn ghost sm" data-act="clear">${icon("trash", 13)} Clear all</button>
-          <span class="tiny dim">${check.ids.length} selected</span>
+          <button class="btn ghost sm" data-act="clear">${icon("trash", 13)} Очистить всё</button>
+          <span class="tiny dim">выбрано: ${check.ids.length}</span>
         </div>
       </div>
     </div>
@@ -479,8 +479,8 @@ export const interactions = {
         <div class="row top" style="gap:8px">
           <span style="color:var(--warn);flex:none;margin-top:1px">${icon("alert", 15)}</span>
           <p class="tiny dim" style="line-height:1.6">
-            This engine encodes well-described pharmacology. It cannot see your genetics, kidneys, liver, blood pressure or the drug you forgot to mention.
-            A clean result is a starting point for a conversation, not a clearance to combine anything.
+            Этот движок кодирует хорошо описанную фармакологию. Он не видит твою генетику, почки, печень, давление и препарат, о котором ты забыл упомянуть.
+            Чистый результат — отправная точка для разговора, а не разрешение что-то комбинировать.
           </p>
         </div>
       </div>
@@ -489,14 +489,14 @@ export const interactions = {
     <section class="block" style="margin-top:22px">
       <div class="row between" style="margin-bottom:10px;gap:8px">
         <div>
-          <div class="eyebrow">Reference</div>
-          <strong style="font-size:16px">Phenomena glossary</strong>
+          <div class="eyebrow">Справка</div>
+          <strong style="font-size:16px">Глоссарий феноменов</strong>
         </div>
-        <span class="tiny dim nowrap">${PHENOMENA.length} terms</span>
+        <span class="tiny dim nowrap">терминов: ${PHENOMENA.length}</span>
       </div>
       <div class="search-input" style="margin-bottom:10px">
         ${icon("search", 16)}
-        <input class="input" id="phen-q" type="search" placeholder="Filter terms — withdrawal, QT, CYP…" autocomplete="off">
+        <input class="input" id="phen-q" type="search" placeholder="Фильтр терминов — отмена, QT, CYP…" autocomplete="off">
       </div>
       <div class="stack" id="phen-list" style="gap:8px">
         ${PHENOMENA.map(
@@ -509,7 +509,7 @@ export const interactions = {
           </details>`
         ).join("")}
       </div>
-      <div class="tiny dim" id="phen-none" hidden style="margin-top:8px">No matching term.</div>
+      <div class="tiny dim" id="phen-none" hidden style="margin-top:8px">Нет подходящего термина.</div>
     </section>`;
   },
 
@@ -530,10 +530,10 @@ export const interactions = {
             const s = substanceOf(id);
             return s ? `<button class="chip chip-btn on" data-remove="${esc(id)}">${esc(s.name)} ${icon("x", 11)}</button>` : "";
           })
-          .join("") || `<span class="tiny dim">Nothing selected yet.</span>`;
+          .join("") || `<span class="tiny dim">Пока ничего не выбрано.</span>`;
       quick.querySelectorAll("[data-add]").forEach((b) => b.classList.toggle("on", check.ids.includes(b.dataset.add)));
       const count = root.querySelector("[data-act=clear]")?.parentElement?.querySelector(".tiny");
-      if (count) count.textContent = `${check.ids.length} selected`;
+      if (count) count.textContent = `выбрано: ${check.ids.length}`;
     };
 
     input?.addEventListener("input", () => {
@@ -545,7 +545,7 @@ export const interactions = {
       const hits = searchCompounds(q).slice(0, 6);
       suggest.innerHTML = hits
         .map((c) => `<button class="chip chip-btn" data-add="${esc(c.id)}"><span class="dot" style="background:${classColor(c.cls)}"></span>${esc(c.name)}</button>`)
-        .join("") || `<span class="tiny dim">No match</span>`;
+        .join("") || `<span class="tiny dim">Нет совпадений</span>`;
     });
 
     input?.addEventListener("keydown", (ev) => {
