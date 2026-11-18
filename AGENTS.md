@@ -13,8 +13,8 @@ Editing files is the whole build step.
 - Router + shell: `app/main.js` (hash router)
 - Views: `app/views/*.js`, each exports `{ render(ctx), mount(root, ctx) }`
   or named exports that `main.js` special-cases
-- Data: `app/data/*.js` (compounds a-f, neuro, interactions, learn,
-  atlas, organs, brainmap, conditions a-c, bloodwork a-b, card-queries)
+- Data: `app/data/*.js` (compounds a-j, neuro, interactions + interactions-g,
+  learn, atlas, organs, brainmap, conditions a-c, bloodwork a-b, card-queries)
 - Styles: `app/styles.css`, `app/clinic.css`, `app/skin.css`
 - Service worker: `sw.js` (version constant lives at the top - bump it)
 
@@ -98,9 +98,24 @@ FTP password, provider API keys, the Telegram bot token. Keep them in
 conversation state or environment, never in a tracked file. This repo is
 public.
 
-## Where we are right now — 2026-11-17
+## Where we are right now — v4.0.0
 
-- App is **v3.0.0**, feature-complete. `#/dev/audit` must show 12/12.
+- App is **v4.0.0**. `#/dev/audit` must show 12/12.
+- **210 compounds**: 148 legacy + 62 new in `compounds-g/h/i/j.js`
+  (antidepressants/anxiolytics · hypnotics/neurosteroids · antipsychotics/
+  anticonvulsants · addiction medicine/migraine/Parkinson's).
+- **218 pair rules + 63 class rules** (`interactions.js` merges
+  `interactions-g.js`), 14 everyday substances, **28-term phenomena glossary**
+  with live filter at the bottom of `#/lab/interactions`.
+- Brain map rebuilt: layered SVG shell (45 gyri, 12 sulci, callosal, brainstem,
+  cerebellum folia) + neuron layer (24 axons, 17 somas, 24 pulses). Neuron ids
+  resolve via `NEURON_MAP` — somas are NOT part of `REGIONS`, never use
+  `REGION_MAP` for the neuron layer.
+- Animation budget clean: transform/opacity only. Meter/bar fills use scaleX,
+  live-dot ring uses scale, mech-link dashes use translateY on a pseudo.
+- PubMed key is user-supplied (Settings → Research), localStorage only.
+- `index-standalone.html` / `preview.html` are stale v3 single-file fallbacks;
+  the live app is the module build. `promo.html` / `promo-ru.html` untouched.
 - Hosting was migrated from SprintHost to **GitHub Pages**. Repo root is the site.
 - `CNAME` exists in the repo, so the custom domain `neurodifference.ru` is
   saved in Settings -> Pages.
@@ -121,8 +136,9 @@ public.
 ### Next steps for the next agent
 
 1. ~~Verify the deploy~~ **done 2026-11-17**: `/`, `/manifest.json`, `/sw.js`,
-   `/app/main.js`, `/promo.html` all 200 over HTTPS. Remaining check: open
-   `#/dev/audit` (12/12) and install the PWA from the custom domain.
+   `/app/main.js`, `/promo.html` all 200 over HTTPS. After the v4 push:
+   hard-reload, open `#/dev/audit` (12/12, 210 compounds / 218 pairs), check
+   the neuron layer on `#/brain` (axons must be visible), install the PWA.
 2. Optional: deploy `tools/ai-proxy-worker.js` with `npx wrangler deploy`
    (needs a Cloudflare account and the three secrets listed in the file).
 3. Optional: Telegram digest. Create a bot with @BotFather, then send messages
