@@ -394,7 +394,7 @@ export const settings = {
 
     root.querySelector("#set-sub")?.addEventListener("change", (ev) => {
       store.set("settings.subHidden", !ev.target.checked);
-      toast(ev.target.checked ? "Subscribe plate is back" : "Subscribe plate hidden", "info");
+      toast(ev.target.checked ? "Плашка подписки возвращена" : "Плашка подписки скрыта", "info");
       rerender();
     });
 
@@ -409,14 +409,14 @@ export const settings = {
 
     root.querySelector("#set-evidence")?.addEventListener("change", (ev) => {
       store.set("settings.evidence", ev.target.value);
-      toast("Evidence filter updated", "info");
+      toast("Фильтр доказательности обновлён", "info");
     });
 
     const caf = root.querySelector("#set-caf");
     caf?.addEventListener("input", () => {
       const v = Number(caf.value) || 5;
       const out = root.querySelector("#set-caf-val");
-      if (out) out.textContent = `${v}h`;
+      if (out) out.textContent = `${v} ч`;
       store.set("settings.caffeineHalfLife", v);
     });
 
@@ -430,10 +430,10 @@ export const settings = {
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 2000);
-      toast("Backup downloaded", "success");
+      toast("Бэкап скачан", "success");
     });
 
-    root.querySelector("#set-copy")?.addEventListener("click", () => copyText(store.export(), "State JSON copied"));
+    root.querySelector("#set-copy")?.addEventListener("click", () => copyText(store.export(), "JSON состояния скопирован"));
 
     const file = root.querySelector("#set-file");
     root.querySelector("#set-import")?.addEventListener("click", () => file?.click());
@@ -442,14 +442,14 @@ export const settings = {
       if (!f) return;
       try {
         const text = await f.text();
-        if (!confirm("Replace all current data with this backup?")) return;
+        if (!confirm("Заменить все текущие данные этим бэкапом?")) return;
         store.import(text);
         applyAppearance();
         window.dispatchEvent(new CustomEvent("nd:appearance"));
-        toast("Backup restored", "success");
+        toast("Бэкап восстановлен", "success");
         rerender();
       } catch (err) {
-        toast(`Import failed: ${err.message}`, "danger");
+        toast(`Импорт не удался: ${err.message}`, "danger");
       } finally {
         // Always clear, or picking the same file again fires no change event.
         file.value = "";
@@ -457,8 +457,8 @@ export const settings = {
     });
 
     root.querySelector("#set-reset")?.addEventListener("click", () => {
-      if (!confirm("Delete all progress, notes, stack and preferences on this device?")) return;
-      if (!confirm("Last check — this cannot be undone. Reset?")) return;
+      if (!confirm("Удалить весь прогресс, заметки, стек и настройки на этом устройстве?")) return;
+      if (!confirm("Последняя проверка — отменить нельзя. Сбросить?")) return;
       store.reset();
       applyAppearance();
       window.dispatchEvent(new CustomEvent("nd:appearance"));
