@@ -102,15 +102,15 @@ function curveSeries(c, overrides) {
 
 function fmtH(h) {
   if (!Number.isFinite(h)) return "—";
-  if (h < 1) return `${Math.round(h * 60)} min`;
-  if (h < 48) return `${Math.round(h * 10) / 10} h`;
-  return `${Math.round((h / 24) * 10) / 10} d`;
+  if (h < 1) return `${Math.round(h * 60)} мин`;
+  if (h < 48) return `${Math.round(h * 10) / 10} ч`;
+  return `${Math.round((h / 24) * 10) / 10} дн`;
 }
 
 function simChartHtml() {
   const a = curveSeries(getCompound(sim.id), sim);
   if (!a) {
-    return `<div class="card">${emptyState("flask", "Pick a compound", "Choose something with a known half-life to see its plasma curve.", "")}</div>`;
+    return `<div class="card">${emptyState("flask", "Выбери препарат", "Выбери вещество с известным полувыведением, чтобы увидеть кривую в плазме.", "")}</div>`;
   }
   const series = [{ color: "var(--accent)", points: a.result.pts }];
   let b = null;
@@ -124,20 +124,20 @@ function simChartHtml() {
 
   const maxT = Math.max(a.result.total, b?.result.total || 0);
   const step = maxT / 4;
-  const ticks = [0, step, step * 2, step * 3, step * 4].map((t) => ({ x: t, label: `${Math.round(t)}h` }));
+  const ticks = [0, step, step * 2, step * 3, step * 4].map((t) => ({ x: t, label: `${Math.round(t)} ч` }));
 
   const legend = `
     <div class="legend">
       <span><i style="background:var(--accent)"></i>${esc(a.c.name)}</span>
       ${b ? `<span><i style="background:var(--good)"></i>${esc(b.c.name)}</span>` : ""}
-      <span class="dim">schematic units · Vd ${Math.round(sim.vd)} L</span>
+      <span class="dim">схематичные единицы · Vd ${Math.round(sim.vd)} л</span>
     </div>`;
 
   return `<div class="card">
     <div class="card-head">
-      <h3 style="font-size:14px">Plasma concentration</h3>
+      <h3 style="font-size:14px">Концентрация в плазме</h3>
       <span class="spacer"></span>
-      <span class="tiny mono dim">${sim.doses} × ${esc(sim.dose)} ${esc(sim.unit)} q${Math.round(sim.interval)}h</span>
+      <span class="tiny mono dim">${sim.doses} × ${esc(sim.dose)} ${esc(sim.unit)} каждые ${Math.round(sim.interval)} ч</span>
     </div>
     ${lineChart(series, { height: 190, xTicks: ticks, yLabel: `${sim.unit}/L` })}
     ${legend}
@@ -150,10 +150,10 @@ function simMetricsHtml() {
   const r = a.result;
   return `
   <div class="grid grid-4" style="gap:10px">
-    ${statTile({ label: "C-max", value: `${r.cmax.toFixed(2)}`, sub: `${sim.unit}/L` })}
-    ${statTile({ label: "T-max", value: fmtH(r.tmax), sub: "model, not reference" })}
-    ${statTile({ label: "Accumulation", value: `${r.acc.toFixed(2)}×`, sub: `q${Math.round(sim.interval)}h` })}
-    ${statTile({ label: "Steady state", value: fmtH(a.halfLife * 5), sub: "≈5 half-lives" })}
+    ${statTile({ label: "C-макс", value: `${r.cmax.toFixed(2)}`, sub: `${sim.unit}/л` })}
+    ${statTile({ label: "T-макс", value: fmtH(r.tmax), sub: "модель, не справка" })}
+    ${statTile({ label: "Накопление", value: `${r.acc.toFixed(2)}×`, sub: `каждые ${Math.round(sim.interval)} ч` })}
+    ${statTile({ label: "Равновесие", value: fmtH(a.halfLife * 5), sub: "≈5 полувыведений" })}
   </div>`;
 }
 
@@ -172,11 +172,11 @@ export const lab = {
 
     return `
     ${pageHead(
-      "Lab",
-      "Model plasma levels before you touch anything. Numbers are a schematic, not a prescription.",
+      "Лаборатория",
+      "Моделируй уровни в плазме, прежде чем что-то трогать. Числа — схема, не назначение.",
       `<span class="row" style="gap:6px">
-        <a class="btn ghost sm" href="#/lab/interactions">${icon("shield", 14)} Interactions</a>
-        <a class="btn ghost sm" href="#/lab/taper">${icon("scale", 14)} Taper</a>
+        <a class="btn ghost sm" href="#/lab/interactions">${icon("shield", 14)} Взаимодействия</a>
+        <a class="btn ghost sm" href="#/lab/taper">${icon("scale", 14)} Снижение</a>
       </span>`
     )}
 
@@ -184,44 +184,44 @@ export const lab = {
       <div class="stack" style="gap:14px">
         <div class="card">
           <div class="stack" style="gap:12px">
-            <label class="field">Compound
+            <label class="field">Препарат
               <select class="select" id="sim-c">
                 ${DOSE_COMPOUNDS.map((x) => `<option value="${esc(x.id)}" ${x.id === sim.id ? "selected" : ""}>${esc(x.name)} — t½ ${fmtH(Number(x.pk.halfLife))}</option>`).join("")}
               </select>
             </label>
 
             <div class="grid grid-2" style="gap:10px">
-              <label class="field">Dose (${esc(sim.unit)})
+              <label class="field">Доза (${esc(sim.unit)})
                 <input class="input" id="sim-dose" type="number" inputmode="decimal" min="1" max="20000" step="any" value="${sim.dose}">
               </label>
-              <label class="field">Interval (h)
+              <label class="field">Интервал (ч)
                 <input class="input" id="sim-int" type="number" inputmode="numeric" min="0.5" max="168" step="0.5" value="${sim.interval}">
               </label>
-              <label class="field">Number of doses
+              <label class="field">Число доз
                 <input class="input" id="sim-n" type="number" inputmode="numeric" min="1" max="60" step="1" value="${sim.doses}">
               </label>
-              <label class="field">Half-life (h)
+              <label class="field">Полувыведение (ч)
                 <input class="input" id="sim-hl" type="number" inputmode="decimal" min="0.1" max="400" step="0.1" value="${Math.round((sim.halfLife || Number(c?.pk?.halfLife) || 5) * 10) / 10}">
               </label>
             </div>
 
-            <label class="field">Compare with (optional)
+            <label class="field">Сравнить с (опционально)
               <select class="select" id="sim-cmp">
-                <option value="">No comparison</option>
+                <option value="">Без сравнения</option>
                 ${compareOptions.map((x) => `<option value="${esc(x.id)}" ${sim.compare === x.id ? "selected" : ""}>${esc(x.name)} — t½ ${fmtH(Number(x.pk.halfLife))}</option>`).join("")}
               </select>
             </label>
 
             <div class="row wrap" style="gap:6px">
               ${[
-                ["q8h", 8],
-                ["q12h", 12],
-                ["q24h", 24],
-                ["Weekly", 168],
+                ["8 ч", 8],
+                ["12 ч", 12],
+                ["24 ч", 24],
+                ["Раз в неделю", 168],
               ]
                 .map(([label, h]) => `<button class="chip chip-btn ${sim.interval === h ? "on" : ""}" data-int="${h}">${label}</button>`)
                 .join("")}
-              <button class="btn ghost sm" data-act="reset" style="margin-left:auto">${icon("refresh", 13)} Reset</button>
+              <button class="btn ghost sm" data-act="reset" style="margin-left:auto">${icon("refresh", 13)} Сброс</button>
             </div>
 
             ${c ? `<div class="divider"></div>
@@ -236,31 +236,31 @@ export const lab = {
         <div id="sim-out">${simBody()}</div>
 
         <div class="card tight">
-          <div class="eyebrow" style="margin-bottom:6px">Model honesty</div>
+          <div class="eyebrow" style="margin-bottom:6px">Честность модели</div>
           <p class="small muted" style="line-height:1.6">
-            One compartment, first-order absorption and elimination, no protein binding, no active metabolites, no saturation.
-            Real kinetics can differ several-fold between people — CYP polymorphisms alone move plasma levels by an order of magnitude.
+            Один компартмент, всасывание и выведение первого порядка, без связывания с белками, без активных метаболитов, без насыщения.
+            Реальная кинетика может отличаться в разы между людьми — одни только полиморфизмы CYP двигают уровни в плазме на порядок.
           </p>
         </div>
       </div>
 
       <aside class="col sticky-side" style="gap:14px">
         ${c ? `<div class="card">
-          <div class="eyebrow" style="margin-bottom:7px">Reference kinetics</div>
+          <div class="eyebrow" style="margin-bottom:7px">Справочная кинетика</div>
           <dl class="kv">
-            <dt>Half-life</dt><dd>${c.pk.halfLife ? fmtH(Number(c.pk.halfLife)) : "—"}</dd>
-            <dt>T-max</dt><dd>${c.pk.tmax ? fmtH(Number(c.pk.tmax)) : "—"}</dd>
-            <dt>Duration</dt><dd>${c.pk.duration ? fmtH(Number(c.pk.duration)) : "—"}</dd>
-            <dt>Metabolism</dt><dd>${esc(c.pk.metabolism || "—")}</dd>
-            <dt>Excretion</dt><dd>${esc(c.pk.excretion || "—")}</dd>
+            <dt>Полувыведение</dt><dd>${c.pk.halfLife ? fmtH(Number(c.pk.halfLife)) : "—"}</dd>
+            <dt>T-макс</dt><dd>${c.pk.tmax ? fmtH(Number(c.pk.tmax)) : "—"}</dd>
+            <dt>Длительность</dt><dd>${c.pk.duration ? fmtH(Number(c.pk.duration)) : "—"}</dd>
+            <dt>Метаболизм</dt><dd>${esc(c.pk.metabolism || "—")}</dd>
+            <dt>Выведение</dt><dd>${esc(c.pk.excretion || "—")}</dd>
           </dl>
-          ${(c.doses || []).length ? `<div class="divider"></div><div class="eyebrow" style="margin-bottom:6px">Literature doses</div>
+          ${(c.doses || []).length ? `<div class="divider"></div><div class="eyebrow" style="margin-bottom:6px">Дозы из литературы</div>
           <div class="stack" style="gap:5px">${c.doses
-            .map((d) => `<div class="row between tiny"><span class="muted">${esc(d.route || "oral")}</span><span class="mono">${esc(d.low)}${d.high && d.high !== d.low ? `–${esc(d.high)}` : ""} ${esc(d.unit || "mg")}</span></div>`)
+            .map((d) => `<div class="row between tiny"><span class="muted">${esc(d.route || "внутрь")}</span><span class="mono">${esc(d.low)}${d.high && d.high !== d.low ? `–${esc(d.high)}` : ""} ${esc(d.unit || "mg")}</span></div>`)
             .join("")}</div>` : ""}
         </div>` : ""}
 
-        ${c ? `<div>${callout("warn", "Half-life is not duration", "A compound can feel active long after plasma levels fall — or feel inactive while levels are high. Effects and kinetics are different questions.")}</div>` : ""}
+        ${c ? `<div>${callout("warn", "Полувыведение — не длительность", "Вещество может ощущаться активным долго после падения уровней в плазме — или не ощущаться, пока уровни высоки. Эффекты и кинетика — разные вопросы.")}</div>` : ""}
       </aside>
     </div>`;
   },
@@ -325,7 +325,7 @@ export const lab = {
         setVal("#sim-n", sim.doses);
         setVal("#sim-hl", Math.round(sim.halfLife * 10) / 10);
         repaint();
-        toast("Simulator reset", "info");
+        toast("Симулятор сброшен", "info");
       }
     });
   },
@@ -355,15 +355,15 @@ function findingsHtml() {
   if (subs.length < 2) {
     return `<div class="card">${emptyState(
       "shield",
-      "Add at least two substances",
-      `The engine combines ${PAIR_RULES.length} explicit pair rules with class-level flag rules, so unstudied combinations still surface risk.`,
-      `<a class="btn soft sm" href="#/compounds">${icon("search", 14)} Browse compounds</a>`
+      "Добавь минимум два вещества",
+      `Движок сочетает ${PAIR_RULES.length} явных парных правил с правилами флагов на уровне классов, поэтому даже неизученные комбинации показывают риск.`,
+      `<a class="btn soft sm" href="#/compounds">${icon("search", 14)} К препаратам</a>`
     )}</div>`;
   }
   const findings = checkInteractions(subs);
   if (!findings.length) {
     return `<div class="card">
-      ${emptyState("check", "No known interaction", "Nothing in the rule base links these substances. That means “not documented”, not “safe” — unstudied combinations are the norm, not the exception.")}
+      ${emptyState("check", "Известных взаимодействий нет", "Ничто в базе правил не связывает эти вещества. Это значит «не задокументировано», а не «безопасно» — неизученные комбинации это норма, а не исключение.")}
     </div>`;
   }
   const groups = ["critical", "major", "moderate", "minor"];
