@@ -98,9 +98,9 @@ FTP password, provider API keys, the Telegram bot token. Keep them in
 conversation state or environment, never in a tracked file. This repo is
 public.
 
-## Where we are right now — v4.0.0
+## Where we are right now — v4.1.0
 
-- App is **v4.0.0**. `#/dev/audit` must show 12/12.
+- App is **v4.1.0**. `#/dev/audit` must show 12/12.
 - **210 compounds**: 148 legacy + 62 new in `compounds-g/h/i/j.js`
   (antidepressants/anxiolytics · hypnotics/neurosteroids · antipsychotics/
   anticonvulsants · addiction medicine/migraine/Parkinson's).
@@ -111,6 +111,12 @@ public.
   cerebellum folia) + neuron layer (24 axons, 17 somas, 24 pulses). Neuron ids
   resolve via `NEURON_MAP` — somas are NOT part of `REGIONS`, never use
   `REGION_MAP` for the neuron layer.
+- `#/brain` defaults to a **3D hologram** (`app/lib/brain3d.js`, hand-rolled
+  canvas renderer, zero deps): procedural gyrencephalic hemispheres,
+  cerebellum folia, brainstem, synapse sparks, drag-orbit + inertia + pinch
+  zoom, region hotspots wired to the same selection as the SVG. Toggle
+  "3D / Schematic" in the map toolbar. Honors reduced-motion (static until
+  interacted). Global polish pass lives at the bottom of `skin.css`.
 - Animation budget clean: transform/opacity only. Meter/bar fills use scaleX,
   live-dot ring uses scale, mech-link dashes use translateY on a pseudo.
 - PubMed key is user-supplied (Settings → Research), localStorage only.
