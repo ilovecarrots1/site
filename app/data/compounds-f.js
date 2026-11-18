@@ -526,7 +526,7 @@ export const COMPOUNDS_F = [
       good: ["Potent anabolic signalling", "Improved nutrient partitioning", "Hypoglycaemic effect"],
       bad: ["Severe hypoglycaemia", "Intestinal and organ growth in animal models", "Acromegalic tissue changes", "Joint pain"],
     },
-    flags: ["peptide", "igf1", "anabolic", "hypoglycaemic", "research"],
+    flags: ["peptide", "igf1", "gh-axis", "anabolic", "hypoglycaemic", "research"],
     warnings: [
       "Causes hypoglycaemia: this is the main acute-risk mechanism and it can be severe",
       "IGF-1 drives proliferation in many tissues; mitogenicity is not a theoretical concern",
