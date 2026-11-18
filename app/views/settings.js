@@ -10,22 +10,22 @@ import { pubmedKey, setPubmedKey } from "../lib/pubmed.js";
 import { pageHead, callout, subscribePlate } from "./ui.js";
 
 const ACCENTS = [
-  ["violet", "Violet", "#8b7bff"],
-  ["amber", "Amber", "#f2b23e"],
-  ["teal", "Teal", "#2dd4bf"],
-  ["rose", "Rose", "#fb7185"],
-  ["green", "Green", "#4ade80"],
-  ["blue", "Blue", "#60a5fa"],
-  ["cyan", "Cyan", "#22d3ee"],
-  ["lime", "Lime", "#a3e635"],
-  ["orange", "Orange", "#fb923c"],
-  ["magenta", "Magenta", "#e879f9"],
+  ["violet", "Фиолетовый", "#8b7bff"],
+  ["amber", "Янтарный", "#f2b23e"],
+  ["teal", "Бирюзовый", "#2dd4bf"],
+  ["rose", "Розовый", "#fb7185"],
+  ["green", "Зелёный", "#4ade80"],
+  ["blue", "Синий", "#60a5fa"],
+  ["cyan", "Циан", "#22d3ee"],
+  ["lime", "Лаймовый", "#a3e635"],
+  ["orange", "Оранжевый", "#fb923c"],
+  ["magenta", "Маджента", "#e879f9"],
 ];
 
 const SKINS = [
-  ["aurora", "Aurora glass", "Soft light behind frosted cards"],
-  ["scope", "Oscilloscope", "Phosphor traces on a gridded scope"],
-  ["prism", "Prism", "Spectral gradients, harder edges"],
+  ["aurora", "Аврора", "Мягкий свет за матовыми карточками"],
+  ["scope", "Осциллограф", "Фосфорные трассы на сетке"],
+  ["prism", "Призма", "Спектральные градиенты, жёсткие края"],
 ];
 
 /* ---- accent maths ---------------------------------------------------- */
@@ -72,8 +72,8 @@ export function accentTokens(hex) {
 }
 
 const DENSITIES = [
-  ["comfortable", "Comfortable"],
-  ["compact", "Compact"],
+  ["comfortable", "Просторная"],
+  ["compact", "Компактная"],
 ];
 
 export function applyAppearance() {
@@ -112,16 +112,16 @@ function settingRow({ title, sub, control }) {
 
 function stackHtml() {
   const stack = (store.data.stack || []).map((id) => getCompound(id)).filter(Boolean);
-  if (!stack.length) return `<p class="tiny dim">Your stack is empty. Add compounds from any entry page to track what you actually take.</p>`;
+  if (!stack.length) return `<p class="tiny dim">Стек пуст. Добавляй препараты со страниц записей, чтобы отслеживать, что реально принимаешь.</p>`;
   return `<div class="row wrap" style="gap:5px">
     ${stack
       .map(
         (c) => `<span class="chip"><span class="dot" style="background:var(--accent)"></span>${esc(c.name)}
-          <button class="x" data-unstack="${esc(c.id)}" aria-label="Remove ${esc(c.name)}" style="margin-left:3px;opacity:.6">${icon("x", 11)}</button>
+          <button class="x" data-unstack="${esc(c.id)}" aria-label="Убрать ${esc(c.name)}" style="margin-left:3px;opacity:.6">${icon("x", 11)}</button>
         </span>`
       )
       .join("")}
-    <a class="btn ghost xs" href="#/lab/interactions">${icon("shield", 12)} Check interactions</a>
+    <a class="btn ghost xs" href="#/lab/interactions">${icon("shield", 12)} Проверить взаимодействия</a>
   </div>`;
 }
 
@@ -136,7 +136,7 @@ export const settings = {
     const stack = (s.stack || []).length;
 
     return `
-    ${pageHead("Settings", "Everything is stored locally in this browser. No account, no sync, no tracking.", "")}
+    ${pageHead("Настройки", "Всё хранится локально в этом браузере. Без аккаунта, без синхронизации, без слежки.", "")}
 
     <div style="margin-bottom:16px">${subscribePlate()}</div>
 
@@ -144,9 +144,9 @@ export const settings = {
       <div class="col" style="gap:16px">
 
         <section class="card">
-          <div class="card-head"><h3>Appearance</h3><span class="spacer"></span><span class="tag">applies instantly</span></div>
+          <div class="card-head"><h3>Внешний вид</h3><span class="spacer"></span><span class="tag">применяется сразу</span></div>
           <div class="block">
-            <div class="eyebrow" style="margin-bottom:7px">Skin</div>
+            <div class="eyebrow" style="margin-bottom:7px">Скин</div>
             <div class="skin-pick" id="set-skin">
               ${SKINS.map(
                 ([key, label, sub]) => `<button class="skin-card ${(st.skin || "aurora") === key ? "on" : ""}" data-skin="${key}">
@@ -158,7 +158,7 @@ export const settings = {
             </div>
           </div>
           <div class="block">
-            <div class="eyebrow" style="margin-bottom:7px">Accent</div>
+            <div class="eyebrow" style="margin-bottom:7px">Акцент</div>
             <div class="row wrap" style="gap:7px" id="set-accent">
               ${ACCENTS.map(
                 ([key, label, hex]) => `<button class="chip chip-btn ${!st.accentHex && (st.accent || "violet") === key ? "on" : ""}" data-accent="${key}">
@@ -170,101 +170,101 @@ export const settings = {
               <span class="hs-swatch" id="set-hex-swatch" style="background:${esc(accentTokens(st.accentHex) ? accentTokens(st.accentHex).accent : "#8b7bff")}"></span>
               <input class="input mono" id="set-hex" type="text" spellcheck="false" autocapitalize="off" autocomplete="off"
                 placeholder="#8b7bff" maxlength="7" value="${esc(st.accentHex || "")}" style="width:104px;font-size:12px;text-align:center">
-              <button class="btn soft xs" id="set-hex-apply" type="button">Apply</button>
-              <button class="btn ghost xs" id="set-hex-clear" type="button">Auto</button>
-              <span class="tiny dim" id="set-hex-note">${st.accentHex ? "custom" : "luminance-normalised on apply"}</span>
+              <button class="btn soft xs" id="set-hex-apply" type="button">Применить</button>
+              <button class="btn ghost xs" id="set-hex-clear" type="button">Авто</button>
+              <span class="tiny dim" id="set-hex-note">${st.accentHex ? "свой" : "яркость нормализуется при применении"}</span>
             </div>
           </div>
           <div class="block">
-            <div class="eyebrow" style="margin-bottom:7px">Density</div>
+            <div class="eyebrow" style="margin-bottom:7px">Плотность</div>
             <div class="btn-group" id="set-density">
               ${DENSITIES.map(([key, label]) => `<button class="chip chip-btn ${st.density === key ? "on" : ""}" data-density="${key}">${label}</button>`).join("")}
             </div>
           </div>
           ${settingRow({
-            title: "Motion",
-            sub: "Pulse animations on the brain map and hover transitions. Turn off to save battery.",
+            title: "Анимации",
+            sub: "Пульсация на карте мозга и hover-переходы. Выключи, чтобы экономить батарею.",
             control: `<label class="switch"><input type="checkbox" id="set-motion" ${st.motion !== false ? "checked" : ""}><span></span></label>`,
           })}
           ${settingRow({
-            title: "Subscribe plate",
-            sub: "The “free access” banner with the Telegram link. You can hide it — nothing in the app is locked either way.",
+            title: "Плашка подписки",
+            sub: "Баннер «бесплатный доступ» со ссылкой на Telegram. Можно скрыть — ничего в приложении от этого не закроется.",
             control: `<label class="switch"><input type="checkbox" id="set-sub" ${st.subHidden ? "" : "checked"}><span></span></label>`,
           })}
           ${settingRow({
-            title: "Text size",
-            sub: "Scales every view. Useful at 110–115% on small phones.",
+            title: "Размер текста",
+            sub: "Масштабирует все экраны. На маленьких телефонах удобно 110–115%.",
             control: `<div class="row" style="gap:8px"><input class="range" type="range" min="85" max="120" step="5" value="${clamp(Number(st.scale) || 100, 85, 120)}" id="set-scale" style="width:110px"><span class="tiny mono" id="set-scale-val" style="width:38px;text-align:right">${clamp(Number(st.scale) || 100, 85, 120)}%</span></div>`,
           })}
         </section>
 
         <section class="card">
-          <div class="card-head"><h3>Study</h3></div>
+          <div class="card-head"><h3>Обучение</h3></div>
           ${settingRow({
-            title: "Evidence filter",
-            sub: "Hide compounds whose evidence grade is below the threshold you pick. Applies to the compound list.",
+            title: "Фильтр доказательности",
+            sub: "Скрывать препараты ниже выбранного порога доказательности. Применяется к списку препаратов.",
             control: `<select class="select" id="set-evidence" style="width:auto">
               ${[
-                ["all", "Show all"],
-                ["anecdotal", "Anecdotal and up"],
-                ["preclinical", "Preclinical and up"],
-                ["limited", "Limited and up"],
-                ["moderate", "Moderate and up"],
-                ["strong", "Strong only"],
+                ["all", "Показывать все"],
+                ["anecdotal", "От анекдотических"],
+                ["preclinical", "От доклинических"],
+                ["limited", "От ограниченных"],
+                ["moderate", "От умеренных"],
+                ["strong", "Только сильные"],
               ]
                 .map(([v, l]) => `<option value="${v}" ${st.evidence === v ? "selected" : ""}>${l}</option>`)
                 .join("")}
             </select>`,
           })}
           ${settingRow({
-            title: "Caffeine half-life",
-            sub: "CYP1A2 activity varies roughly 2–9 h between people. Changes the default caffeine curve in the lab.",
-            control: `<div class="row" style="gap:8px"><input class="range" type="range" min="2" max="9" step="0.5" value="${Number(st.caffeineHalfLife) || 5}" id="set-caf" style="width:110px"><span class="tiny mono" id="set-caf-val" style="width:34px;text-align:right">${Number(st.caffeineHalfLife) || 5}h</span></div>`,
+            title: "Полувыведение кофеина",
+            sub: "Активность CYP1A2 у людей варьирует примерно 2–9 ч. Меняет кривую кофеина по умолчанию в лаборатории.",
+            control: `<div class="row" style="gap:8px"><input class="range" type="range" min="2" max="9" step="0.5" value="${Number(st.caffeineHalfLife) || 5}" id="set-caf" style="width:110px"><span class="tiny mono" id="set-caf-val" style="width:34px;text-align:right">${Number(st.caffeineHalfLife) || 5} ч</span></div>`,
           })}
         </section>
 
         <section class="card">
-          <div class="card-head"><h3>Your stack</h3><span class="spacer"></span><a class="tiny" href="#/compounds">Add compounds</a></div>
+          <div class="card-head"><h3>Твой стек</h3><span class="spacer"></span><a class="tiny" href="#/compounds">Добавить препараты</a></div>
           <div class="block">${stackHtml()}</div>
         </section>
 
         <section class="card">
-          <div class="card-head"><h3>Data</h3><span class="spacer"></span><span class="tag">local only</span></div>
+          <div class="card-head"><h3>Данные</h3><span class="spacer"></span><span class="tag">только локально</span></div>
           <div class="block stack" style="gap:10px">
             <div class="row wrap" style="gap:8px">
-              <button class="btn soft sm" id="set-export">${icon("download", 14)} Export backup</button>
-              <button class="btn ghost sm" id="set-import">${icon("upload", 14)} Import</button>
-              <button class="btn ghost sm" id="set-copy">${icon("copy", 14)} Copy JSON</button>
+              <button class="btn soft sm" id="set-export">${icon("download", 14)} Экспорт бэкапа</button>
+              <button class="btn ghost sm" id="set-import">${icon("upload", 14)} Импорт</button>
+              <button class="btn ghost sm" id="set-copy">${icon("copy", 14)} Копировать JSON</button>
             </div>
             <input type="file" id="set-file" accept="application/json,.json" hidden>
             <div>
-              <button class="btn danger sm" id="set-reset">${icon("trash", 14)} Reset everything</button>
-              <p class="tiny dim" style="margin-top:6px;line-height:1.5">Deletes XP, streak, lesson progress, flashcards schedule, stack, notes and saved items. Cannot be undone.</p>
+              <button class="btn danger sm" id="set-reset">${icon("trash", 14)} Сбросить всё</button>
+              <p class="tiny dim" style="margin-top:6px;line-height:1.5">Удаляет XP, серию, прогресс уроков, расписание карточек, стек, заметки и сохранённое. Отменить нельзя.</p>
             </div>
           </div>
         </section>
 
         <section class="card">
-          <div class="card-head"><h3>Research</h3><span class="spacer"></span><span class="tag">optional</span></div>
+          <div class="card-head"><h3>Исследования</h3><span class="spacer"></span><span class="tag">опционально</span></div>
           ${settingRow({
             title: "PubMed API key",
-            sub: "Your own NCBI E-utilities key raises live search from 3 to 10 requests per second. Stored only on this device — never sent anywhere except NCBI. Everything works without it.",
-            control: `<div class=\"row\" style=\"gap:6px\"><input class=\"input mono\" id=\"set-pubmed-key\" type=\"password\" spellcheck=\"false\" autocomplete=\"off\" placeholder=\"NCBI key (optional)\" value=\"${esc(pubmedKey())}\" style=\"width:190px\"><button class=\"btn soft sm\" id=\"set-pubmed-save\">Save</button></div>`,
+            sub: "Свой ключ NCBI E-utilities поднимает живой поиск с 3 до 10 запросов в секунду. Хранится только на этом устройстве и отправляется только в NCBI. Без ключа всё работает.",
+            control: `<div class=\"row\" style=\"gap:6px\"><input class=\"input mono\" id=\"set-pubmed-key\" type=\"password\" spellcheck=\"false\" autocomplete=\"off\" placeholder=\"Ключ NCBI (опционально)\" value=\"${esc(pubmedKey())}\" style=\"width:190px\"><button class=\"btn soft sm\" id=\"set-pubmed-save\">Сохранить</button></div>`,
           })}
         </section>
 
         <section class="card">
-          <div class="card-head"><h3>About</h3></div>
+          <div class="card-head"><h3>О приложении</h3></div>
           <div class="block stack" style="gap:8px">
-            <p class="small muted" style="line-height:1.6">NeuroDifference is a personal study tool: an evidence-graded compound encyclopedia, a transmitter atlas, a pharmacokinetic sandbox and a spaced-repetition course set. It is not a medical device.</p>
-            ${callout("danger", "Not medical advice", "Nothing here is a recommendation to take, combine, taper or stop any substance. Dosages are reference figures from the literature, not prescriptions. Talk to a clinician who knows your history.")}
+            <p class="small muted" style="line-height:1.6">NeuroDifference — личный учебный инструмент: энциклопедия препаратов с градацией доказательности, атлас нейромедиаторов, песочница фармакокинетики и курсы с интервальным повторением. Это не медицинское изделие.</p>
+            ${callout("danger", "Не медицинская рекомендация", "Ничто здесь не является рекомендацией принимать, комбинировать, снижать или отменять какое-либо вещество. Дозировки — справочные величины из литературы, не назначения. Поговори с врачом, который знает твою историю.")}
             <div class="row wrap" style="gap:5px;margin-top:2px">
-              <span class="chip">v4.1.0</span>
-              <span class="chip">${COMPOUNDS.length} compounds</span>
-              <span class="chip">${SYSTEMS.length} systems</span>
-              <span class="chip">${TOTAL_LESSONS} lessons</span>
-              <span class="chip">${FLASHCARDS.length} cards</span>
-              <span class="chip">${PAIR_RULES.length + FLAG_RULES.length} interaction rules</span>
+              <span class="chip">v4.2.0</span>
+              <span class="chip">${COMPOUNDS.length} препаратов</span>
+              <span class="chip">${SYSTEMS.length} систем</span>
+              <span class="chip">${TOTAL_LESSONS} уроков</span>
+              <span class="chip">${FLASHCARDS.length} карточек</span>
+              <span class="chip">${PAIR_RULES.length + FLAG_RULES.length} правил взаимодействий</span>
             </div>
           </div>
         </section>
@@ -272,30 +272,30 @@ export const settings = {
 
       <aside class="col sticky-side" style="gap:12px">
         <div class="card">
-          <div class="eyebrow" style="margin-bottom:8px">Your progress</div>
+          <div class="eyebrow" style="margin-bottom:8px">Твой прогресс</div>
           <div class="row between" style="margin-bottom:6px">
-            <span style="font-size:13px;font-weight:600">Level ${lvl.level}</span>
+            <span style="font-size:13px;font-weight:600">Уровень ${lvl.level}</span>
             <span class="tiny mono dim">${s.profile.xp || 0} XP</span>
           </div>
           <div class="meter" style="margin-bottom:10px"><i style="width:${Math.round((lvl.into / (lvl.need || 1)) * 100)}%"></i></div>
-          <div class="kv"><span>Streak</span><span>${s.profile.streak || 0} day${(s.profile.streak || 0) === 1 ? "" : "s"}</span></div>
-          <div class="kv"><span>Lessons done</span><span>${lessonsDone} / ${TOTAL_LESSONS}</span></div>
-          <div class="kv"><span>Quiz accuracy</span><span>${s.profile.quizzes ? Math.round((s.profile.correct / s.profile.quizzes) * 100) : 0}%</span></div>
-          <div class="kv"><span>Cards due</span><span>${cards.due}</span></div>
-          <div class="kv"><span>Saved</span><span>${saved}</span></div>
-          <div class="kv"><span>In stack</span><span>${stack}</span></div>
-          <div class="kv"><span>Notes</span><span>${(s.notes || []).length}</span></div>
+          <div class="kv"><span>Серия</span><span>${s.profile.streak || 0} дн.</span></div>
+          <div class="kv"><span>Уроков пройдено</span><span>${lessonsDone} / ${TOTAL_LESSONS}</span></div>
+          <div class="kv"><span>Точность квизов</span><span>${s.profile.quizzes ? Math.round((s.profile.correct / s.profile.quizzes) * 100) : 0}%</span></div>
+          <div class="kv"><span>Карточек к повторению</span><span>${cards.due}</span></div>
+          <div class="kv"><span>Сохранено</span><span>${saved}</span></div>
+          <div class="kv"><span>В стеке</span><span>${stack}</span></div>
+          <div class="kv"><span>Заметки</span><span>${(s.notes || []).length}</span></div>
         </div>
         <div class="card tight">
-          <div class="eyebrow" style="margin-bottom:7px">Shortcuts</div>
+          <div class="eyebrow" style="margin-bottom:7px">Горячие клавиши</div>
           <div class="stack" style="gap:6px">
             ${[
-              ["Search", "Ctrl / ⌘ + K"],
-              ["Home", "G then H"],
-              ["Compounds", "G then C"],
-              ["Brain map", "G then B"],
-              ["Lab", "G then L"],
-              ["Ask", "G then A"],
+              ["Поиск", "Ctrl / ⌘ + K"],
+              ["Главная", "G, затем H"],
+              ["Препараты", "G, затем C"],
+              ["Карта мозга", "G, затем B"],
+              ["Лаборатория", "G, затем L"],
+              ["Спроси", "G, затем A"],
             ]
               .map(
                 ([label, key]) => `<div class="row between"><span class="tiny muted">${label}</span><kbd class="tiny mono" style="padding:1px 5px;border:1px solid var(--line);border-radius:5px;background:var(--bg-2)">${key}</kbd></div>`
@@ -313,7 +313,7 @@ export const settings = {
     root.querySelector("#set-pubmed-save")?.addEventListener("click", () => {
       const input = root.querySelector("#set-pubmed-key");
       setPubmedKey(input ? input.value : "");
-      toast(pubmedKey() ? "PubMed key saved on this device" : "PubMed key removed — anonymous rate");
+      toast(pubmedKey() ? "Ключ PubMed сохранён на этом устройстве" : "Ключ PubMed удалён — анонимный лимит");
     });
     const bump = () => {
       applyAppearance();
@@ -340,7 +340,7 @@ export const settings = {
       const sw = root.querySelector("#set-hex-swatch");
       if (sw) sw.style.background = ACCENTS.find(([k]) => k === b.dataset.accent)?.[2] || "#8b7bff";
       const note = root.querySelector("#set-hex-note");
-      if (note) note.textContent = "preset";
+      if (note) note.textContent = "пресет";
     });
 
     const hexApply = () => {
@@ -348,7 +348,7 @@ export const settings = {
       if (!input) return;
       const t = accentTokens(input.value);
       if (!t) {
-        toast("Use a hex colour like #8b7bff", "info");
+        toast("Введи hex-цвет, например #8b7bff", "info");
         return;
       }
       store.set("settings.accentHex", t.accent);
@@ -376,7 +376,7 @@ export const settings = {
       const sw = root.querySelector("#set-hex-swatch");
       if (sw) sw.style.background = "#8b7bff";
       const note = root.querySelector("#set-hex-note");
-      if (note) note.textContent = "preset";
+      if (note) note.textContent = "пресет";
     });
 
     root.querySelector("#set-density")?.addEventListener("click", (ev) => {
