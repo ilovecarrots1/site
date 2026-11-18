@@ -84,41 +84,102 @@ export function compoundsByClass(cls) {
   return COMPOUNDS.filter((c) => c.cls === cls);
 }
 
-/** Free-text search scored by name/alias/class/tag relevance. */
+/* ---- Russian / slang search support ------------------------------------
+   The UI is RU-first: people type Cyrillic names and street slang ("тирза",
+   "гр", "иа"). Canonical names/ids stay English — this layer only widens
+   matching, it never renames a compound or touches the dose disclaimer. */
+const RU_TRANSLIT = { а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ё:"e",ж:"zh",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"h",ц:"ts",ч:"ch",ш:"sh",щ:"sch",ъ:"",ы:"y",ь:"",э:"e",ю:"yu",я:"ya" };
+function translit(s) {
+  return String(s).toLowerCase().split("").map((ch) => (RU_TRANSLIT[ch] !== undefined ? RU_TRANSLIT[ch] : ch)).join("");
+}
+/* Russian names + common slang → canonical compound id. */
+const RU_ALIASES = {
+  "семакс":"semax","семак":"semax",
+  "селанк":"selank",
+  "тирзепатид":"tirzepatide","тирза":"tirzepatide","тирз":"tirzepatide",
+  "ретатрутид":"retatrutide","ретта":"retatrutide","рета":"retatrutide",
+  "семаглутид":"semaglutide","сема":"semaglutide","оземпик":"semaglutide","оземп":"semaglutide",
+  "соматропин":"somatropin","соматотропин":"somatropin","гормон роста":"somatropin","гр":"somatropin","гх":"somatropin",
+  "ибутаморен":"mk-677","мк677":"mk-677","мк-677":"mk-677",
+  "игф1":"igf-1-lr3","игф-1":"igf-1-lr3","игф":"igf-1-lr3",
+  "анастрозол":"anastrozole","летрозол":"letrozole","экземестан":"exemestane",
+  "ипаморелин":"ipamorelin","серморелин":"sermorelin","гхрп2":"ghrp-2","гхрп-2":"ghrp-2","гхрп6":"ghrp-6","гхрп-6":"ghrp-6",
+  "бпк157":"bpc-157","бпк-157":"bpc-157","тб500":"tb-500","тб-500":"tb-500",
+  "кофеин":"caffeine","никотин":"nicotine","мелатонин":"melatonin","креатин":"creatine",
+  "литий":"lithium","кетамин":"ketamine","ашваганда":"ashwagandha","омега3":"omega-3","омега-3":"omega-3","инсулин":"insulin",
+};
+/* Russian class slang → canonical cls value (lists every member). */
+const RU_CLASS_TOKENS = {
+  "иа":"Aromatase inhibitor","ингибитор ароматазы":"Aromatase inhibitor","инг ароматазы":"Aromatase inhibitor","ароматаза":"Aromatase inhibitor",
+  "аас":"Anabolic steroid","анаболики":"Anabolic steroid","стероиды":"Anabolic steroid",
+  "секретагоги":"Growth hormone secretagogue","секретагог":"Growth hormone secretagogue",
+  "глп1":"GLP-1 agonist","глп-1":"GLP-1 agonist","инкретины":"GLP-1 agonist",
+};
+function queryVariants(q) {
+  const set = new Set([q]);
+  if (/[а-яё]/.test(q)) {
+    const t = translit(q);
+    if (t.length >= 3) set.add(t); // skip 2-letter translit noise ("иа"→"ia")
+  }
+  return [...set];
+}
+
+/** Free-text search scored by name/alias/class/tag relevance (RU-aware). */
 export function searchCompounds(query) {
-  const q = String(query || "").trim().toLowerCase();
-  if (!q) return COMPOUNDS;
+  const raw = String(query || "").trim().toLowerCase();
+  if (!raw) return COMPOUNDS;
+  const variants = queryVariants(raw);
+  const targetId = RU_ALIASES[raw] || null;
+  const targetCls = RU_CLASS_TOKENS[raw] || null;
   const scored = [];
   for (const c of COMPOUNDS) {
     let score = 0;
+    if (targetId && c.id === targetId) score = 130;
+    if (targetCls && c.cls === targetCls) score = Math.max(score, 95);
     const name = c.name.toLowerCase();
-    if (name === q) score = 120;
-    else if (name.startsWith(q)) score = 100;
-    else if (name.includes(q)) score = 80;
-    if (!score && c.aliases.some((a) => a.toLowerCase().includes(q))) score = 70;
-    if (!score && c.cls.toLowerCase().includes(q)) score = 45;
-    if (!score && c.subcls && c.subcls.toLowerCase().includes(q)) score = 40;
-    if (!score && c.tags.some((t) => t.includes(q))) score = 35;
-    if (!score && c.summary.toLowerCase().includes(q)) score = 20;
-    if (!score && c.targets.some((t) => t.name.toLowerCase().includes(q))) score = 25;
+    for (const q of variants) {
+      if (!q) continue;
+      if (name === q) score = Math.max(score, 120);
+      else if (name.startsWith(q)) score = Math.max(score, 100);
+      else if (name.includes(q)) score = Math.max(score, 80);
+      if (score < 70 && c.aliases.some((a) => a.toLowerCase().includes(q))) score = Math.max(score, 70);
+      if (score < 45 && c.cls.toLowerCase().includes(q)) score = Math.max(score, 45);
+      if (score < 40 && c.subcls && c.subcls.toLowerCase().includes(q)) score = Math.max(score, 40);
+      if (score < 35 && c.tags.some((t) => t.includes(q))) score = Math.max(score, 35);
+      if (score < 25 && c.targets.some((t) => t.name.toLowerCase().includes(q))) score = Math.max(score, 25);
+      if (score < 20 && c.summary.toLowerCase().includes(q)) score = Math.max(score, 20);
+    }
     if (score) scored.push({ c, score });
   }
   return scored.sort((a, b) => b.score - a.score || a.c.name.localeCompare(b.c.name)).map((x) => x.c);
 }
 
-/** Resolve loose user input ("xanax", "vyvanse", "5htp") to a compound. */
+/** Resolve loose user input ("xanax", "vyvanse", "тирза", "гр") to a compound. */
 export function resolveCompound(input) {
   const q = String(input || "").trim().toLowerCase();
   if (!q) return null;
   if (COMPOUND_BY_ID.has(q)) return COMPOUND_BY_ID.get(q);
-  const normalised = q.replace(/[^a-z0-9]/g, "");
-  for (const c of COMPOUNDS) {
-    const candidates = [c.id, c.name, ...c.aliases].map((x) => String(x).toLowerCase().replace(/[^a-z0-9]/g, ""));
-    if (candidates.some((x) => x === normalised)) return c;
+  const rid = RU_ALIASES[q];
+  if (rid && COMPOUND_BY_ID.has(rid)) return COMPOUND_BY_ID.get(rid);
+  const rcls = RU_CLASS_TOKENS[q];
+  if (rcls) {
+    const hit = COMPOUNDS.find((c) => c.cls === rcls);
+    if (hit) return hit;
   }
-  for (const c of COMPOUNDS) {
-    const candidates = [c.id, c.name, ...c.aliases].map((x) => String(x).toLowerCase());
-    if (candidates.some((x) => x.startsWith(q) || x.includes(q))) return c;
+  const variants = queryVariants(q);
+  for (const v of variants) {
+    const normalised = v.replace(/[^a-z0-9]/g, "");
+    if (!normalised) continue;
+    for (const c of COMPOUNDS) {
+      const candidates = [c.id, c.name, ...c.aliases].map((x) => String(x).toLowerCase().replace(/[^a-z0-9]/g, ""));
+      if (candidates.some((x) => x === normalised)) return c;
+    }
+  }
+  for (const v of variants) {
+    for (const c of COMPOUNDS) {
+      const candidates = [c.id, c.name, ...c.aliases].map((x) => String(x).toLowerCase());
+      if (candidates.some((x) => x.startsWith(v) || x.includes(v))) return c;
+    }
   }
   return null;
 }
