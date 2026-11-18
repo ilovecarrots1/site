@@ -2,8 +2,8 @@
    Bump VERSION on every release: the old cache name is deleted on activate so
    a stale shell can never outlive a deploy. */
 
-const VERSION = "nd-v3.0.0";
-const V = "3.0.0";
+const VERSION = "nd-v4.0.0";
+const V = "4.0.0";
 
 const SHELL = [
   "./",
@@ -26,10 +26,15 @@ const SHELL = [
   "./app/data/compounds-d.js",
   "./app/data/compounds-e.js",
   "./app/data/compounds-f.js",
+  "./app/data/compounds-g.js",
+  "./app/data/compounds-h.js",
+  "./app/data/compounds-i.js",
+  "./app/data/compounds-j.js",
   "./app/data/neuro.js",
   "./app/data/atlas.js",
   "./app/data/organs.js",
   "./app/data/interactions.js",
+  "./app/data/interactions-g.js",
   "./app/data/learn.js",
   "./app/data/card-queries.js",
   "./app/data/brainmap.js",
