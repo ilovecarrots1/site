@@ -576,3 +576,97 @@ html { scroll-behavior: smooth; }
 /* Eyebrows pick up the accent so sections read as branded. */
 .eyebrow { color: color-mix(in srgb, var(--accent) 62%, var(--text-3)); }
 
+/* ==========================================================================
+   v4.4 — full interface overhaul: depth, ambient light, micro-interactions,
+   scroll reveals. Budget unchanged — transform/opacity only, one grain tile,
+   reduced-motion + data-motion="off" respected. Surface tints are scoped to
+   the aurora skin so oscilloscope/prism keep their own identity.
+   ========================================================================== */
+
+/* --- Ambient light ------------------------------------------------------ */
+.bgfx {
+  animation: nd-breathe 22s ease-in-out infinite alternate;
+  box-shadow: inset 0 0 240px 40px rgba(0, 0, 0, 0.5);
+}
+.bgfx i:nth-child(2) {
+  background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent-2, var(--accent)) 13%, transparent) 0%, transparent 60%);
+}
+@keyframes nd-breathe { from { opacity: 0.55; } to { opacity: 0.74; } }
+
+/* Soft accent horizon behind the top bar. */
+.topbar {
+  background-image: radial-gradient(120% 150% at 50% -45%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 62%);
+}
+
+::selection { background: color-mix(in srgb, var(--accent) 38%, transparent); color: var(--text); }
+
+/* --- Card depth (aurora surface) --------------------------------------- */
+[data-skin="aurora"] .card {
+  background-image:
+    linear-gradient(180deg, color-mix(in srgb, var(--text) 5%, transparent), transparent 130px),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-2) 94%, var(--accent)), var(--bg-1));
+  border-color: color-mix(in srgb, var(--accent) 13%, var(--line));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03) inset, 0 18px 40px -30px rgba(0, 0, 0, 0.9);
+}
+.card { transition: transform var(--t-2) var(--e-out), border-color var(--t-2) var(--e-out); }
+.card.hoverable:hover, a.card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+}
+.card.hoverable:active, a.card:active { transform: translateY(-1px) scale(0.995); }
+
+.compound-card { transition: transform var(--t-2) var(--e-out), border-color var(--t-2) var(--e-out); }
+.compound-card:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--accent) 38%, var(--line)); }
+.compound-card:active { transform: translateY(-1px) scale(0.995); }
+
+/* --- Hero --------------------------------------------------------------- */
+[data-skin="aurora"] .hero-card {
+  background-image:
+    radial-gradient(90% 120% at 88% -10%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 55%),
+    linear-gradient(180deg, color-mix(in srgb, var(--bg-2) 94%, var(--accent)), var(--bg-1));
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+}
+.hero-card .orb { box-shadow: 0 0 34px -4px var(--accent-glow); }
+
+/* --- Buttons: gloss sweep on primary ----------------------------------- */
+.btn.primary { position: relative; isolation: isolate; overflow: hidden; }
+.btn.primary::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(105deg, transparent 32%, rgba(255, 255, 255, 0.32) 50%, transparent 68%);
+  transform: translateX(-130%);
+  transition: transform 0.65s var(--e-out);
+}
+.btn.primary:hover::after { transform: translateX(130%); }
+.btn-group button.on { background: color-mix(in srgb, var(--accent) 18%, var(--bg-3)); color: var(--text); }
+
+/* --- Meters + bars: gradient fills ------------------------------------- */
+.meter > i { background: linear-gradient(90deg, var(--accent), var(--accent-2, var(--accent))); }
+.bar-track i { background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 70%, var(--bg-3)), var(--accent)); }
+
+/* --- Typography hierarchy ---------------------------------------------- */
+.page-head h1 { font-size: clamp(24px, 5vw, 32px); letter-spacing: -0.03em; line-height: 1.08; }
+.block-head h2 { font-weight: 700; }
+.card-head h3 { font-weight: 650; letter-spacing: -0.01em; }
+.eyebrow { text-transform: uppercase; letter-spacing: 0.09em; font-weight: 700; }
+
+/* --- Sidebar brand + nav ----------------------------------------------- */
+.brand-mark { box-shadow: 0 0 22px -4px var(--accent-glow); }
+.nav-item.active { box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent), 0 8px 20px -12px var(--accent); }
+
+/* --- Scroll reveals (JS adds .nd-reveal, IntersectionObserver .nd-in) --- */
+.nd-reveal { opacity: 0; transform: translate3d(0, 16px, 0); transition: opacity var(--t-4) var(--e-out), transform var(--t-4) var(--e-out); }
+.nd-reveal.nd-in { opacity: 1; transform: none; }
+
+/* --- Motion guards ------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  .bgfx { animation: none; }
+  .btn.primary::after, .btn.primary:hover::after { transition: none; transform: translateX(-130%); }
+  .nd-reveal { opacity: 1 !important; transform: none !important; transition: none; }
+  .card, .compound-card { transition: none; }
+  .card.hoverable:hover, a.card:hover, .compound-card:hover { transform: none; }
+}
+[data-motion="off"] .bgfx { animation: none; }
+[data-motion="off"] .btn.primary::after, [data-motion="off"] .btn.primary:hover::after { transition: none; transform: translateX(-130%); }
+[data-motion="off"] .nd-reveal { opacity: 1 !important; transform: none !important; }
+[data-motion="off"] .card.hoverable:hover, [data-motion="off"] a.card:hover, [data-motion="off"] .compound-card:hover { transform: none; }
+
