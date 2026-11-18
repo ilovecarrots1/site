@@ -52,7 +52,7 @@ export const MARKERS_A = [
     ref: { low: 40, high: 129 },
     better: "low",
     note: "Also comes from bone — rises during growth, fracture healing and with anabolic bone turnover.",
-    compounds: ["abaloparatide", "somatotropin", "testosterone-cypionate", "anastrozole", "letrozole"],
+    compounds: ["abaloparatide", "somatropin", "testosterone-cypionate", "anastrozole", "letrozole"],
   },
   {
     id: "bilirubin",
@@ -76,7 +76,7 @@ export const MARKERS_A = [
     ref: { low: 3.5, high: 5.0 },
     better: "high",
     note: "Falls with inflammation, not only with liver failure — it is a negative acute-phase protein.",
-    compounds: ["semaglutide", "tirzepatide", "oxandrolone", "nandrolone-decanoate", "somatotropin"],
+    compounds: ["semaglutide", "tirzepatide", "oxandrolone", "nandrolone-decanoate", "somatropin"],
   },
   {
     id: "lipase",
@@ -114,7 +114,7 @@ export const MARKERS_A = [
     ref: { low: 7, high: 20 },
     better: "low",
     note: "Moves with hydration and protein intake before it moves with kidney function.",
-    compounds: ["creatine", "somatotropin", "testosterone-enanthate", "insulin", "semaglutide"],
+    compounds: ["creatine", "somatropin", "testosterone-enanthate", "insulin", "semaglutide"],
   },
   {
     id: "egfr",
@@ -152,7 +152,7 @@ export const MARKERS_A = [
     ref: { low: 70, high: 99 },
     better: "mid",
     note: "Both ends matter: below 70 is hypoglycaemia, above 99 is the prediabetes range.",
-    compounds: ["semaglutide", "tirzepatide", "retatrutide", "insulin", "mk-677", "ghrp-6", "hgh-fragment-176-191", "somatotropin", "mirtazapine", "quetiapine", "clenbuterol", "liothyronine"],
+    compounds: ["semaglutide", "tirzepatide", "retatrutide", "insulin", "mk-677", "ghrp-6", "hgh-fragment-176-191", "somatropin", "mirtazapine", "quetiapine", "clenbuterol", "liothyronine"],
   },
   {
     id: "hba1c",
@@ -164,7 +164,7 @@ export const MARKERS_A = [
     ref: { low: 4.0, high: 5.6 },
     better: "low",
     note: "Reflects ~3 months of average glucose; anaemia and haemolysis make it unreliable.",
-    compounds: ["semaglutide", "tirzepatide", "retatrutide", "insulin", "mk-677", "somatotropin"],
+    compounds: ["semaglutide", "tirzepatide", "retatrutide", "insulin", "mk-677", "somatropin"],
   },
   {
     id: "insulin",
@@ -176,7 +176,7 @@ export const MARKERS_A = [
     ref: { low: 2, high: 25 },
     better: "low",
     note: "High fasting insulin with normal glucose is the earliest sign of insulin resistance.",
-    compounds: ["mk-677", "somatotropin", "insulin", "semaglutide", "ghrp-2", "ghrp-6"],
+    compounds: ["mk-677", "somatropin", "insulin", "semaglutide", "ghrp-2", "ghrp-6"],
   },
   {
     id: "homa-ir",
@@ -188,7 +188,7 @@ export const MARKERS_A = [
     ref: { low: 0.5, high: 2.0 },
     better: "low",
     note: "Computed as glucose (mg/dL) × insulin (µIU/mL) / 405.",
-    compounds: ["mk-677", "somatotropin", "semaglutide", "tirzepatide"],
+    compounds: ["mk-677", "somatropin", "semaglutide", "tirzepatide"],
   },
 
   /* ---------------- lipids ---------------- */
@@ -238,7 +238,7 @@ export const MARKERS_A = [
     ref: { low: 40, high: 150 },
     better: "low",
     note: "Sensitive to the last meal and to alcohol; fast 10–12 h before testing.",
-    compounds: ["omega-3", "semaglutide", "mk-677", "somatotropin", "insulin", "cardarine"],
+    compounds: ["omega-3", "semaglutide", "mk-677", "somatropin", "insulin", "cardarine"],
   },
   {
     id: "apob",
@@ -276,7 +276,7 @@ export const MARKERS_A = [
     ref: { low: 0.4, high: 4.0 },
     better: "mid",
     note: "The screening test: it moves opposite to thyroid hormone. Suppressed TSH means over-replacement.",
-    compounds: ["liothyronine", "somatotropin", "testosterone-cypionate", "mk-677", "semaglutide", "tirzepatide", "clenbuterol", "ashwagandha"],
+    compounds: ["liothyronine", "somatropin", "testosterone-cypionate", "mk-677", "semaglutide", "tirzepatide", "clenbuterol", "ashwagandha"],
   },
   {
     id: "ft4",
@@ -288,7 +288,7 @@ export const MARKERS_A = [
     ref: { low: 0.8, high: 1.8 },
     better: "mid",
     note: "The storage hormone; T4 therapy normalises FT4 while TSH stays the guide to dose.",
-    compounds: ["liothyronine", "somatotropin", "ashwagandha"],
+    compounds: ["liothyronine", "somatropin", "ashwagandha"],
   },
   {
     id: "ft3",
@@ -300,7 +300,7 @@ export const MARKERS_A = [
     ref: { low: 2.3, high: 4.2 },
     better: "mid",
     note: "The active hormone. Low FT3 with normal TSH suggests impaired conversion, not thyroid disease.",
-    compounds: ["liothyronine", "clenbuterol", "somatotropin"],
+    compounds: ["liothyronine", "clenbuterol", "somatropin"],
   },
   {
     id: "tpo-ab",
