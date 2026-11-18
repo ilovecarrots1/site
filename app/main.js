@@ -666,6 +666,39 @@ function renderRoute() {
   }
   document.documentElement.setAttribute("data-scrolled", String(window.scrollY > 8));
   applyI18n();
+  wireReveals(host);
+}
+
+/* Scroll reveals: fade/lift cards as they enter the viewport. Skipped when
+   motion is off. Direct #view children already run the entrance animation,
+   so only nested cards are revealed — one animation per element. */
+let revealIO = null;
+function wireReveals(host) {
+  const rootEl = document.documentElement;
+  const off =
+    rootEl.dataset.motion === "off" ||
+    (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if (off || !("IntersectionObserver" in window) || !host) return;
+  if (revealIO) revealIO.disconnect();
+  const els = Array.from(host.querySelectorAll(".card, .compound-card")).filter(
+    (el) => el.parentElement && el.parentElement.id !== "view" && !el.classList.contains("hero-card")
+  );
+  if (!els.length) return;
+  revealIO = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          e.target.classList.add("nd-in");
+          revealIO.unobserve(e.target);
+        }
+      }
+    },
+    { rootMargin: "0px 0px -8% 0px", threshold: 0.05 }
+  );
+  els.forEach((el) => {
+    el.classList.add("nd-reveal");
+    revealIO.observe(el);
+  });
 }
 
 /* ------------------------------------------------------------------ */
