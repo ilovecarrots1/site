@@ -3,6 +3,9 @@
  * (class effects). Findings are deduplicated and sorted by severity.
  */
 
+import { EXTRA_SUBSTANCES_G, PAIR_RULES_G, FLAG_RULES_G, PHENOMENA } from "./interactions-g.js";
+export { PHENOMENA };
+
 export const SEVERITY = {
   critical: { label: "Avoid", rank: 4, tone: "critical" },
   major: { label: "High risk", rank: 3, tone: "major" },
@@ -11,7 +14,7 @@ export const SEVERITY = {
 };
 
 /** Substances commonly stacked that are not in the compound encyclopedia. */
-export const EXTRA_SUBSTANCES = [
+const EXTRA_SUBSTANCES_BASE = [
   {
     id: "alcohol",
     name: "Alcohol (ethanol)",
@@ -59,6 +62,8 @@ export const EXTRA_SUBSTANCES = [
   },
 ];
 
+export const EXTRA_SUBSTANCES = [...EXTRA_SUBSTANCES_BASE, ...EXTRA_SUBSTANCES_G];
+
 /* Pair-specific rules: keyed by sorted id pair. */
 const pair = (a, b, severity, title, mechanism, advice) => ({
   a,
@@ -69,7 +74,7 @@ const pair = (a, b, severity, title, mechanism, advice) => ({
   advice,
 });
 
-export const PAIR_RULES = [
+const PAIR_RULES_BASE = [
   pair(
     "phenelzine",
     "sertraline",
@@ -800,8 +805,10 @@ export const PAIR_RULES = [
   ),
 ];
 
+export const PAIR_RULES = [...PAIR_RULES_BASE, ...PAIR_RULES_G];
+
 /* Symmetric class-level rules applied via compound flags. */
-export const FLAG_RULES = [
+const FLAG_RULES_BASE = [
   { a: "maoi", b: "serotonergic", severity: "critical", title: "MAOI + serotonergic drug: serotonin syndrome", mechanism: "Preventing serotonin breakdown while blocking its reuptake can push synaptic serotonin to toxic levels.", advice: "Contraindicated. Observe 2-week washouts (5 weeks after fluoxetine)." },
   { a: "maoi", b: "serotonergic-weak", severity: "major", title: "MAOI + serotonergic activity: elevated risk", mechanism: "Even weak serotonergic activity adds to MAO inhibition.", advice: "Avoid; discuss alternatives with a prescriber." },
   { a: "maoi", b: "sympathomimetic", severity: "critical", title: "MAOI + sympathomimetic: hypertensive crisis", mechanism: "Noradrenaline cannot be broken down while release is stimulated — blood pressure can spike dangerously.", advice: "Contraindicated, including cold medicines containing pseudoephedrine." },
@@ -848,6 +855,8 @@ export const FLAG_RULES = [
   { a: "anticholinergic", b: "anticholinergic", severity: "moderate", title: "Two anticholinergic drugs: cumulative burden", mechanism: "Anticholinergic load is additive across OTC sleep aids, allergy tablets, bladder drugs and tricyclics; higher burden tracks with confusion, falls and long-term cognitive decline.", advice: "Add up the total burden and drop the least essential agent — the 'PM' tablet is usually the easiest to lose." },
   { a: "melatonergic", b: "melatonergic", severity: "minor", title: "Two melatonin-receptor agonists: redundant", mechanism: "Both act on the same MT1/MT2 receptors, so the second adds little while adding sedation and cost.", advice: "Use one, dosed by timing rather than by stacking." },
 ];
+
+export const FLAG_RULES = [...FLAG_RULES_BASE, ...FLAG_RULES_G];
 
 const normalise = (s) => String(s || "").toLowerCase().trim();
 
