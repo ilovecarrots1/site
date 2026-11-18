@@ -490,7 +490,7 @@ export const taper = {
       const plan = planFor(c, cfg);
 
       if (act === "copy") {
-        copyText(planText(c, plan, cfg), "Taper plan copied");
+        copyText(planText(c, plan, cfg), "План снижения скопирован");
         return;
       }
 
@@ -499,7 +499,7 @@ export const taper = {
         const now = new Date().toISOString();
         store.data.notes.unshift({
           id: uid(),
-          title: `Taper — ${c.name}`,
+          title: `Снижение — ${c.name}`,
           body,
           tags: ["taper", c.id],
           compoundId: c.id,
@@ -507,11 +507,11 @@ export const taper = {
           updatedAt: now,
         });
         if (store.save()) {
-          awardXP(8, "taper plan saved");
-          toast("Saved to notebook", "ok");
+          awardXP(8, "план снижения сохранён");
+          toast("Сохранено в заметки", "ok");
           ctx.refreshCounts?.();
         } else {
-          toast("Could not save — storage is full", "error");
+          toast("Не удалось сохранить — хранилище переполнено", "error");
         }
       }
     });
