@@ -282,4 +282,81 @@ const PHRASES = {
   "нейромедиаторная система": "neurotransmitter system",
 };
 
-/* __REST__ */
+/* Dynamic strings carrying numbers. Tested against the trimmed text. */
+const PATTERNS = [
+  [/^Уровень (\d+)$/, "Level $1"],
+  [/^(\d+) препаратов$/, "$1 compounds"],
+  [/^(\d+) систем$/, "$1 systems"],
+  [/^(\d+) уроков$/, "$1 lessons"],
+  [/^(\d+) карточек$/, "$1 flashcards"],
+  [/^(\d+) правил взаимодействий$/, "$1 interaction rules"],
+  [/^(\d+) классов$/, "$1 classes"],
+  [/^(\d+) дн\. подряд( 🔥)?$/, "$1 day streak$2"],
+  [/^(\d+) дн\.$/, "$1 days"],
+  [/^(\d+) ч$/, "$1 h"],
+  [/^(\d+) мин$/, "$1 min"],
+  [/^точность квизов (\d+)%$/, "quiz accuracy $1%"],
+  [/^(\d+) зрелых · (\d+) всего$/, "$1 mature · $2 total"],
+  [/^(\d+) преп\. · сигналов: (\d+)$/, "$1 compounds · signals: $2"],
+  [/^Сигналов: (\d+)\. Посмотри детали, прежде чем доверять этому стеку\.$/, "$1 signals. Review the details before trusting this stack."],
+  [/^Убрать (.+)$/, "Remove $1"],
+  [/^(.+) убран из стека$/, "$1 removed from stack"],
+  [/^Импорт не удался: (.+)$/, "Import failed: $1"],
+  [/^Элемент$/, "Item"],
+];
+
+function tr(value) {
+  if (lang !== "en" || !value) return value;
+  const key = value.trim();
+  if (!key) return value;
+  const hit = PHRASES[key];
+  if (hit != null) return hit;
+  for (const [re, rep] of PATTERNS) {
+    if (re.test(key)) return key.replace(re, rep);
+  }
+  return value;
+}
+
+/** Explicit helper for code paths that build strings (toasts, etc.). */
+export function t(ru) {
+  return tr(ru);
+}
+
+const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEXTAREA"]);
+const ATTRS = ["placeholder", "aria-label", "title"];
+
+/**
+ * Translate a rendered subtree in place. No-op when lang === "ru".
+ * Skips user-editable content and anything marked data-notx (compound names,
+ * dose notes and rendered markdown are never touched).
+ */
+export function applyI18n(root) {
+  if (lang !== "en") return;
+  const scope = root || document.body;
+  if (!scope || !scope.querySelectorAll) return;
+
+  scope.querySelectorAll("[placeholder],[aria-label],[title]").forEach((el) => {
+    if (el.closest("[data-notx]")) return;
+    for (const a of ATTRS) {
+      const v = el.getAttribute(a);
+      if (!v) continue;
+      const nv = tr(v);
+      if (nv !== v) el.setAttribute(a, nv);
+    }
+  });
+
+  const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, null);
+  const nodes = [];
+  let n;
+  while ((n = walker.nextNode())) nodes.push(n);
+  for (const node of nodes) {
+    const p = node.parentElement;
+    if (!p || SKIP_TAGS.has(p.tagName) || p.closest("[data-notx]")) continue;
+    const v = node.nodeValue;
+    if (!v || !v.trim()) continue;
+    const nv = tr(v);
+    if (nv !== v) node.nodeValue = nv;
+  }
+}
+
+export default { LANGS, getLang, setLang, t, applyI18n };
