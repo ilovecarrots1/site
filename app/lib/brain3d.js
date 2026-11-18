@@ -576,6 +576,9 @@ export function mountBrain3D(canvas, opts) {
     yaw = 0.62; pitch = 0.16; zoom = 1; vyaw = 0; vpitch = 0; dirty = true; kick();
   }, sig);
 
+  /* Right-click must not pop the browser's native context menu over the model. */
+  canvas.addEventListener("contextmenu", (e) => e.preventDefault(), sig);
+
   /* ---- lifecycle --------------------------------------------------------- */
 
   const ro = new ResizeObserver(resize);
