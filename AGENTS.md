@@ -209,6 +209,59 @@ public.
   bug list from the user is still outstanding for the wider bug sweep.
   No attribution needed (procedural, no mesh).
 
+### v4.3.1 brain geometry fix — DRAFTED, NOT APPLIED (user rejected v1 look)
+
+User verdict on the v1 solid brain: (1) looks like an oval, not a brain;
+(2) gap between hemispheres is huge; (3) overall ugly. `app/lib/brain3d.js`
+is STILL v1 (592 lines) - the v2 write was truncated and never applied.
+Exact fix spec (apply as a two-chunk write, then eval):
+
+- Proportions: v1 was L304 x W146 (W/L 0.48 = skinny egg). Real cerebrum
+  W/L ~0.8. New base radii: x=140, y=95, z=105 per hemisphere.
+  Ellipsoid-normal denominators: 19600 / 9025 / 11025.
+- Gap: v1 medial walls at z=+/-14 (canyon 28). New:
+  `if (z*s < 2) z = s*(2 + (z*s-2)*0.18); z += s*0.9;` -> walls +/-2.5, gap ~5.
+- Smooth shaping (replace hard ifs), helper `ss(a,b,x)` = smoothstep:
+  frontal `fr=ss(65,140,x); y*=1-0.10*fr; z*=1-0.12*fr`;
+  occipital `oc=ss(-75,-140,x); y*=1-0.16*oc; z*=1-0.20*oc`;
+  temporal gaussian `tb=exp(-((x-15)/85)^2)*exp(-((y+42)/30)^2);
+  z*=1+0.17*tb; y-=11*tb`.
+- Gyri (sharpened warped ridges, absolute displacement along the normal):
+  `w=0.65*sin(6.2p+2.0*sin(2.9t)+0.7*sin(7.3t))+0.35*sin(5.1t+1.7*sin(3.8p));
+  ridge=sign(w)*pow(|w|,0.62); fine=0.30*sin(11.5p+7t+1.9*sin(4.2t));
+  fade=clamp((z*s-2)/16,0,1)*clamp((y+78)/22,0,1);
+  disp=(7.0*ridge+2.0*fine)*fade`.
+- Fissures (narrow/deep, carved AFTER folds): lat=ss(24,42,|z|);
+  win=ss(-80,-58,x)*(1-ss(78,98,x));
+  Sylvian `12*lat*win*exp(-((y-(-17+0.11x))/5.5)^2)`;
+  STS `6.5*lat*win*exp(-((y+44)/5)^2)`;
+  central `8*lat*cwin*exp(-((x-(24-0.28y))/4.5)^2)`,
+  cwin=ss(6,24,y)*(1-ss(86,98,y)).
+- Baked AO per vert: `ao=clamp(1-0.045*groove-0.02*max(0,-disp),0.5,1)`;
+  verts carry ao, face ao = avg of its 3 verts. Cerebellum
+  ao=clamp(0.8+(f-1)*3,0.6,1); stem ao=0.92.
+- Mesh: cortex R=26,C=34; cerebellum cbR=18,cbC=30, center(-102,-84),
+  radii 48/30/58, folia `f=1+0.045*sign(sin9t)*pow(|sin9t|,0.6)+0.02*sin7p`;
+  stem stR=10,stC=16, cx=-22-18u, cy=-58-64u,
+  r=13*(1-u*0.5)+3.2*exp(-((u-0.32)/0.18)^2). addFace orientation refs:
+  stem axis u=clamp((-58-cy)/64,0,1), axisX=-22-18u; cerebellum center
+  (-102,-84). Sparks: 28.
+- regionAt tweaks: olfactory x>112 && y<-40; occipital x<-88; frontal x>55
+  (orbitofrontal if y<-24); temporal y<-28 && az>24 && x>-85;
+  insula az>30, x[-25,40], y[-30,4]; cingulate az<18, x[-12,72], y[-12,56];
+  motor y>40 (x>-8); parietal y>16 && x<=-8; stem y>-88 pons /
+  y>-112 medulla / else spinal-cord.
+- Renderer: BUCKETS=32, sh=0.22+0.78*b/31; in the cull pass stash
+  fc._d=diffuse and fc._k=ao*(1-0.22*rim) where rim=pow(1-|nz2|,3);
+  fill diff=fc._d*fc._k (focus dim *0.78 on level 0). Deep-anchor
+  projection: /140, /95, Z=100*sqrt(q). Labels declutter: dots always for
+  surface+front (alpha ~0.5), TEXT only if level>0 OR
+  (surface && front && zoom>1.5 && !focus). Sparks alpha 0.5, radius 1.0*scale.
+- After applying: eval (syntax, gap ~5, W/L ~0.8, outward normals, region
+  coverage, hit-test), keep version 4.3.0 (nothing pushed yet), short RU
+  report. Write the file in TWO chunks (write + edit on a __TAIL__ marker) -
+  single-shot writes of this file get truncated.
+
 ## Working from the shell
 
 The project lives in the Acode Terminal home (`~/neuro`, shown in Files as
