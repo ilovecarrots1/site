@@ -131,22 +131,22 @@ export function buildPlan({ startDose, freq, stepPct, holdDays, finalPct, halfLi
 
 function planText(c, plan, cfg) {
   const lines = [];
-  lines.push(`Taper plan — ${c.name}${Number(c.pk?.halfLife) > 0 ? ` (t½ ${fmt.duration(Number(c.pk.halfLife))})` : ""}`);
+  lines.push(`План снижения — ${c.name}${Number(c.pk?.halfLife) > 0 ? ` (t½ ${fmt.duration(Number(c.pk.halfLife))})` : ""}`);
   lines.push(
-    `Start ${doseText(cfg.dose, cfg.unit)} per day (${cfg.freq}×/day) → target ${doseText(plan.finalDose, cfg.unit)}, −${cfg.stepPct}% every ${cfg.holdDays} days`
+    `Старт ${doseText(cfg.dose, cfg.unit)} в день (${cfg.freq}×/день) → цель ${doseText(plan.finalDose, cfg.unit)}, −${cfg.stepPct}% каждые ${cfg.holdDays} дн.`
   );
   lines.push("");
   let day = 1;
   for (const s of plan.steps) {
     const last = day + cfg.holdDays - 1;
     lines.push(
-      `Step ${s.n} · days ${day}–${last} · ${doseText(s.dose, cfg.unit)}/day (${doseText(s.perDose, cfg.unit)} ${cfg.freq === 1 ? "once" : `${cfg.freq}×`} daily) · −${s.dropPct}%`
+      `Шаг ${s.n} · дни ${day}–${last} · ${doseText(s.dose, cfg.unit)}/день (${doseText(s.perDose, cfg.unit)} ${cfg.freq === 1 ? "1 раз" : `${cfg.freq}×`} в день) · −${s.dropPct}%`
     );
     day = last + 1;
   }
   lines.push("");
-  lines.push(`Total: ${plan.totalDays} days (${(plan.totalDays / 7).toFixed(1)} weeks)`);
-  lines.push("Generated with NeuroDifference. Educational estimate — not medical advice.");
+  lines.push(`Итого: ${plan.totalDays} дн. (${(plan.totalDays / 7).toFixed(1)} нед.)`);
+  lines.push("Сгенерировано в NeuroDifference. Образовательная оценка — не медицинская рекомендация.");
   return lines.join("\n");
 }
 
@@ -154,8 +154,8 @@ function rowsHtml(c, plan, cfg) {
   if (!plan.steps.length) {
     return `<div class="card">${emptyState(
       "check",
-      "Nothing to taper",
-      "The starting dose is already at or below your target. Lower the target, raise the start dose, or pick another compound.",
+      "Снижать нечего",
+      "Стартовая доза уже на уровне цели или ниже. Опусти цель, подними стартовую дозу или выбери другой препарат.",
       ""
     )}</div>`;
   }
@@ -168,13 +168,13 @@ function rowsHtml(c, plan, cfg) {
         <span class="taper-n" aria-hidden="true">${s.n}</span>
         <div class="taper-body">
           <div class="row between" style="gap:8px">
-            <b class="mono" style="font-size:13.5px">${esc(doseText(s.dose, cfg.unit))}<span class="dim" style="font-weight:400"> / day</span></b>
+            <b class="mono" style="font-size:13.5px">${esc(doseText(s.dose, cfg.unit))}<span class="dim" style="font-weight:400"> / день</span></b>
             <span class="tiny dim">−${esc(String(s.dropPct))}%</span>
           </div>
           <div class="meter" style="margin:6px 0 5px"><i style="width:${width}%"></i></div>
           <div class="tiny dim">
-            ${cfg.freq > 1 ? `${esc(doseText(s.perDose, cfg.unit))} × ${cfg.freq}/day` : "once daily"}
-            · level settles in ~${esc(settle)}
+            ${cfg.freq > 1 ? `${esc(doseText(s.perDose, cfg.unit))} × ${cfg.freq}/день` : "1 раз в день"}
+            · уровень устоится за ~${esc(settle)}
           </div>
         </div>
       </li>`;
@@ -186,8 +186,8 @@ function rowsHtml(c, plan, cfg) {
       ? `<li class="taper-row taper-stop">
           <span class="taper-n" aria-hidden="true">${icon("flag", 13)}</span>
           <div class="taper-body">
-            <b style="font-size:13px">Step off from ${esc(doseText(plan.finalDose, cfg.unit))}</b>
-            <div class="tiny dim" style="margin-top:3px">The rest clears over ~${esc(fmt.duration(5 * (Number(c.pk?.halfLife) || 0) || 24))}. Expect a few uneven nights — that is the last of the drug leaving, not a relapse.</div>
+            <b style="font-size:13px">Сход с ${esc(doseText(plan.finalDose, cfg.unit))}</b>
+            <div class="tiny dim" style="margin-top:3px">Остаток выводится за ~${esc(fmt.duration(5 * (Number(c.pk?.halfLife) || 0) || 24))}. Жди несколько неровных ночей — это последние следы препарата уходят, а не рецидив.</div>
           </div>
         </li>`
       : "";
@@ -199,23 +199,23 @@ function summaryHtml(c, plan, cfg) {
   const hl = Number(c.pk?.halfLife) || 0;
   const weeks = plan.totalDays / 7;
   return `<div class="grid grid-2 grid-4" style="gap:10px">
-    ${statTile({ label: "Steps", value: String(plan.steps.length), sub: `−${cfg.stepPct}% each`, iconName: "list" })}
+    ${statTile({ label: "Шагов", value: String(plan.steps.length), sub: `по −${cfg.stepPct}%`, iconName: "list" })}
     ${statTile({
-      label: "Duration",
-      value: plan.totalDays >= 14 ? `${fmt.num(weeks, 1)} w` : `${plan.totalDays} d`,
-      sub: `${plan.totalDays} days total`,
+      label: "Длительность",
+      value: plan.totalDays >= 14 ? `${fmt.num(weeks, 1)} нед` : `${plan.totalDays} дн`,
+      sub: `всего ${plan.totalDays} дн.`,
       iconName: "clock",
     })}
     ${statTile({
-      label: "Final dose",
+      label: "Финальная доза",
       value: doseText(plan.finalDose, cfg.unit),
-      sub: `${Math.round((plan.finalDose / Math.max(cfg.dose, 1e-9)) * 100)}% of start`,
+      sub: `${Math.round((plan.finalDose / Math.max(cfg.dose, 1e-9)) * 100)}% от старта`,
       iconName: "target",
     })}
     ${statTile({
-      label: "Half-life",
+      label: "Полувыведение",
       value: hl > 0 ? fmt.duration(hl) : "—",
-      sub: hl > 0 ? `steady state in ~${fmt.duration(hl * 5)}` : "no PK data",
+      sub: hl > 0 ? `равновесие за ~${fmt.duration(hl * 5)}` : "нет данных PK",
       iconName: "activity",
     })}
   </div>`;
@@ -230,8 +230,8 @@ function warningsHtml(c, cfg) {
     out.push(
       callout(
         "warn",
-        `${cfg.stepPct}% per step is steep`,
-        "Above ~10% the drop usually outruns adaptation. For benzodiazepines, alcohol-like sedatives and antidepressants, 5–10% steps are the tolerated range."
+        `${cfg.stepPct}% за шаг — круто`,
+        "Выше ~10% снижение обычно обгоняет адаптацию. Для бензодиазепинов, алкоголеподобных седативных и антидепрессантов переносимый диапазон — шаги 5–10%."
       )
     );
   }
@@ -239,8 +239,8 @@ function warningsHtml(c, cfg) {
     out.push(
       callout(
         "danger",
-        "Do not do this alone",
-        `${c.name} withdrawal can include rebound anxiety, insomnia and — with sedatives — seizures. A prescriber should own the schedule; abrupt stops are more dangerous than the drug.`
+        "Не делай это в одиночку",
+        `Отмена ${c.name} может включать рикошетную тревогу, бессонницу и — у седативных — судороги. Расписание должен вести врач; резкая отмена опаснее самого препарата.`
       )
     );
   }
@@ -248,8 +248,8 @@ function warningsHtml(c, cfg) {
     out.push(
       callout(
         "info",
-        "Antidepressant discontinuation",
-        "Expect dizziness, 'brain zaps', irritability and flu-like aches if steps are too big. A 10% step every 4 weeks is the slow end; some people need the last milligrams removed in liquid or by bead counting."
+        "Отмена антидепрессантов",
+        "Жди головокружения, «прострелов в мозге», раздражительности и гриппоподобной ломоты, если шаги слишком большие. Шаг 10% раз в 4 недели — медленный край; кому-то последние миллиграммы приходится убирать в жидкой форме или подсчётом гранул."
       )
     );
   }
@@ -257,8 +257,8 @@ function warningsHtml(c, cfg) {
     out.push(
       callout(
         "warn",
-        "The next step comes before the level settles",
-        `With a ${fmt.duration(hl)} half-life the new steady state needs about ${fmt.duration(hl * 5)}. Holding only ${cfg.holdDays} days stacks withdrawal on top of withdrawal.`
+        "Следующий шаг раньше, чем устоится уровень",
+        `При полувыведении ${fmt.duration(hl)} новое равновесие требует около ${fmt.duration(hl * 5)}. Удержание всего ${cfg.holdDays} дн. накладывает отмену на отмену.`
       )
     );
   }
@@ -266,8 +266,8 @@ function warningsHtml(c, cfg) {
     out.push(
       callout(
         "ok",
-        "No dependence signal in this database",
-        "There is no pharmacological reason to taper this compound slowly. Stopping is usually fine — check the warning list in the monograph first."
+        "В этой базе нет сигнала зависимости",
+        "Фармакологических причин снижать этот препарат медленно нет. Отмена обычно безопасна — сначала проверь список предупреждений в монографии."
       )
     );
   }
@@ -292,15 +292,15 @@ function planHtml(c, cfg) {
     ${summaryHtml(c, plan, cfg)}
     <div class="card">
       <div class="card-head">
-        <h3>Reduction ladder</h3>
+        <h3>Лестница снижения</h3>
         <span class="spacer"></span>
         <span class="row" style="gap:6px">
-          <button class="btn ghost sm" data-act="copy">${icon("copy", 13)} Copy</button>
-          <button class="btn soft sm" data-act="save">${icon("pin", 13)} Save</button>
+          <button class="btn ghost sm" data-act="copy">${icon("copy", 13)} Копировать</button>
+          <button class="btn soft sm" data-act="save">${icon("pin", 13)} Сохранить</button>
         </span>
       </div>
       <p class="small muted" style="margin-bottom:12px">
-        Each step holds ${cfg.holdDays} days before the next drop. Doses are rounded to something you can actually measure.
+        Каждый шаг держится ${cfg.holdDays} дн. до следующего снижения. Дозы округлены до того, что реально можно отмерить.
       </p>
       ${rowsHtml(c, plan, cfg)}
     </div>
@@ -314,10 +314,10 @@ function planHtml(c, cfg) {
 
 function compoundOptions() {
   const selected = (c) => (c.id === state.id ? "selected" : "");
-  return `<optgroup label="Commonly tapered">
+  return `<optgroup label="Часто снижают">
     ${TAPERABLE.map((c) => `<option value="${esc(c.id)}" ${selected(c)}>${esc(c.name)} — t½ ${esc(fmt.duration(Number(c.pk.halfLife)))}</option>`).join("")}
   </optgroup>
-  <optgroup label="Everything else">
+  <optgroup label="Все остальные">
     ${OTHERS.map((c) => `<option value="${esc(c.id)}" ${selected(c)}>${esc(c.name)} — t½ ${esc(fmt.duration(Number(c.pk.halfLife)))}</option>`).join("")}
   </optgroup>`;
 }
@@ -343,9 +343,9 @@ export const taper = {
     };
 
     return `${pageHead(
-      "Taper planner",
-      "Turn a half-life into a schedule: how fast to step down, how long each step holds, and when the level actually settles.",
-      `<a class="btn ghost sm" href="#/lab">${icon("flask", 14)} Dose lab</a>`
+      "План снижения",
+      "Преврати полувыведение в расписание: как быстро шагать вниз, сколько держать каждый шаг и когда уровень реально устоится.",
+      `<a class="btn ghost sm" href="#/lab">${icon("flask", 14)} Лаборатория доз</a>`
     )}
 
     <div class="split split-mobile-first">
@@ -354,47 +354,47 @@ export const taper = {
 
         <div class="card tight">
           <div class="stack-3">
-            <b style="font-size:13px">Why hyperbolic</b>
+            <b style="font-size:13px">Почему гипербола</b>
             <p class="tiny muted" style="line-height:1.6">
-              The same 1 mg is a 50% cut at 2 mg and a 5% cut at 20 mg. Fixed-percent steps therefore remove more drug early and
-              smaller amounts later, which is what receptor adaptation can follow. Time between steps is set by the half-life:
-              about five of them and the plasma level has finished moving.
+              Один и тот же 1 мг — это срез 50% при 2 мг и 5% при 20 мг. Поэтому фиксированные проценты убирают больше препарата в начале и
+              меньше в конце — именно за этим успевает адаптация рецепторов. Время между шагами задаёт полувыведение:
+              примерно пять из них — и уровень в плазме закончил движение.
             </p>
           </div>
         </div>
 
         <div class="card tight">
           <p class="tiny dim" style="line-height:1.6">
-            Educational model. It knows the half-life and the arithmetic — not your kidneys, your dose form or your history.
-            Anyone on benzodiazepines, opioids, antipsychotics or antidepressants should taper with a prescriber.
+            Образовательная модель. Она знает полувыведение и арифметику — но не твои почки, форму дозы и историю.
+            Всем, кто на бензодиазепинах, опиоидах, антипсихотиках или антидепрессантах, снижаться нужно с врачом.
           </p>
         </div>
       </div>
 
       <aside class="sticky-side">
         <div class="card">
-          <div class="card-head"><h3>Inputs</h3></div>
+          <div class="card-head"><h3>Параметры</h3></div>
           <div class="stack" style="gap:12px">
-            <label class="field">Compound
+            <label class="field">Препарат
               <select class="select" id="tp-c">${compoundOptions()}</select>
             </label>
 
             <div class="grid grid-2" style="gap:10px">
-              <label class="field">Daily dose (${esc(state.unit)})
+              <label class="field">Дневная доза (${esc(state.unit)})
                 <input class="input" id="tp-dose" type="number" inputmode="decimal" min="0.01" max="20000" step="any" value="${state.dose}">
               </label>
-              <label class="field">Doses per day
+              <label class="field">Приёмов в день
                 <input class="input" id="tp-freq" type="number" inputmode="numeric" min="1" max="4" step="1" value="${state.freq}">
               </label>
-              <label class="field">Step size (%)
+              <label class="field">Размер шага (%)
                 <input class="input" id="tp-step" type="number" inputmode="numeric" min="1" max="50" step="1" value="${state.stepPct}">
               </label>
-              <label class="field">Hold (days)
+              <label class="field">Удержание (дн.)
                 <input class="input" id="tp-hold" type="number" inputmode="numeric" min="1" max="120" step="1" value="${state.holdDays}">
               </label>
             </div>
 
-            <div class="field">Stop at (% of start)
+            <div class="field">Остановиться на (% от старта)
               <div class="row wrap" style="gap:6px;margin-top:2px">
                 ${TARGETS.map(
                   (t) => `<button class="chip chip-btn ${state.finalPct === t ? "on" : ""}" data-target="${t}">${t}%</button>`
