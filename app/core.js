@@ -2,6 +2,8 @@
  * Zero dependencies. Small utilities, state store, markdown, icons, toasts.
  */
 
+import { t } from "./lib/i18n.js";
+
 export const VERSION = "4.3.0";
 
 /* ------------------------------------------------------------------ */
@@ -355,6 +357,7 @@ function defaultState() {
     studies: [],
     history: [],
     settings: {
+      lang: "ru",
       accent: "violet",
       accentHex: "",
       skin: "aurora",
@@ -554,7 +557,7 @@ export function toast(message, kind = "info", timeout = 2600) {
   const node = document.createElement("div");
   node.className = `toast toast-${kind}`;
   const ic = kind === "success" ? "check" : kind === "danger" ? "alert" : kind === "warn" ? "alert" : "info";
-  node.innerHTML = `${icon(ic, 16)}<span>${esc(message)}</span>`;
+  node.innerHTML = `${icon(ic, 16)}<span>${esc(t(message))}</span>`;
   toastHost.appendChild(node);
   requestAnimationFrame(() => node.classList.add("in"));
   const kill = () => {
