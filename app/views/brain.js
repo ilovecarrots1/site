@@ -62,6 +62,7 @@ const S = {
 
 let paperSeq = 0;
 const paperCache = new Map(); // session-only, never persisted
+let live3d = null; // previous 3D instance — destroyed on re-mount so loops never stack
 
 /* Neuroanatomically plausible tracts for the impulse animation. */
 const TRACTS = [
@@ -593,6 +594,10 @@ export function mount(root) {
     return { lit, focus };
   }
 
+  if (live3d) {
+    live3d.destroy();
+    live3d = null;
+  }
   let b3d = null;
   if (canvas3d) {
     b3d = mountBrain3D(canvas3d, {
@@ -601,6 +606,7 @@ export function mount(root) {
       getLit: litState,
       onSelect: (id) => select("region", id),
     });
+    live3d = b3d;
   }
 
   root.querySelectorAll("[data-view]").forEach((b) =>
