@@ -17,6 +17,13 @@ import {
   SILHOUETTE,
   CEREBELLUM,
   SULCI,
+  GYRI,
+  CEREBELLUM_FOLIA,
+  BRAINSTEM,
+  CORPUS_CALLOSUM,
+  NEURON_LINKS,
+  NEURON_SOMAS,
+  NEURON_PULSES,
   LAYERS,
   STATS,
   targetsForRegion,
@@ -98,9 +105,12 @@ function layerSvg(layerId, extra) {
 
 function mapSvg() {
   const shell = `<path class="bm-shell" d="${SILHOUETTE}"></path>
-    <path class="bm-shell" d="${CEREBELLUM}" style="opacity:.75"></path>
+    <path class="bm-callosal" d="${CORPUS_CALLOSUM}"></path>
+    ${GYRI.map((d) => `<path class="bm-gyrus" d="${d}"></path>`).join("")}
     ${SULCI.map((d) => `<path class="bm-sulcus" d="${d}"></path>`).join("")}
-    <path class="bm-inner" d="M150 200 C186 214 226 208 248 188"></path>`;
+    <path class="bm-brainstem" d="${BRAINSTEM}"></path>
+    <path class="bm-shell bm-cerebellum" d="${CEREBELLUM}"></path>
+    ${CEREBELLUM_FOLIA.map((d) => `<path class="bm-folium" d="${d}"></path>`).join("")}`;
 
   const clusters = CLUSTER_DOTS.map(
     (d) => `<circle cx="${d.x}" cy="${d.y}" r="1.05" style="--d:${d.d}s"></circle>`
@@ -108,11 +118,38 @@ function mapSvg() {
 
   const tracts = TRACTS.map(([a, b]) => `<path class="bm-tract" d="${tractPath(a, b)}"></path>`).join("");
 
+  /* Neuron overlay: axons, travelling pulses, somas with dendrite crosses. */
+  const axons = NEURON_LINKS.map(([a, b]) => {
+    const A = REGION_MAP.get(a);
+    const B = REGION_MAP.get(b);
+    if (!A || !B) return "";
+    return `<line class="bm-axon" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"></line>`;
+  }).join("");
+  const pulses = NEURON_PULSES.map(
+    (p) => `<circle class="bm-pulse" r="1.5" style="--x1:${p.x1}px;--y1:${p.y1}px;--x2:${p.x2}px;--y2:${p.y2}px;--d:${p.d}s;--t:${p.t}s"></circle>`
+  ).join("");
+  const somas = NEURON_SOMAS.map((r) => {
+    const col = regionColor(r);
+    return `<g class="bm-soma" style="color:${col}"><path d="M${r.x - 4.5} ${r.y} L${r.x + 4.5} ${r.y} M${r.x} ${r.y - 4.5} L${r.x} ${r.y + 4.5}"></path><circle cx="${r.x}" cy="${r.y}" r="2.1"></circle></g>`;
+  }).join("");
+  const neurons = `<g class="bm-neurons">${axons}${pulses}${somas}</g>`;
+
   return `<svg class="bm-svg" id="bm-svg" viewBox="0 0 ${420} 320" data-focus="off" role="img"
       aria-label="Interactive map of brain regions, neurotransmitter targets and compounds">
+      <defs>
+        <radialGradient id="bm-shell-grad" cx="42%" cy="30%" r="85%">
+          <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.17"></stop>
+          <stop offset="55%" stop-color="var(--accent)" stop-opacity="0.07"></stop>
+          <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.02"></stop>
+        </radialGradient>
+        <linearGradient id="bm-stem-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.32"></stop>
+          <stop offset="100%" stop-color="var(--accent)" stop-opacity="0.10"></stop>
+        </linearGradient>
+      </defs>
       <g id="bm-cam">
         ${layerSvg("shell", shell)}
-        ${layerSvg("deep", `<g class="bm-cluster">${clusters}</g>${tracts}`)}
+        ${layerSvg("deep", `<g class="bm-cluster">${clusters}</g>${tracts}${neurons}`)}
         ${layerSvg("mid")}
       </g>
     </svg>`;
