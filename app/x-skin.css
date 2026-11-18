@@ -1,0 +1,260 @@
+/* ================================================================== */
+/* NeuroDifference — EXPERIMENTAL "LAB INSTRUMENT" skin                 */
+/* ------------------------------------------------------------------ */
+/* Secret test build only (enrnejis8e8w.html). Loaded AFTER styles.css, */
+/* skin.css and clinic.css, and EVERY rule is scoped to html[data-lab]. */
+/* The main app never sets data-lab and never loads this file, so the   */
+/* production version is untouched. Functions / routes / data are NOT   */
+/* modified — this is a pure visual regeneration.                       */
+/*                                                                      */
+/* Design language: technical dossier / instrument panel. Flat panels,  */
+/* 1px hairlines, sharp 10-12px corners, monospace overlines + counters, */
+/* blueprint grid, a single instrument blue. Palette taken from the     */
+/* product brief: bg #0B0D10, panels #14171C, cards #191D24,            */
+/* lines #262B33, text #E6E8EB / #9AA3AD / #6B7280, blue #58A6FF,       */
+/* green #3FB950, orange #D29922.                                       */
+/*                                                                      */
+/* Invariants kept: animate transform/opacity only, one animation per   */
+/* element, one grain tile, no blurred ANIMATED divs, no fixed heights  */
+/* on text containers, no text overlap, mobile-first, reduced-motion +  */
+/* data-motion="off" honoured. --bad (never --danger).                  */
+/* ================================================================== */
+
+/* --- 1. Palette + shape tokens (!important beats inline accent) ----- */
+html[data-lab="1"] {
+  --bg: #0b0d10 !important;
+  --bg-1: #14171c !important;
+  --bg-2: #191d24 !important;
+  --bg-3: #1f242c !important;
+  --line: #262b33 !important;
+  --line-soft: #1e232b !important;
+
+  --text: #e6e8eb !important;
+  --text-2: #9aa3ad !important;
+  --text-3: #6b7280 !important;
+
+  --accent: #58a6ff !important;
+  --accent-2: #2f81f7 !important;
+  --accent-ink: #06121f !important;
+  --accent-soft: rgba(88, 166, 255, 0.12) !important;
+  --accent-line: rgba(88, 166, 255, 0.34) !important;
+  --accent-glow: rgba(88, 166, 255, 0.4) !important;
+
+  --good: #3fb950 !important;
+  --ok: #58a6ff !important;
+  --warn: #d29922 !important;
+  --bad: #f0883e !important;
+  --critical: #f85149 !important;
+
+  --radius-s: 6px !important;
+  --radius: 10px !important;
+  --radius-l: 12px !important;
+  --radius-xl: 12px !important;
+
+  --sidebar-w: 232px !important;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+  --shadow-2: 0 12px 30px -16px rgba(0, 0, 0, 0.8) !important;
+  --shadow-3: 0 24px 60px -24px rgba(0, 0, 0, 0.9) !important;
+  --fx-opacity: 0.55 !important;
+
+  /* instrument graph hues (blue / green / orange + extras) */
+  --lab-blue: #58a6ff;
+  --lab-green: #3fb950;
+  --lab-orange: #d29922;
+  --lab-purple: #a371f7;
+  --lab-pink: #f778ba;
+  --lab-yellow: #e3b341;
+  --lab-teal: #39c5cf;
+  --lab-grid: rgba(88, 166, 255, 0.055);
+}
+
+/* --- 2. Base canvas + blueprint background -------------------------- */
+html[data-lab="1"] body {
+  background:
+    radial-gradient(120% 80% at 50% -10%, rgba(88, 166, 255, 0.07), transparent 55%),
+    var(--bg);
+  color: var(--text);
+}
+
+/* Repurpose the ambient layer: faint instrument glows (transform drift
+   keyframes already live in skin.css) over a precise blueprint grid. */
+html[data-lab="1"] .bgfx i {
+  background: radial-gradient(circle at 50% 50%, rgba(88, 166, 255, 0.16), transparent 62%);
+  filter: none;
+}
+html[data-lab="1"] .bgfx i:nth-child(2) {
+  background: radial-gradient(circle at 50% 50%, rgba(57, 197, 207, 0.12), transparent 62%);
+}
+html[data-lab="1"] .bgfx i:nth-child(3) {
+  background: radial-gradient(circle at 50% 50%, rgba(163, 113, 247, 0.1), transparent 62%);
+}
+html[data-lab="1"] .bgfx::before {
+  background-image:
+    linear-gradient(var(--lab-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--lab-grid) 1px, transparent 1px);
+  background-size: 34px 34px, 34px 34px;
+  -webkit-mask-image: radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 85%);
+  mask-image: radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 85%);
+  opacity: 0.9;
+}
+/* one grain tile + a faint scanline, static */
+html[data-lab="1"] .bgfx::after {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.014) 0 1px, transparent 1px 3px);
+  opacity: 0.5;
+}
+
+html[data-lab="1"] ::selection { background: rgba(88, 166, 255, 0.28); color: #fff; }
+
+html[data-lab="1"] * { scrollbar-width: thin; scrollbar-color: #2c333d transparent; }
+html[data-lab="1"] ::-webkit-scrollbar { width: 9px; height: 9px; }
+html[data-lab="1"] ::-webkit-scrollbar-thumb {
+  background: #2c333d; border-radius: 2px; border: 2px solid var(--bg);
+}
+html[data-lab="1"] ::-webkit-scrollbar-thumb:hover { background: var(--accent-line); }
+
+html[data-lab="1"] a { color: var(--accent); }
+html[data-lab="1"] :focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* --- 3. Typography: display + monospace instrument labels ----------- */
+html[data-lab="1"] h1,
+html[data-lab="1"] h2,
+html[data-lab="1"] h3 { letter-spacing: -0.025em; }
+
+html[data-lab="1"] .page-head {
+  margin: 2px 0 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+html[data-lab="1"] .page-head h1 {
+  font-size: clamp(25px, 5.4vw, 33px);
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+html[data-lab="1"] .page-head p { color: var(--text-2); font-size: 13.5px; }
+
+html[data-lab="1"] .eyebrow {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+html[data-lab="1"] .eyebrow::before { content: "// "; opacity: 0.55; }
+
+html[data-lab="1"] .block-head h2 { font-size: 16px; letter-spacing: -0.02em; }
+html[data-lab="1"] .block-sub,
+html[data-lab="1"] .stat-label,
+html[data-lab="1"] .side-label {
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+html[data-lab="1"] .stat-value {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+html[data-lab="1"] .stat-value.good { color: var(--good); }
+html[data-lab="1"] .stat-value.accent { color: var(--accent); }
+html[data-lab="1"] .mono { font-variant-numeric: tabular-nums; }
+
+/* --- 4. Sidebar: technical rail (desktop) --------------------------- */
+html[data-lab="1"] .sidebar {
+  background: var(--bg-1);
+  border-right: 1px solid var(--line);
+}
+html[data-lab="1"] .brand-mark {
+  border-radius: 6px;
+  background: linear-gradient(150deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 0 1px var(--accent-line), 0 6px 16px -8px var(--accent);
+}
+html[data-lab="1"] .brand-text b { letter-spacing: -0.02em; }
+html[data-lab="1"] .brand-text span,
+html[data-lab="1"] .sidebar .brand span {
+  font-family: var(--mono);
+  letter-spacing: 0.06em;
+  color: var(--text-3);
+}
+html[data-lab="1"] .side-label {
+  font-size: 10px;
+  color: var(--text-3);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+}
+html[data-lab="1"] .side-item {
+  border-radius: 7px;
+  border: 1px solid transparent;
+  color: var(--text-2);
+}
+html[data-lab="1"] .side-item:hover {
+  background: var(--bg-2);
+  border-color: var(--line);
+  color: var(--text);
+}
+html[data-lab="1"] .side-item.active {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+html[data-lab="1"] .side-item.active::before {
+  left: -13px;
+  width: 3px;
+  height: 16px;
+  border-radius: 0;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+html[data-lab="1"] .side-foot { border-top: 1px solid var(--line); }
+html[data-lab="1"] .side-xp {
+  border-radius: 8px;
+  background: var(--bg-2);
+  border: 1px solid var(--line);
+}
+html[data-lab="1"] .side-xp .lv b { color: var(--accent); }
+
+/* --- 5. Topbar ------------------------------------------------------ */
+html[data-lab="1"] .topbar {
+  background: color-mix(in srgb, var(--bg-1) 88%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+html[data-lab="1"] [data-scrolled="true"] .topbar { border-bottom-color: var(--accent-line); }
+html[data-lab="1"] .icon-btn { border-radius: 7px; }
+html[data-lab="1"] .icon-btn:hover { background: var(--bg-2); border-color: var(--line); }
+html[data-lab="1"] .topbar-title { font-weight: 650; letter-spacing: -0.01em; }
+
+/* --- 6. Bottom nav: instrument segment bar (flatten aurora pill) ---- */
+html[data-lab="1"] .bottom-nav {
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  background: color-mix(in srgb, var(--bg-1) 94%, transparent) !important;
+  border-top: 1px solid var(--line) !important;
+  box-shadow: 0 -8px 24px -18px #000 !important;
+}
+html[data-lab="1"] .nav-item { color: var(--text-3); font-weight: 600; }
+html[data-lab="1"] .nav-item.active {
+  color: var(--accent);
+  background: transparent !important;
+}
+html[data-lab="1"] .nav-item.active::before {
+  top: 0;
+  width: 22px;
+  height: 2px;
+  border-radius: 0 !important;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+html[data-lab="1"] .nav-item.active::after { display: none !important; }
+
+/* __LAB_CHUNK_2__ */
