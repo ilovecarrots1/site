@@ -630,11 +630,11 @@ export function scoreMatch(needle, haystack) {
 /* ------------------------------------------------------------------ */
 
 export const EVIDENCE = {
-  strong: { label: "Strong human evidence", short: "Strong", tone: "good" },
-  moderate: { label: "Moderate evidence", short: "Moderate", tone: "ok" },
-  limited: { label: "Limited human data", short: "Limited", tone: "warn" },
-  preclinical: { label: "Preclinical / animal", short: "Preclinical", tone: "warn" },
-  anecdotal: { label: "Anecdotal only", short: "Anecdotal", tone: "bad" },
+  strong: { label: "Сильные доказательства на людях", short: "Сильная", tone: "good" },
+  moderate: { label: "Умеренные доказательства", short: "Умеренная", tone: "ok" },
+  limited: { label: "Ограниченные данные на людях", short: "Ограниченная", tone: "warn" },
+  preclinical: { label: "Доклиника / животные", short: "Доклиника", tone: "warn" },
+  anecdotal: { label: "Только анекдотические", short: "Анекдотическая", tone: "bad" },
 };
 
 export function evidenceChip(level) {
