@@ -91,7 +91,7 @@ export function buildGeometry() {
   }
 
   /* ---- Cerebrum: two shaped, gyrified, fissure-carved hemispheres -------- */
-  const R = 26, C = 34;
+  const R = 30, C = 40;
   const cortexCount = 2 * (R + 1) * C;
   for (const s of [-1, 1]) {
     const grid = [];
@@ -155,7 +155,7 @@ export function buildGeometry() {
   }
 
   /* ---- Cerebellum: under the occipital lobe, fine transverse folia ------- */
-  const cbR = 18, cbC = 30;
+  const cbR = 20, cbC = 34;
   const cbGrid = [];
   for (let i = 0; i <= cbR; i++) {
     const t = (i / cbR) * Math.PI;
@@ -257,14 +257,14 @@ export function mountBrain3D(canvas, opts) {
   } catch (e) { /* keep fallback */ }
 
   /* shade cache: [part][litLevel][bucket] -> css rgb string */
-  const BUCKETS = 32;
+  const BUCKETS = 48;
   const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
   const shadeCache = colors.map((base) => {
     const tints = [base, mix(base, bad, 0.32), mix(base, bad, 0.84)];
     return tints.map((tc) => {
       const arr = [];
       for (let b = 0; b < BUCKETS; b++) {
-        const sh = 0.22 + 0.78 * (b / (BUCKETS - 1));
+        const sh = 0.18 + 0.82 * (b / (BUCKETS - 1));
         arr.push(`rgb(${Math.round(clamp(tc[0] * sh, 0, 255))},${Math.round(clamp(tc[1] * sh, 0, 255))},${Math.round(clamp(tc[2] * sh, 0, 255))})`);
       }
       return arr;
@@ -307,6 +307,9 @@ export function mountBrain3D(canvas, opts) {
   /* fixed camera-space light: upper-left, toward the viewer */
   const Ll = Math.hypot(-0.35, 0.62, -0.70);
   const LX = -0.35 / Ll, LY = 0.62 / Ll, LZ = -0.70 / Ll;
+  /* half-vector between key light and view (0,0,-1) for a soft specular sheen */
+  const Hl = Math.hypot(LX, LY, LZ - 1);
+  const HX = LX / Hl, HY = LY / Hl, HZ = (LZ - 1) / Hl;
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
@@ -337,6 +340,26 @@ export function mountBrain3D(canvas, opts) {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
 
+    /* ambient vignette + soft ground shadow give the model a stage */
+    const amb = ctx.createRadialGradient(cxp, cyp * 0.86, 8, cxp, cyp, Math.max(W, H) * 0.78);
+    amb.addColorStop(0, "rgba(255,255,255,0.05)");
+    amb.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = amb;
+    ctx.fillRect(0, 0, W, H);
+    const gy = cyp + 122 * scale, grx = 150 * scale, gry = 24 * scale;
+    const gsh = ctx.createRadialGradient(cxp, gy, 1, cxp, gy, grx);
+    gsh.addColorStop(0, "rgba(0,0,0,0.32)");
+    gsh.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.save();
+    ctx.translate(cxp, gy);
+    ctx.scale(1, gry / grx);
+    ctx.translate(-cxp, -gy);
+    ctx.fillStyle = gsh;
+    ctx.beginPath();
+    ctx.arc(cxp, gy, grx, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+
     /* project every vertex */
     for (let i = 0; i < NV; i++) {
       const p = geo.verts[i];
@@ -365,6 +388,7 @@ export function mountBrain3D(canvas, opts) {
       const cz1 = -fc.cx * sy + fc.cz * cy;
       fdepth[i] = fc.cy * sp + cz1 * cp;
       fc._d = diff;
+      fc._nx = nx1; fc._ny = ny2; fc._nz = nz2;
       /* baked AO + silhouette rim darkening define the folds */
       const rim = Math.pow(1 - Math.abs(nz2), 3);
       fc._k = fc.ao * (1 - 0.22 * rim);
@@ -396,6 +420,17 @@ export function mountBrain3D(canvas, opts) {
       ctx.closePath();
       ctx.fill();
       ctx.stroke();
+      /* specular sheen on faces angled toward the key light */
+      const hd = fc._nx * HX + fc._ny * HY + fc._nz * HZ;
+      if (hd > 0.55) {
+        const spec = Math.pow(hd, 16) * 0.30;
+        if (spec > 0.02) {
+          ctx.globalAlpha = Math.min(0.28, spec);
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      }
       if (fc.region) hitFaces.push({ ax: A.x, ay: A.y, bx: B.x, by: B.y, cx: Cc.x, cy: Cc.y, d: fdepth[i], region: fc.region });
     }
 
