@@ -290,7 +290,320 @@
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
-/*__JS__*/
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = "chitalka.v1";
+
+  var wordEl = $("word"), lEl = wordEl.querySelector(".l"),
+      pEl = wordEl.querySelector(".p"), rEl = wordEl.querySelector(".r");
+  var fill = $("fill"), bar = $("bar"), input = $("input");
+  var playBtn = $("play"), playIcon = $("playIcon"), playText = $("playText");
+
+  var ICON_PLAY = '<path d="M8 5v14l11-7z"/>';
+  var ICON_PAUSE = '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';
+
+  var words = [], i = 0, playing = false, timer = null, wakeLock = null;
+  var wpm = 350, chunk = 1, usePivot = true, mono = false;
+  var startedAt = 0, readCount = 0, saveTimer = null;
+
+  var DEMO = "Обычное чтение тормозит не из-за глаз, а из-за привычки проговаривать текст про себя. Внутренний голос тянет скорость к двумстам словам в минуту, хотя мозг распознаёт слово целиком за долю секунды. Когда слова идут по одному в одной и той же точке экрана, глазам не нужно бегать по строкам и искать следующую строку — исчезает самая дорогая часть чтения, возвратные движения взгляда. Красная буква в центре называется опорной точкой распознавания: если держать её неподвижной, слово опознаётся быстрее, чем при обычном взгляде. Начни с трёхсот пятидесяти слов в минуту и поднимай на двадцать каждые пару абзацев, пока понимание не начнёт проседать. Технические тексты и стихи читай медленнее, новости и письма — быстрее. Смысл не в рекорде скорости, а в том, чтобы у тебя появился выбор: проглотить статью за минуту или смаковать абзац.";
+
+  /* ---------- persistence (local only, nothing leaves the device) ---------- */
+  function save() {
+    try {
+      localStorage.setItem(KEY, JSON.stringify({
+        text: input.value, wpm: wpm, chunk: chunk, pivot: usePivot, mono: mono
+      }));
+    } catch (e) { /* private mode / quota — reading still works */ }
+  }
+  function saveSoon() { clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); }
+  function load() {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+    if (d) {
+      input.value = typeof d.text === "string" ? d.text : "";
+      wpm = clamp(+d.wpm || 350, 120, 900);
+      chunk = [1, 2, 3].indexOf(+d.chunk) >= 0 ? +d.chunk : 1;
+      usePivot = d.pivot !== false; mono = !!d.mono;
+    } else {
+      input.value = DEMO;
+    }
+  }
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+
+  /* ---------- tokenise ---------- */
+  function tokenize(text) {
+    var out = [];
+    var paras = String(text).replace(/\u00ad/g, "").replace(/\r/g, "").split(/\n+/);
+    for (var p = 0; p < paras.length; p++) {
+      var parts = paras[p].trim().split(/\s+/).filter(Boolean);
+      for (var k = 0; k < parts.length; k++) {
+        out.push({ t: parts[k], para: k === parts.length - 1 });
+      }
+    }
+    return out;
+  }
+
+  /* optimal recognition point, 0-based */
+  function orp(w) {
+    var n = w.replace(/[^\p{L}\p{N}]/gu, "").length || w.length;
+    if (n <= 1) return 0;
+    if (n <= 5) return 1;
+    if (n <= 9) return 2;
+    if (n <= 13) return 3;
+    return 4;
+  }
+
+  function displayAt(idx) {
+    var n = Math.min(chunk, words.length - idx), s = "";
+    for (var k = 0; k < n; k++) s += (k ? " " : "") + words[idx + k].t;
+    return { text: s, n: n, last: words[idx + n - 1] };
+  }
+
+  function paint(d) {
+    var s = d.text, pi = usePivot ? Math.min(orp(words[i].t), s.length - 1) : -1;
+    if (pi < 0) { lEl.textContent = ""; pEl.textContent = ""; rEl.textContent = s; }
+    else {
+      lEl.textContent = s.slice(0, pi);
+      pEl.textContent = s.charAt(pi);
+      rEl.textContent = s.slice(pi + 1);
+    }
+    wordEl.className = "word" + (mono ? " mono" : "") +
+      (s.length > 26 ? " tiny" : s.length > 15 ? " small" : "");
+  }
+
+  function idle(msg) {
+    wordEl.className = "word idle";
+    lEl.textContent = ""; pEl.textContent = msg; rEl.textContent = "";
+  }
+
+  /* ---------- timing ---------- */
+  function delayFor(d) {
+    var base = 60000 / wpm;
+    var m = d.n > 1 ? d.n * 0.92 : 1;
+    var t = d.last.t;
+    if (/[.!?…]["'»)]*$/.test(t)) m *= 2.1;
+    else if (/[,;:—–]["'»)]*$/.test(t)) m *= 1.5;
+    if (d.last.para) m *= 1.5;
+    if (t.length > 13) m *= 1.2;
+    return Math.max(45, base * m);
+  }
+
+  function fmt(sec) {
+    sec = Math.max(0, Math.round(sec));
+    var m = Math.floor(sec / 60), s = sec % 60;
+    if (m >= 60) return Math.floor(m / 60) + " ч " + (m % 60) + " мин";
+    return m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  function meta() {
+    var total = words.length;
+    $("mPos").textContent = total ? Math.min(i + 1, total) : 0;
+    $("mTotal").textContent = total;
+    $("mLeft").textContent = total ? fmt((total - i) / wpm * 60) : "—";
+    $("mTime").textContent = total ? fmt(total / wpm * 60) : "—";
+    var pct = total ? i / total : 0;
+    fill.style.transform = "scaleX(" + pct + ")";
+    bar.setAttribute("aria-valuenow", Math.round(pct * 100));
+  }
+
+  /* ---------- engine ---------- */
+  function step() {
+    if (i >= words.length) return finish();
+    var d = displayAt(i);
+    paint(d);
+    readCount += d.n;
+    meta();
+    timer = setTimeout(function () {
+      i += d.n;
+      step();
+    }, delayFor(d));
+  }
+
+  function play() {
+    if (!words.length) rebuild();
+    if (!words.length) { toast("Сначала вставь текст"); return; }
+    if (i >= words.length) i = 0;
+    playing = true; readCount = 0; startedAt = performance.now();
+    playIcon.innerHTML = ICON_PAUSE; playText.textContent = "Пауза";
+    clearTimeout(timer); step(); keepAwake(true);
+  }
+
+  function pause() {
+    playing = false; clearTimeout(timer); timer = null;
+    playIcon.innerHTML = ICON_PLAY; playText.textContent = "Читать";
+    keepAwake(false);
+  }
+
+  function finish() {
+    pause();
+    var mins = (performance.now() - startedAt) / 60000;
+    var real = mins > 0.05 ? Math.round(readCount / mins) : wpm;
+    idle("готово · " + words.length + " слов · " + real + " сл/мин");
+    fill.style.transform = "scaleX(1)";
+    $("mPos").textContent = words.length;
+    $("mLeft").textContent = "0:00";
+    i = words.length;
+    toast("Дочитал: " + words.length + " слов");
+  }
+
+  function rebuild() {
+    words = tokenize(input.value);
+    i = clamp(i, 0, Math.max(0, words.length - 1));
+    meta();
+    if (!words.length) idle("вставь текст");
+    else if (!playing) { var d = displayAt(i); paint(d); }
+  }
+
+  function jump(to) {
+    i = clamp(to, 0, Math.max(0, words.length - 1));
+    if (playing) { clearTimeout(timer); step(); }
+    else if (words.length) { paint(displayAt(i)); meta(); }
+  }
+
+  function keepAwake(on) {
+    try {
+      if (on && "wakeLock" in navigator && !wakeLock) {
+        navigator.wakeLock.request("screen").then(function (l) {
+          wakeLock = l;
+          l.addEventListener("release", function () { wakeLock = null; });
+        }).catch(function () {});
+      } else if (!on && wakeLock) { wakeLock.release().catch(function () {}); wakeLock = null; }
+    } catch (e) {}
+  }
+
+  var toastTimer = null;
+  function toast(msg) {
+    var el = $("toast");
+    el.textContent = msg; el.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("on"); }, 2200);
+  }
+
+  /* ---------- wiring ---------- */
+  playBtn.addEventListener("click", function () { playing ? pause() : play(); });
+  $("stage").addEventListener("click", function () { playing ? pause() : play(); });
+  $("back").addEventListener("click", function () { jump(i - 10); });
+  $("fwd").addEventListener("click", function () { jump(i + 10); });
+  $("restart").addEventListener("click", function () { pause(); i = 0; rebuild(); toast("В начало"); });
+
+  function setFocus(on) {
+    document.body.classList.toggle("focus", on);
+    if (on && document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(function () {});
+    } else if (!on && document.fullscreenElement) {
+      document.exitFullscreen().catch(function () {});
+    }
+  }
+  $("focus").addEventListener("click", function () { setFocus(true); });
+  $("exit").addEventListener("click", function () { setFocus(false); });
+
+  $("wpm").addEventListener("input", function (e) {
+    wpm = clamp(+e.target.value, 120, 900);
+    $("wpmVal").textContent = wpm + " сл/мин";
+    $("badge").textContent = wpm + " сл/мин";
+    meta(); saveSoon();
+  });
+
+  $("chunk").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-n]"); if (!b) return;
+    chunk = +b.dataset.n;
+    Array.prototype.forEach.call(this.querySelectorAll("button"), function (x) {
+      x.setAttribute("aria-pressed", String(+x.dataset.n === chunk));
+    });
+    if (words.length && !playing) paint(displayAt(i));
+    saveSoon();
+  });
+
+  $("pivot").addEventListener("change", function (e) {
+    usePivot = e.target.checked;
+    if (words.length && !playing) paint(displayAt(i));
+    saveSoon();
+  });
+  $("mono").addEventListener("change", function (e) {
+    mono = e.target.checked;
+    if (words.length && !playing) paint(displayAt(i));
+    saveSoon();
+  });
+
+  input.addEventListener("input", function () { pause(); i = 0; rebuild(); saveSoon(); });
+
+  $("paste").addEventListener("click", function () {
+    if (!navigator.clipboard || !navigator.clipboard.readText) {
+      input.focus(); toast("Жми Ctrl+V в поле текста"); return;
+    }
+    navigator.clipboard.readText().then(function (t) {
+      if (!t) { toast("Буфер пуст"); return; }
+      input.value = t; pause(); i = 0; rebuild(); save(); toast("Вставлено");
+    }).catch(function () { input.focus(); toast("Разреши доступ к буферу или жми Ctrl+V"); });
+  });
+
+  $("file").addEventListener("click", function () { $("fileInput").click(); });
+  $("fileInput").addEventListener("change", function (e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var fr = new FileReader();
+    fr.onload = function () {
+      input.value = String(fr.result || ""); pause(); i = 0; rebuild(); save();
+      toast("Загружено: " + f.name);
+    };
+    fr.onerror = function () { toast("Не смог прочитать файл"); };
+    fr.readAsText(f);
+    e.target.value = "";
+  });
+
+  $("demo").addEventListener("click", function () {
+    input.value = DEMO; pause(); i = 0; rebuild(); save(); toast("Пример загружен");
+  });
+  $("clear").addEventListener("click", function () {
+    input.value = ""; pause(); i = 0; rebuild(); save(); input.focus();
+  });
+
+  function seekFromEvent(e) {
+    var r = bar.getBoundingClientRect();
+    var x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+    jump(Math.round(clamp(x / r.width, 0, 1) * words.length));
+  }
+  bar.addEventListener("click", seekFromEvent);
+  bar.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight") { jump(i + Math.max(1, Math.round(words.length * .02))); e.preventDefault(); }
+    if (e.key === "ArrowLeft") { jump(i - Math.max(1, Math.round(words.length * .02))); e.preventDefault(); }
+  });
+
+  document.addEventListener("keydown", function (e) {
+    var tag = (e.target.tagName || "").toLowerCase();
+    if (tag === "textarea" || tag === "input") {
+      if (e.key === "Escape") e.target.blur();
+      return;
+    }
+    var k = e.key;
+    if (k === " " || k === "Enter") { e.preventDefault(); playing ? pause() : play(); }
+    else if (k === "r" || k === "R" || k === "к" || k === "К") { pause(); i = 0; rebuild(); }
+    else if (k === "f" || k === "F" || k === "а" || k === "А") { setFocus(!document.body.classList.contains("focus")); }
+    else if (k === "Escape") { setFocus(false); }
+    else if (k === "ArrowRight") { e.preventDefault(); jump(i + (e.shiftKey ? 10 : chunk)); }
+    else if (k === "ArrowLeft") { e.preventDefault(); jump(i - (e.shiftKey ? 10 : chunk)); }
+    else if (k === "ArrowUp") { e.preventDefault(); $("wpm").value = clamp(wpm + 20, 120, 900); $("wpm").dispatchEvent(new Event("input")); }
+    else if (k === "ArrowDown") { e.preventDefault(); $("wpm").value = clamp(wpm - 20, 120, 900); $("wpm").dispatchEvent(new Event("input")); }
+  });
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden && playing) pause();
+    else if (!document.hidden && playing) keepAwake(true);
+  });
+
+  /* ---------- boot ---------- */
+  load();
+  $("wpm").value = wpm;
+  $("wpmVal").textContent = wpm + " сл/мин";
+  $("badge").textContent = wpm + " сл/мин";
+  $("pivot").checked = usePivot;
+  $("mono").checked = mono;
+  Array.prototype.forEach.call($("chunk").querySelectorAll("button"), function (x) {
+    x.setAttribute("aria-pressed", String(+x.dataset.n === chunk));
+  });
+  rebuild();
+})();
 </script>
 </body>
 </html>
