@@ -100,6 +100,9 @@ const MOBILE_NAV = [
   { id: "more", label: "Ещё", icon: "menu", more: true },
 ];
 
+/* v5: horizontal section strip in the topbar replaces the desktop sidebar. */
+const TOPNAV = NAV.flatMap((g) => g.items).filter((it) => it.id !== "settings");
+
 /* ------------------------------------------------------------------ */
 /* Shell                                                               */
 /* ------------------------------------------------------------------ */
@@ -139,6 +142,9 @@ function topbarHtml() {
     <button class="icon-btn menu-btn" id="btn-menu" aria-label="Открыть меню">${icon("menu", 20)}</button>
     <a class="brand" href="#/">${BRAND}</a>
     <div class="topbar-title" id="topbar-title">Главная</div>
+    <nav class="topnav" aria-label="Разделы">${TOPNAV.map(
+      (it) => `<a href="${it.href}" data-nav="${it.id}">${esc(it.label)}</a>`
+    ).join("")}</nav>
     <div class="topbar-actions">
       <button class="icon-btn" id="btn-search" aria-label="Поиск">
         ${icon("search", 18)}
@@ -580,6 +586,12 @@ function paintNav(navId) {
   if (navId === "cards") {
     const learn = document.querySelector('#bottom-nav [data-nav="learn"]');
     if (learn) learn.classList.add("active");
+  }
+  // Keep the active chip centred in the desktop section strip.
+  const strip = document.querySelector(".topnav");
+  if (strip) {
+    const on = strip.querySelector("a.active");
+    if (on) strip.scrollTo({ left: on.offsetLeft - strip.clientWidth / 2 + on.offsetWidth / 2, behavior: "smooth" });
   }
 }
 
