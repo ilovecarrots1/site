@@ -1,37 +1,40 @@
 <!doctype html>
-<html lang="en" data-accent="mint" data-density="comfortable" data-motion="on" data-skin="field">
+<html lang="en" data-accent="teal" data-density="comfortable" data-motion="on" data-skin="field">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>NeuroDifference v5 — evidence · compounds · pathways</title>
+    <title>NeuroDifference v5 — Field Lab</title>
     <meta
       name="description"
-      content="Redesigned NeuroDifference: an evidence-graded map of neuropharmacology with a new interface and 3D brain."
+      content="NeuroDifference v5 test build: redesigned interface and 3D brain, isolated from the main site."
     />
     <meta name="theme-color" content="#0a0f0d" />
     <meta name="color-scheme" content="dark" />
-    <link rel="icon" href="../icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="../icon.svg" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="NeuroDifference v5" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon.svg" />
+
     <link rel="stylesheet" href="./app/styles.css?v=5.0.0" />
-    <link rel="stylesheet" href="./app/clinic.css?v=5.0.0" />
     <link rel="stylesheet" href="./app/skin.css?v=5.0.0" />
+    <link rel="stylesheet" href="./app/clinic.css?v=5.0.0" />
   </head>
   <body>
-    <div class="bgfx" aria-hidden="true"><i></i><i></i><i></i></div>
-    <div id="root"></div>
-<div id="app" class="shell">
-      <aside id="sidebar" class="sidebar" aria-label="Primary"></aside>
-      <div class="main" id="main">
-        <header id="topbar" class="topbar"></header>
-        <main id="view" class="view" role="main"></main>
-      </div>
+    <div id="root">
+      <noscript>
+        <div style="padding: 32px; font-family: system-ui, sans-serif; color: #e6e8eb; background: #0a0f0d; min-height: 100dvh">
+          <h1 style="font-size: 20px; margin-bottom: 8px">NeuroDifference v5 needs JavaScript</h1>
+          <p style="color: #a9b2bf; font-size: 14px; line-height: 1.6; max-width: 46ch">
+            This test build renders on the device. Enable JavaScript to use it.
+          </p>
+        </div>
+      </noscript>
     </div>
-    <nav id="bottom-nav" class="bottom-nav" aria-label="Navigation"></nav>
-    <div id="drawer" class="drawer" aria-hidden="true"></div>
-    <div id="search" class="overlay" aria-hidden="true"></div>
-    <div id="modal" class="overlay" aria-hidden="true"></div>
-    <div id="toast" class="toast-host" aria-live="polite" aria-atomic="true"></div>
-    <noscript>This app needs JavaScript to run. The content is a client-side single page app.</noscript>
     <script type="module" src="./app/main.js?v=5.0.0"></script>
   </body>
 </html>
