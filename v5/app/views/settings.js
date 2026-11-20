@@ -11,22 +11,18 @@ import { pageHead, callout, subscribePlate } from "./ui.js";
 import { LANGS, setLang } from "../lib/i18n.js";
 
 const ACCENTS = [
-  ["violet", "Фиолетовый", "#8b7bff"],
-  ["amber", "Янтарный", "#f2b23e"],
-  ["teal", "Бирюзовый", "#2dd4bf"],
-  ["rose", "Розовый", "#fb7185"],
-  ["green", "Зелёный", "#4ade80"],
-  ["blue", "Синий", "#60a5fa"],
-  ["cyan", "Циан", "#22d3ee"],
-  ["lime", "Лаймовый", "#a3e635"],
-  ["orange", "Оранжевый", "#fb923c"],
-  ["magenta", "Маджента", "#e879f9"],
+  ["moss", "Мох", "#3fb8a3"],
+  ["oxide", "Оксид", "#d17a4b"],
+  ["slate", "Сланец", "#6ba3c7"],
+  ["dune", "Дюна", "#b89b5e"],
+  ["sage", "Шалфей", "#7fae7a"],
+  ["clay", "Глина", "#c96f5a"],
 ];
 
 const SKINS = [
-  ["aurora", "Аврора", "Мягкий свет за матовыми карточками"],
-  ["scope", "Осциллограф", "Фосфорные трассы на сетке"],
-  ["prism", "Призма", "Спектральные градиенты, жёсткие края"],
+  ["field", "Field Lab", "Тёплый графит, минеральные акценты, матовые поверхности"],
+  ["slate", "Сланец", "Холодная сталь и сине-серые трассы"],
+  ["oxide", "Оксид", "Медь, охра и тёплая патина"],
 ];
 
 /* ---- accent maths ---------------------------------------------------- */
@@ -80,7 +76,7 @@ const DENSITIES = [
 export function applyAppearance() {
   const s = store.data.settings || {};
   const rootEl = document.documentElement;
-  const skin = SKINS.some(([k]) => k === s.skin) ? s.skin : "aurora";
+  const skin = SKINS.some(([k]) => k === s.skin) ? s.skin : "field";
   rootEl.setAttribute("data-skin", skin);
   rootEl.setAttribute("data-density", s.density || "comfortable");
   rootEl.setAttribute("data-motion", s.motion === false ? "off" : "on");
@@ -96,7 +92,7 @@ export function applyAppearance() {
     rootEl.style.setProperty("--accent-soft", custom.soft);
     rootEl.style.setProperty("--accent-line", custom.line);
   } else {
-    rootEl.setAttribute("data-accent", s.accent || "violet");
+    rootEl.setAttribute("data-accent", ACCENTS.some(([k]) => k === s.accent) ? s.accent : "moss");
     ["--accent", "--accent-2", "--accent-ink", "--accent-soft", "--accent-line"].forEach((p) => rootEl.style.removeProperty(p));
   }
 }
@@ -266,7 +262,7 @@ export const settings = {
             <p class="small muted" style="line-height:1.6">NeuroDifference — личный учебный инструмент: энциклопедия препаратов с градацией доказательности, атлас нейромедиаторов, песочница фармакокинетики и курсы с интервальным повторением. Это не медицинское изделие.</p>
             ${callout("danger", "Не медицинская рекомендация", "Ничто здесь не является рекомендацией принимать, комбинировать, снижать или отменять какое-либо вещество. Дозировки — справочные величины из литературы, не назначения. Поговори с врачом, который знает твою историю.")}
             <div class="row wrap" style="gap:5px;margin-top:2px">
-              <span class="chip">v4.4.1</span>
+              <span class="chip">v5.0.0</span>
               <span class="chip">${COMPOUNDS.length} препаратов</span>
               <span class="chip">${SYSTEMS.length} систем</span>
               <span class="chip">${TOTAL_LESSONS} уроков</span>
