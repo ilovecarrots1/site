@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
+<meta name="description" content="Читалка — вставь текст и читай в 2-3 раза быстрее. Слова по одному, опорная буква, настройка скорости. Работает офлайн, ничего никуда не отправляет.">
+<title>Читалка — быстрое чтение текста</title>
+<style>
+  /* ---------- tokens ---------- */
+  :root{
+    --bg:#0b0d10; --bg-1:#12151a; --bg-2:#171b21; --line:#242a33;
+    --text:#e9edf3; --text-2:#9aa4b2; --text-3:#66707d;
+    --accent:#8b7cf6; --accent-2:#5eead4; --pivot:#f85149;
+    --ok:#3fb950; --warn:#d29922;
+    --r-s:10px; --r:14px; --r-l:20px; --r-xl:26px;
+    --pad:16px; --gap:12px; --tap:46px;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --shadow:0 18px 50px -18px rgba(0,0,0,.85);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    min-height:100vh; line-height:1.5; overflow-x:hidden;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  /* static ambient glow — no animated blur anywhere */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      radial-gradient(900px 520px at 12% -8%, rgba(139,124,246,.16), transparent 62%),
+      radial-gradient(760px 460px at 92% 4%, rgba(94,234,212,.10), transparent 60%);
+  }
+  .wrap{position:relative; z-index:1; max-width:860px; margin:0 auto; padding:20px var(--pad) 40px}
+
+  /* ---------- header ---------- */
+  header{display:flex; align-items:center; gap:var(--gap); flex-wrap:wrap; margin-bottom:18px}
+  .logo{
+    width:42px; height:42px; flex:0 0 auto; border-radius:var(--r);
+    background:linear-gradient(140deg,var(--accent),#6d5ce0);
+    display:grid; place-items:center; box-shadow:0 8px 22px -10px rgba(139,124,246,.9);
+  }
+  .logo svg{width:22px; height:22px; display:block}
+  .titles{min-width:0; flex:1 1 180px}
+  h1{margin:0; font-size:20px; letter-spacing:-.02em; font-weight:700}
+  .sub{margin:2px 0 0; font-size:13px; color:var(--text-2)}
+  .badge{
+    font:600 12px/1 var(--mono); color:var(--accent-2);
+    border:1px solid var(--line); background:var(--bg-1);
+    padding:8px 10px; border-radius:999px; white-space:nowrap;
+  }
+
+  /* ---------- reader ---------- */
+  .reader{
+    position:relative; background:var(--bg-1); border:1px solid var(--line);
+    border-radius:var(--r-xl); box-shadow:var(--shadow); overflow:hidden;
+  }
+  .stage{position:relative; padding:34px 18px 30px; min-height:190px; display:grid; place-items:center}
+  .guide{position:absolute; left:18px; right:18px; height:1px; background:var(--line)}
+  .guide.top{top:26px} .guide.bot{bottom:26px}
+  .tick{position:absolute; left:50%; width:1px; height:9px; background:var(--text-3); opacity:.55; transform:translateX(-50%)}
+  .tick.top{top:26px} .tick.bot{bottom:26px}
+
+  /* ORP alignment: pivot char sits exactly on the centre line */
+  .word{
+    display:grid; grid-template-columns:1fr auto 1fr; align-items:baseline;
+    width:100%; font-size:clamp(26px,8.4vw,58px); font-weight:650;
+    letter-spacing:-.01em; line-height:1.15;
+  }
+  .word .l{text-align:right; white-space:pre}
+  .word .p{color:var(--pivot); white-space:pre}
+  .word .r{text-align:left; white-space:pre}
+  .word.mono{font-family:var(--mono); font-weight:600; letter-spacing:0}
+  .word.small{font-size:clamp(19px,5.6vw,38px)}
+  .word.tiny{font-size:clamp(15px,4.4vw,28px)}
+  .word.idle{color:var(--text-3); font-weight:600; font-size:clamp(17px,4.6vw,26px)}
+  .word.idle .p{color:var(--text-3)}
+
+  .bar{height:4px; background:var(--bg-2); cursor:pointer; position:relative}
+  .bar > i{
+    display:block; height:100%; width:100%; transform-origin:0 50%; transform:scaleX(0);
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  }
+  .meta{
+    display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between;
+    padding:12px 16px; border-top:1px solid var(--line);
+    font:500 12px/1.3 var(--mono); color:var(--text-2);
+  }
+  .meta b{color:var(--text); font-weight:600}
+
+  /* ---------- controls ---------- */
+  .controls{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:16px}
+  button{font-family:inherit}
+  .btn{
+    min-height:var(--tap); padding:0 16px; border-radius:var(--r);
+    border:1px solid var(--line); background:var(--bg-1); color:var(--text);
+    font-size:14px; font-weight:600; cursor:pointer; display:inline-flex;
+    align-items:center; justify-content:center; gap:8px;
+    transition:transform .16s var(--ease), opacity .16s var(--ease);
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn:active{transform:translateY(0) scale(.985)}
+  .btn.icon{width:var(--tap); padding:0; flex:0 0 auto}
+  .btn.primary{
+    background:linear-gradient(140deg,var(--accent),#6d5ce0); border-color:transparent;
+    color:#fff; flex:1 1 150px; box-shadow:0 12px 28px -14px rgba(139,124,246,.95);
+  }
+  .btn svg{width:18px; height:18px; display:block; flex:0 0 auto}
+  .btn[disabled]{opacity:.45; cursor:not-allowed; transform:none}
+
+  .panel{
+    margin-top:16px; background:var(--bg-1); border:1px solid var(--line);
+    border-radius:var(--r-l); padding:var(--pad);
+  }
+  .row{display:flex; gap:var(--gap); align-items:center; flex-wrap:wrap}
+  .row + .row{margin-top:14px}
+  .label{font:600 11px/1 var(--sans); letter-spacing:.14em; text-transform:uppercase; color:var(--text-3); flex:0 0 auto}
+  .val{font:600 13px/1 var(--mono); color:var(--accent-2); min-width:74px; text-align:right}
+  input[type=range]{
+    -webkit-appearance:none; appearance:none; flex:1 1 140px; height:var(--tap);
+    background:transparent; cursor:pointer; margin:0;
+  }
+  input[type=range]::-webkit-slider-runnable-track{height:4px; border-radius:999px; background:var(--bg-2)}
+  input[type=range]::-moz-range-track{height:4px; border-radius:999px; background:var(--bg-2)}
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:22px; height:22px; border-radius:50%; margin-top:-9px;
+    background:var(--accent); border:3px solid var(--bg-1); box-shadow:0 2px 10px rgba(0,0,0,.6);
+  }
+  input[type=range]::-moz-range-thumb{
+    width:16px; height:16px; border-radius:50%; background:var(--accent);
+    border:3px solid var(--bg-1);
+  }
+  .seg{display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; background:var(--bg-2)}
+  .seg button{
+    min-height:38px; padding:0 14px; border:0; background:transparent; color:var(--text-2);
+    font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .seg button[aria-pressed=true]{background:var(--accent); color:#fff}
+  .switch{display:inline-flex; align-items:center; gap:9px; cursor:pointer; font-size:13px; color:var(--text-2); min-height:38px}
+  .switch input{position:absolute; opacity:0; width:0; height:0}
+  .switch i{
+    width:42px; height:24px; border-radius:999px; background:var(--bg-2);
+    border:1px solid var(--line); position:relative; flex:0 0 auto;
+    transition:background .18s var(--ease);
+  }
+  .switch i::after{
+    content:""; position:absolute; top:2px; left:2px; width:18px; height:18px;
+    border-radius:50%; background:var(--text-3);
+    transition:transform .18s var(--ease), background .18s var(--ease);
+  }
+  .switch input:checked + i{background:rgba(139,124,246,.35)}
+  .switch input:checked + i::after{transform:translateX(18px); background:var(--accent)}
+  .switch input:focus-visible + i{outline:2px solid var(--accent); outline-offset:2px}
+
+  textarea{
+    width:100%; min-height:170px; resize:vertical; padding:14px;
+    background:var(--bg-2); color:var(--text); border:1px solid var(--line);
+    border-radius:var(--r); font-family:inherit; font-size:15px; line-height:1.55;
+  }
+  textarea:focus{outline:2px solid var(--accent); outline-offset:1px; border-color:transparent}
+  .hint{margin:10px 0 0; font-size:12px; color:var(--text-3)}
+  .hint kbd{
+    font:600 11px/1 var(--mono); background:var(--bg-2); border:1px solid var(--line);
+    border-radius:6px; padding:3px 6px; color:var(--text-2);
+  }
+  .toast{
+    position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); opacity:0;
+    background:var(--bg-2); border:1px solid var(--line); color:var(--text);
+    padding:12px 16px; border-radius:999px; font-size:13px; font-weight:600;
+    box-shadow:var(--shadow); pointer-events:none; z-index:60; max-width:calc(100vw - 32px);
+    transition:transform .24s var(--ease), opacity .24s var(--ease);
+  }
+  .toast.on{transform:translate(-50%,0); opacity:1}
+  footer{margin-top:22px; font-size:12px; color:var(--text-3); text-align:center}
+
+  /* ---------- focus mode ---------- */
+  body.focus header, body.focus .panel, body.focus footer, body.focus .meta{display:none}
+  body.focus .wrap{max-width:1100px; padding-top:8px}
+  body.focus .stage{min-height:56vh}
+  body.focus .word{font-size:clamp(30px,10vw,84px)}
+  body.focus .word.small{font-size:clamp(22px,6.4vw,52px)}
+  body.focus .word.tiny{font-size:clamp(17px,5vw,36px)}
+  .exit{position:fixed; top:14px; right:14px; z-index:70; display:none}
+  body.focus .exit{display:inline-flex}
+
+  @media (max-width:520px){
+    .wrap{padding:14px 12px 32px}
+    .stage{padding:28px 12px 26px; min-height:168px}
+    .guide{left:12px; right:12px}
+    .meta{font-size:11px; gap:8px}
+    .btn{font-size:13px; padding:0 13px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.01ms !important; animation-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 6h9a3 3 0 0 1 3 3v11a2.5 2.5 0 0 0-2.5-2.5H2z"/>
+        <path d="M22 6h-5a3 3 0 0 0-3 3v11a2.5 2.5 0 0 1 2.5-2.5H22z"/>
+      </svg>
+    </div>
+    <div class="titles">
+      <h1>Читалка</h1>
+      <p class="sub">Вставь текст — читай в 2–3 раза быстрее. Всё считается на устройстве.</p>
+    </div>
+    <span class="badge" id="badge">350 сл/мин</span>
+  </header>
+
+  <section class="reader">
+    <div class="stage" id="stage">
+      <span class="guide top"></span><span class="tick top"></span>
+      <div class="word idle" id="word" aria-live="off"><span class="l"></span><span class="p">готов</span><span class="r"></span></div>
+      <span class="guide bot"></span><span class="tick bot"></span>
+    </div>
+    <div class="bar" id="bar" role="slider" tabindex="0" aria-label="Позиция в тексте" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="fill"></i></div>
+    <div class="meta">
+      <span>слово <b id="mPos">0</b> / <b id="mTotal">0</b></span>
+      <span>осталось <b id="mLeft">—</b></span>
+      <span>всего <b id="mTime">—</b></span>
+    </div>
+  </section>
+
+  <div class="controls">
+    <button class="btn icon" id="back" title="Назад 10 слов (Shift+←)" aria-label="Назад 10 слов">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 17l-5-5 5-5"/><path d="M18 17l-5-5 5-5"/></svg>
+    </button>
+    <button class="btn primary" id="play">
+      <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      <span id="playText">Читать</span>
+    </button>
+    <button class="btn icon" id="fwd" title="Вперёд 10 слов (Shift+→)" aria-label="Вперёд 10 слов">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 17l5-5-5-5"/><path d="M6 17l5-5-5-5"/></svg>
+    </button>
+    <button class="btn icon" id="restart" title="В начало (R)" aria-label="В начало">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+    </button>
+    <button class="btn icon" id="focus" title="Режим фокуса (F)" aria-label="Режим фокуса">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg>
+    </button>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <span class="label">Скорость</span>
+      <input type="range" id="wpm" min="120" max="900" step="10" value="350" aria-label="Слов в минуту">
+      <span class="val" id="wpmVal">350 сл/мин</span>
+    </div>
+    <div class="row">
+      <span class="label">По</span>
+      <span class="seg" id="chunk" role="group" aria-label="Слов за раз">
+        <button data-n="1" aria-pressed="true">1</button>
+        <button data-n="2" aria-pressed="false">2</button>
+        <button data-n="3" aria-pressed="false">3</button>
+      </span>
+      <label class="switch"><input type="checkbox" id="pivot" checked><i></i>опорная буква</label>
+      <label class="switch"><input type="checkbox" id="mono"><i></i>моно</label>
+    </div>
+    <div class="row">
+      <span class="label">Текст</span>
+      <button class="btn" id="paste">Вставить</button>
+      <button class="btn" id="file">Файл .txt</button>
+      <button class="btn" id="demo">Пример</button>
+      <button class="btn" id="clear">Очистить</button>
+      <input type="file" id="fileInput" accept=".txt,.md,text/plain,text/markdown" hidden>
+    </div>
+    <div class="row">
+      <textarea id="input" placeholder="Вставь сюда статью, конспект или главу. Ctrl+V — и жми «Читать»."></textarea>
+    </div>
+    <p class="hint">
+      <kbd>Space</kbd> пуск/пауза · <kbd>R</kbd> в начало · <kbd>←</kbd><kbd>→</kbd> слово ·
+      <kbd>Shift</kbd>+<kbd>←</kbd><kbd>→</kbd> 10 слов · <kbd>F</kbd> фокус · <kbd>Esc</kbd> выход
+    </p>
+  </div>
+
+  <footer>Ничего не загружается в сеть: текст живёт только в этом браузере.</footer>
+</div>
+
+<button class="btn icon exit" id="exit" aria-label="Выйти из режима фокуса">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>
+</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/*__JS__*/
+</script>
+</body>
+</html>
