@@ -121,7 +121,11 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(req)
         .then((res) => {
-          if (res && res.ok) {
+          // Only the app shell may be stored as index.html. Standalone pages
+          // (speedread.html, promo, diagnostics) must never hijack the offline shell.
+          const p = url.pathname;
+          const isShell = p.endsWith("/") || p.endsWith("/index.html");
+          if (res && res.ok && isShell) {
             const copy = res.clone();
             caches.open(VERSION).then((c) => c.put("./index.html", copy)).catch(() => {});
           }
