@@ -493,6 +493,8 @@ h2 { font-weight: 600; letter-spacing: -0.02em; }
 
 /* Legacy chrome is gone for good. */
 .topbar, .bottom-nav, .topnav, .menu-btn, .drawer-host { display: none !important; }
+/* No topbar: reclaim its height so sticky columns sit under the safe area. */
+:root { --top-h: 0px; }
 
 /* Reclaim the space the bars used to occupy. */
 .view {
