@@ -152,7 +152,7 @@ export const settings = {
             <div class="eyebrow" style="margin-bottom:7px">Скин</div>
             <div class="skin-pick" id="set-skin">
               ${SKINS.map(
-                ([key, label, sub]) => `<button class="skin-card ${(st.skin || "aurora") === key ? "on" : ""}" data-skin="${key}">
+                ([key, label, sub]) => `<button class="skin-card ${(st.skin || "field") === key ? "on" : ""}" data-skin="${key}">
                   <span class="skin-swatch" data-skin-swatch="${key}"></span>
                   <span class="skin-name">${label}</span>
                   <span class="skin-sub tiny dim">${sub}</span>
@@ -164,15 +164,15 @@ export const settings = {
             <div class="eyebrow" style="margin-bottom:7px">Акцент</div>
             <div class="row wrap" style="gap:7px" id="set-accent">
               ${ACCENTS.map(
-                ([key, label, hex]) => `<button class="chip chip-btn ${!st.accentHex && (st.accent || "violet") === key ? "on" : ""}" data-accent="${key}">
+                ([key, label, hex]) => `<button class="chip chip-btn ${!st.accentHex && (st.accent || "moss") === key ? "on" : ""}" data-accent="${key}">
                   <span class="dot" style="background:${hex}"></span>${label}
                 </button>`
               ).join("")}
             </div>
             <div class="row wrap" style="gap:8px;margin-top:9px;align-items:center">
-              <span class="hs-swatch" id="set-hex-swatch" style="background:${esc(accentTokens(st.accentHex) ? accentTokens(st.accentHex).accent : "#8b7bff")}"></span>
+              <span class="hs-swatch" id="set-hex-swatch" style="background:${esc(accentTokens(st.accentHex) ? accentTokens(st.accentHex).accent : "#3fb8a3")}"></span>
               <input class="input mono" id="set-hex" type="text" spellcheck="false" autocapitalize="off" autocomplete="off"
-                placeholder="#8b7bff" maxlength="7" value="${esc(st.accentHex || "")}" style="width:104px;font-size:12px;text-align:center">
+                placeholder="#3fb8a3" maxlength="7" value="${esc(st.accentHex || "")}" style="width:104px;font-size:12px;text-align:center">
               <button class="btn soft xs" id="set-hex-apply" type="button">Применить</button>
               <button class="btn ghost xs" id="set-hex-clear" type="button">Авто</button>
               <span class="tiny dim" id="set-hex-note">${st.accentHex ? "свой" : "яркость нормализуется при применении"}</span>
@@ -350,7 +350,7 @@ export const settings = {
       const hex = root.querySelector("#set-hex");
       if (hex) hex.value = "";
       const sw = root.querySelector("#set-hex-swatch");
-      if (sw) sw.style.background = ACCENTS.find(([k]) => k === b.dataset.accent)?.[2] || "#8b7bff";
+      if (sw) sw.style.background = ACCENTS.find(([k]) => k === b.dataset.accent)?.[2] || "#3fb8a3";
       const note = root.querySelector("#set-hex-note");
       if (note) note.textContent = "пресет";
     });
@@ -360,7 +360,7 @@ export const settings = {
       if (!input) return;
       const t = accentTokens(input.value);
       if (!t) {
-        toast("Введи hex-цвет, например #8b7bff", "info");
+        toast("Введи hex-цвет, например #3fb8a3", "info");
         return;
       }
       store.set("settings.accentHex", t.accent);
@@ -378,15 +378,15 @@ export const settings = {
 
     root.querySelector("#set-hex-clear")?.addEventListener("click", () => {
       store.set("settings.accentHex", "");
-      if (store.data.settings.accent === "custom") store.set("settings.accent", "violet");
+      if (store.data.settings.accent === "custom") store.set("settings.accent", "moss");
       const input = root.querySelector("#set-hex");
       if (input) input.value = "";
       bump();
       root.querySelectorAll("#set-accent [data-accent]").forEach((el) =>
-        el.classList.toggle("on", el.dataset.accent === (store.data.settings.accent || "violet"))
+        el.classList.toggle("on", el.dataset.accent === (store.data.settings.accent || "moss"))
       );
       const sw = root.querySelector("#set-hex-swatch");
-      if (sw) sw.style.background = "#8b7bff";
+      if (sw) sw.style.background = "#3fb8a3";
       const note = root.querySelector("#set-hex-note");
       if (note) note.textContent = "пресет";
     });
