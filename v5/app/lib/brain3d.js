@@ -97,6 +97,8 @@ export function buildGeometry() {
     let nx = (B.y - A.y) * (C.z - A.z) - (B.z - A.z) * (C.y - A.y);
     let ny = (B.z - A.z) * (C.x - A.x) - (B.x - A.x) * (C.z - A.z);
     let nz = (B.x - A.x) * (C.y - A.y) - (B.y - A.y) * (C.x - A.x);
+    const area2 = Math.hypot(nx, ny, nz);
+    if (area2 < 0.02) return;   /* pole sliver — zero-area, drop it */
     /* orient outward from the part's local centre / axis */
     let rx, ry, rz;
     if (part === 2) {
@@ -108,7 +110,7 @@ export function buildGeometry() {
       rx = cx; ry = cy; rz = cz;
     }
     if (nx * rx + ny * ry + nz * rz < 0) { nx = -nx; ny = -ny; nz = -nz; const t = b; b = c; c = t; }
-    const len = Math.hypot(nx, ny, nz) || 1;
+    const len = area2;
     const region = regionAt(cx, cy, cz, part);
     faces.push({
       a, b, c, nx: nx / len, ny: ny / len, nz: nz / len,
