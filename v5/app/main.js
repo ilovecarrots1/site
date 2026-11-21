@@ -100,38 +100,12 @@ let currentNavId = "home";
 /* Shell                                                               */
 /* ------------------------------------------------------------------ */
 
-const BRAND = `<span class="brand-mark">${icon("brain", 17)}</span>
-  <span class="brand-text"><b>NeuroDifference</b><span>доказательность · препараты</span></span>`;
-
-function topbarHtml() {
-  return `<header class="topbar">
-    <button class="icon-btn menu-btn" id="btn-menu" aria-label="Открыть меню">${icon("menu", 20)}</button>
-    <a class="brand" href="#/">${BRAND}</a>
-    <div class="topbar-title" id="topbar-title">Главная</div>
-    <nav class="topnav" aria-label="Разделы">${TOPNAV.map(
-      (it) => `<a href="${it.href}" data-nav="${it.id}">${esc(it.label)}</a>`
-    ).join("")}</nav>
-    <div class="topbar-actions">
-      <button class="icon-btn" id="btn-search" aria-label="Поиск">
-        ${icon("search", 18)}
-      </button>
-      <a class="icon-btn only-desktop" href="#/cards" aria-label="Карточки к повторению" style="position:relative">
-        ${icon("layers", 18)}
-        <span class="dot-badge" id="nav-cards-dot" data-due-dot></span>
-      </a>
-      <a class="icon-btn only-desktop" href="#/settings" aria-label="Настройки">${icon("settings", 18)}</a>
-    </div>
-  </header>`;
-}
-
-function bottomNavHtml() {
-  return `<nav class="bottom-nav" id="bottom-nav">
-    ${MOBILE_NAV.map((it) =>
-      it.more
-        ? `<button class="nav-item" id="btn-more" style="background:none;border:0;font:inherit;cursor:pointer">${icon(it.icon, 20)}<span>${esc(it.label)}</span></button>`
-        : `<a class="nav-item" href="${it.href}" data-nav="${it.id}">${icon(it.icon, 20)}${it.id === "learn" ? `<span class="dot-badge" data-due-dot aria-hidden="true"></span>` : ""}<span>${esc(it.label)}</span></a>`
-    ).join("")}
-  </nav>`;
+function orbHtml() {
+  return `<button class="nav-orb" id="nav-orb" aria-label="Навигация и поиск" aria-haspopup="dialog">
+    <span class="nav-orb-ring" aria-hidden="true"></span>
+    <span class="nav-orb-ico" id="nav-orb-ico">${icon("grid", 22)}</span>
+    <span class="dot-badge nav-orb-dot" data-due-dot aria-hidden="true"></span>
+  </button>`;
 }
 
 let shellScrollWired = false;
@@ -140,16 +114,13 @@ function mountShell(root) {
   root.innerHTML = `<div class="bgfx" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="app">
       <div class="main">
-        ${topbarHtml()}
         <div class="view" id="view"></div>
       </div>
     </div>
-    ${bottomNavHtml()}
+    ${orbHtml()}
     <div class="toast-host" id="toast-host"></div>`;
 
-  document.getElementById("btn-menu")?.addEventListener("click", openDrawer);
-  document.getElementById("btn-more")?.addEventListener("click", openDrawer);
-  document.getElementById("btn-search")?.addEventListener("click", openSearch);
+  document.getElementById("nav-orb")?.addEventListener("click", () => openNavigator(false));
 
   if (!shellScrollWired) {
     shellScrollWired = true;
@@ -157,7 +128,31 @@ function mountShell(root) {
       document.documentElement.setAttribute("data-scrolled", String(window.scrollY > 8));
     }, 60);
     window.addEventListener("scroll", onScroll, { passive: true });
+    wireSwipe();
   }
+}
+
+/* Swipe down from the very top edge opens the command palette. Tracking
+   starts only within 72px of the top so it never fights content scrolling. */
+let swipeWired = false;
+function wireSwipe() {
+  if (swipeWired) return;
+  swipeWired = true;
+  let sy = 0, sx = 0, st = 0, tracking = false;
+  document.addEventListener("touchstart", (e) => {
+    if (document.querySelector(".navx-host")) { tracking = false; return; }
+    const t = e.touches[0];
+    if (t && t.clientY < 72) { tracking = true; sx = t.clientX; sy = t.clientY; st = Date.now(); }
+    else tracking = false;
+  }, { passive: true });
+  document.addEventListener("touchmove", (e) => {
+    if (!tracking) return;
+    const t = e.touches[0];
+    if (!t) return;
+    const dy = t.clientY - sy, dx = Math.abs(t.clientX - sx);
+    if (dy > 64 && dx < 90 && Date.now() - st < 650) { tracking = false; openNavigator(true); }
+  }, { passive: true });
+  document.addEventListener("touchend", () => { tracking = false; }, { passive: true });
 }
 
 /* ------------------------------------------------------------------ */
