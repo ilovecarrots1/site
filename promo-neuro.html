@@ -226,7 +226,108 @@ function drawReceptor(ctx,t,alpha,lock){
   ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
 }
 let AB=0; // current aberration px, set each frame before draws
-/*__C2__*/
+/* ================= neural network ================= */
+function persp(n){return 760/(760+n.z);}
+function buildNet(){
+  const nodes=[]; const N=178; let guard=0;
+  while(nodes.length<N && guard<9000){
+    guard++;
+    const a=Math.random()*TAU, rr=Math.pow(Math.random(),0.62);
+    const x=Math.cos(a)*rr*640, y=Math.sin(a)*rr*1030;
+    let ok=true;
+    for(const n of nodes){ if((n.x-x)*(n.x-x)+(n.y-y)*(n.y-y)<58*58){ok=false;break;} }
+    if(!ok) continue;
+    const hub=Math.random()<0.10;
+    nodes.push({x,y,z:rnd(-380,380), r:(hub?rnd(4,6.5):rnd(2.2,4.6)), c:Math.random()<0.32?"m":"c", ph:Math.random()*TAU, hub});
+  }
+  const edges=[],seen=new Set();
+  nodes.forEach((n,i)=>{
+    const near=nodes.map((m,j)=>({j,d:(m.x-n.x)*(m.x-n.x)+(m.y-n.y)*(m.y-n.y)+(m.z-n.z)*(m.z-n.z)*0.3}))
+      .filter(o=>o.j!==i).sort((a,b)=>a.d-b.d).slice(0,n.hub?4:2);
+    near.forEach(o=>{const key=i<o.j?i+"_"+o.j:o.j+"_"+i; if(seen.has(key))return; seen.add(key);
+      edges.push({a:i,b:o.j,off:Math.random(),sp:rnd(0.5,1.3),c:Math.random()<0.5?"c":"m"});});
+  });
+  nodes.forEach(n=>{n.dist=Math.hypot(n.x,n.y); n.ignite=D+n.dist/950+rnd(0,0.12);});
+  edges.forEach(e=>{e.start=Math.max(nodes[e.a].ignite,nodes[e.b].ignite);});
+  return {nodes,edges};
+}
+const NET=buildNet();
+function drawNetwork(ctx,t,alpha){
+  if(alpha<=0.01) return;
+  const flowing=(t>D+10&&t<D+18);
+  const beat=flowing?0.55+0.45*Math.sin((t-D-10)*TAU*2):1;
+  const settle=t>D+18?smooth((t-D-18)/2):0;
+  ctx.globalCompositeOperation="lighter"; ctx.lineCap="round";
+  for(const e of NET.edges){
+    const A=NET.nodes[e.a],B=NET.nodes[e.b];
+    const act=Math.min(smooth((t-A.ignite)/0.5),smooth((t-B.ignite)/0.5));
+    if(act<=0.02) continue;
+    const pa=persp(A),pb=persp(B);
+    const ax=CX+A.x*pa,ay=CY+A.y*pa,bx=CX+B.x*pb,by=CY+B.y*pb;
+    ctx.strokeStyle=rgba(e.c==="m"?MAG:CYAN,0.10*act*alpha*(0.6+0.4*beat));
+    ctx.lineWidth=1.1;
+    ctx.beginPath();ctx.moveTo(ax,ay);ctx.lineTo(bx,by);ctx.stroke();
+    if(t>e.start){
+      const sp=e.sp*(settle>0.5?0.5:1);
+      const f=((t-e.start)*sp+e.off)%1;
+      glowAB(ctx,lerp(ax,bx,f),lerp(ay,by,f),(2.6+2*beat)*3,e.c,act*alpha*(0.5+0.5*beat),AB);
+    }
+  }
+  for(const n of NET.nodes){
+    const act=smooth((t-n.ignite)/0.5);
+    if(act<=0.02) continue;
+    const p=persp(n), x=CX+n.x*p, y=CY+n.y*p;
+    const flick=0.7+0.3*Math.sin(t*4+n.ph);
+    const r=n.r*p*(1+0.5*act)*(settle>0.5?1.12:1);
+    const al=act*alpha*flick*(0.6+0.4*beat);
+    glowAB(ctx,x,y,r*4.2,n.c,al*0.5,AB);
+    glow(ctx,x,y,r*1.1,"w",al*0.85);
+  }
+  ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
+}
+/* ================= shockwave at the drop ================= */
+function drawShock(ctx,t){
+  if(t<D) return;
+  ctx.globalCompositeOperation="lighter";
+  for(let i=0;i<3;i++){
+    const age=t-D-i*0.13; if(age<=0||age>1.5) continue;
+    const k=age/1.5, r=eo(k)*1550, al=(1-k)*0.5, col=i%2?MAG:CYAN;
+    ctx.strokeStyle=rgba(col,al); ctx.lineWidth=lerp(15,1,k);
+    ctx.beginPath();ctx.arc(CX,CY,r,0,TAU);ctx.stroke();
+    glow(ctx,CX,CY,r*0.42,i%2?"m":"c",al*0.10);
+  }
+  ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
+}
+/* ================= volumetric dust ================= */
+const DUST=Array.from({length:95},()=>({x:rnd(-720,720),y:rnd(-1120,1120),z:rnd(-520,520),r:rnd(0.6,2.3),ph:Math.random()*TAU,sp:rnd(0.05,0.26),c:Math.random()<0.25?"m":"c"}));
+function drawDust(ctx,t,alpha){
+  if(alpha<=0.01)return;
+  ctx.globalCompositeOperation="lighter";
+  for(const d of DUST){
+    const y=d.y+Math.sin(t*d.sp+d.ph)*42, x=d.x+Math.cos(t*d.sp*0.7+d.ph)*30;
+    const p=760/(760+d.z), tw=0.4+0.6*Math.abs(Math.sin(t*1.5+d.ph));
+    glow(ctx,CX+x*p,CY+y*p,d.r*p*3,d.c,alpha*0.18*tw);
+  }
+  ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
+}
+/* ================= ordered data pathways (flow) ================= */
+const PATHS=Array.from({length:7},(_,i)=>{const y0=-900+i*300;
+  return {x0:-780,y0,x1:780,y1:y0+rnd(-220,220),cx:rnd(-220,220),cy:y0+rnd(-360,360),off:Math.random(),sp:rnd(0.3,0.7),c:i%2?"m":"c"};});
+function drawPaths(ctx,t,alpha){
+  if(alpha<=0.01)return;
+  ctx.globalCompositeOperation="lighter"; ctx.lineCap="round";
+  for(const p of PATHS){
+    ctx.strokeStyle=rgba(p.c==="m"?MAG:CYAN,0.10*alpha); ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.moveTo(CX+p.x0,CY+p.y0);ctx.quadraticCurveTo(CX+p.cx,CY+p.cy,CX+p.x1,CY+p.y1);ctx.stroke();
+    for(let k=0;k<3;k++){
+      const f=(t*p.sp+p.off+k/3)%1, mt=1-f;
+      const x=mt*mt*p.x0+2*mt*f*p.cx+f*f*p.x1, y=mt*mt*p.y0+2*mt*f*p.cy+f*f*p.y1;
+      glowAB(ctx,CX+x,CY+y,17,p.c,alpha*0.6,AB);
+    }
+  }
+  ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
+}
+/*__C3__*/
 </script>
 </body>
 </html>
