@@ -283,7 +283,7 @@ function openNavigator(focusSearch) {
   });
   host.addEventListener("keydown", (ev) => {
     if (ev.key !== "Tab") return;
-    const f = host.querySelectorAll('a[href], button, input, [tabindex]:not([tabindex="-1"])');
+    const f = Array.from(host.querySelectorAll('a[href], button, input, [tabindex]:not([tabindex="-1"])')).filter((el) => el.offsetParent !== null || el === document.activeElement);
     if (!f.length) return;
     const first = f[0], last = f[f.length - 1];
     if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
