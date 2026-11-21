@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>NeuroDifference — Cinematic Neuro Teaser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --cyan:#19e3ff; --mag:#ff2d95; --hot:#eafcff; --bg:#000208;
+    --ink:#dff6ff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:#000;overflow:hidden}
+  body{
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    display:grid;place-items:center;
+    user-select:none;-webkit-user-select:none;touch-action:manipulation;
+  }
+  /* fixed 9:16 stage, scaled to fit the viewport */
+  #wrap{position:fixed;inset:0;display:grid;place-items:center;background:#000}
+  #stage{
+    position:relative;width:1080px;height:1920px;
+    transform-origin:center center;background:var(--bg);
+    overflow:hidden;box-shadow:0 0 120px rgba(25,227,255,.06);
+  }
+  #c{position:absolute;inset:0;width:1080px;height:1920px;display:block}
+  /* cinematic overlays — static, compositor-cheap */
+  .vig{position:absolute;inset:0;pointer-events:none;z-index:5;
+    background:
+      radial-gradient(120% 80% at 50% 42%, transparent 40%, rgba(0,0,0,.55) 78%, rgba(0,0,0,.9) 100%),
+      radial-gradient(90% 55% at 50% 50%, rgba(25,227,255,.05), transparent 60%);
+    mix-blend-mode:normal;
+  }
+  .grain{position:absolute;inset:-50%;width:200%;height:200%;pointer-events:none;z-index:6;opacity:.05;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+  }
+  .bars{position:absolute;left:0;right:0;height:0;background:#000;z-index:7;pointer-events:none}
+  /* punch on the drop — transform only */
+  #stage.punch{animation:punch .5s cubic-bezier(.2,.8,.2,1)}
+  @keyframes punch{0%{transform:var(--fit) scale(1)}12%{transform:var(--fit) scale(1.045)}100%{transform:var(--fit) scale(1)}}
+  /* control bar */
+  #ui{position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:8px;align-items:center;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    background:linear-gradient(0deg,rgba(0,0,0,.85),transparent);
+    font-size:12px;letter-spacing:.04em;color:#9fd8e6;flex-wrap:wrap;justify-content:center}
+  #ui button{font:inherit;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:#dff6ff;background:rgba(25,227,255,.08);border:1px solid rgba(25,227,255,.35);
+    padding:7px 11px;border-radius:2px;cursor:pointer}
+  #ui button:active{background:rgba(25,227,255,.2)}
+  #ui .t{font-variant-numeric:tabular-nums;color:#fff;min-width:120px;text-align:center}
+  #ui .drop{color:var(--mag);border-color:rgba(255,45,149,.5);background:rgba(255,45,149,.08)}
+  #ui .hint{opacity:.6;width:100%;text-align:center;font-size:11px}
+  body.rec #ui{display:none}
+  #tap{position:fixed;inset:0;z-index:60;display:none;place-items:center;background:rgba(0,2,8,.6);
+    color:#dff6ff;font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:14px;text-align:center;padding:24px}
+  body.fs #tap{display:grid}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="stage">
+    <canvas id="c" width="1080" height="1920"></canvas>
+    <div class="vig"></div>
+    <div class="grain"></div>
+  </div>
+</div>
+<div id="ui">
+  <button id="play">Pause</button>
+  <button id="restart">Restart</button>
+  <button data-scene="0">Riser</button>
+  <button data-scene="1" class="drop">Drop</button>
+  <button data-scene="2">Ignite</button>
+  <button data-scene="3">Flow</button>
+  <button data-scene="4">Outro</button>
+  <span class="t" id="time">0.00 / 30.0</span>
+  <span class="hint" id="hint">DROP @ 0:06 — сведи бас-кик сюда · Space пауза · R рестарт · ←/→ сцены</span>
+</div>
+<div id="tap">Тапни для fullscreen<br><span style="opacity:.6;font-weight:400">затем запись экрана · звук наложишь сам</span></div>
+<script>
+"use strict";
+/* ================= config / params ================= */
+const P = new URLSearchParams(location.search);
+const param = (k,d)=> P.has(k)? P.get(k) : d;
+const W=1080, H=1920, CX=W/2, CY=H/2;
+const DROP = Math.max(1, parseFloat(param("drop","6"))||6);
+const D = DROP;
+const SCENES = [
+  {name:"riser",  a:0,      b:D},
+  {name:"drop",   a:D,      b:D+0.8},
+  {name:"ignite", a:D+0.8,  b:D+10},
+  {name:"flow",   a:D+10,   b:D+18},
+  {name:"outro",  a:D+18,   b:D+24},
+];
+const T_END = D+24;
+const ONCE = param("once","0")==="1";
+const REC  = param("rec","0")==="1";
+const FS   = param("fs","0")==="1";
+const CYAN=[25,227,255], MAG=[255,45,149], HOT=[234,252,255], GOLD=[255,206,120];
+
+/* ================= utils ================= */
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+const lerp=(a,b,t)=>a+(b-a)*t;
+const smooth=t=>{t=clamp(t,0,1);return t*t*(3-2*t);};
+const eio=t=>{t=clamp(t,0,1);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;};
+const eo=t=>1-Math.pow(1-clamp(t,0,1),3);
+const ei=t=>Math.pow(clamp(t,0,1),3);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const TAU=Math.PI*2;
+function rgba(c,a){return `rgba(${c[0]},${c[1]},${c[2]},${a})`;}
+function mix(a,b,t){return [lerp(a[0],b[0],t)|0,lerp(a[1],b[1],t)|0,lerp(a[2],b[2],t)|0];}
+
+/* ================= glow sprites (pre-rendered, fast) ================= */
+function makeGlow(c){
+  const s=document.createElement("canvas"); s.width=s.height=128;
+  const g=s.getContext("2d");
+  const gr=g.createRadialGradient(64,64,0,64,64,64);
+  gr.addColorStop(0,rgba(c,1)); gr.addColorStop(.22,rgba(c,.6));
+  gr.addColorStop(.55,rgba(c,.14)); gr.addColorStop(1,rgba(c,0));
+  g.fillStyle=gr; g.fillRect(0,0,128,128); return s;
+}
+const SP={ c:makeGlow(CYAN), m:makeGlow(MAG), w:makeGlow(HOT), g:makeGlow(GOLD) };
+const SP_OF={c:SP.c,m:SP.m,w:SP.w,g:SP.g};
+function glow(ctx,x,y,r,key,alpha){
+  if(alpha<=0.003||r<=0.2) return;
+  ctx.globalAlpha=clamp(alpha,0,1);
+  ctx.drawImage(SP_OF[key]||SP.c, x-r, y-r, r*2, r*2);
+}
+/* chromatic-aberration ghost pair for a glow point */
+function glowAB(ctx,x,y,r,key,alpha,ab){
+  if(ab>0.4){
+    glow(ctx,x-ab,y,r*1.02,"c",alpha*0.5);
+    glow(ctx,x+ab,y,r*1.02,"m",alpha*0.5);
+  }
+  glow(ctx,x,y,r,key,alpha);
+}
+
+/* ================= timeline drivers ================= */
+function camAt(t){
+  let zoom=1,px=0,py=0,shake=0;
+  if(t<D){ const k=t/D; zoom=1+0.20*eio(k); py=lerp(40,0,eio(k)); }
+  else if(t<D+0.8){ const k=(t-D)/0.8; zoom=1.20+0.12*Math.exp(-k*6)*Math.cos(k*34); shake=10*Math.exp(-k*7); }
+  else if(t<D+10){ const k=(t-D-0.8)/9.2; zoom=1.32+1.55*eio(k); px=Math.sin(k*3.1)*150*k; py=-eio(k)*260; }
+  else if(t<D+18){ const k=(t-D-10)/8; zoom=2.87-1.30*eio(k); px=Math.sin(k*TAU)*90*(1-k*.4); py=-260+eio(k)*180; }
+  else { const k=clamp((t-D-18)/6,0,1); zoom=1.57-0.55*eo(Math.min(1,k*1.4)); px=Math.sin(k*3)*30*(1-k); py=-80*(1-k); }
+  return {zoom,px,py,shake};
+}
+function aberrAt(t){ if(t<D) return 0; const k=t-D; return 30*Math.exp(-k*3.0)+ (t>D+10&&t<D+18? 3*Math.abs(Math.sin((t-D-10)*3.4)):0); }
+function flashAt(t){ if(t<D) return 0; return Math.exp(-(t-D)*8.5); }
+function sceneAt(t){ for(let i=SCENES.length-1;i>=0;i--) if(t>=SCENES[i].a) return i; return 0; }
+
+/* ================= molecule (procedural 3D graph) ================= */
+function buildMolecule(){
+  const atoms=[],bonds=[];
+  const add=(x,y,z,c,r)=>{atoms.push({x,y,z,c,r:r||15});return atoms.length-1;};
+  const ring=(cx,cy,cz,rad,n,tilt)=>{
+    const ids=[];
+    for(let i=0;i<n;i++){const a=i/n*TAU;
+      ids.push(add(cx+Math.cos(a)*rad, cy+Math.sin(a)*rad*Math.cos(tilt), cz+Math.sin(a)*rad*Math.sin(tilt), i%3===0?"m":"c"));
+    }
+    for(let i=0;i<n;i++) bonds.push([ids[i],ids[(i+1)%n]]);
+    return ids;
+  };
+  const r1=ring(-46,-6,0,54,6,0.55);
+  const r2=ring(58,12,18,47,6,-0.42);
+  bonds.push([r1[0],r2[3]]);
+  let prev=r2[0];
+  for(let i=0;i<4;i++){const id=add(118+i*35,34+Math.sin(i*1.3)*24,-12+i*17,i===3?"w":"c",12);bonds.push([prev,id]);prev=id;}
+  bonds.push([r1[2],add(-78,-78,34,"m",11)]);
+  bonds.push([r1[4],add(-30,86,-30,"c",11)]);
+  bonds.push([r2[1],add(96,-58,40,"w",10)]);
+  return {atoms,bonds};
+}
+const MOL=buildMolecule();
+function drawMolecule(ctx,t,alpha,dock){
+  if(alpha<=0.01) return;
+  const ry=t*0.55, rx=0.22+Math.sin(t*0.32)*0.28;
+  const sc=lerp(1,0.60,dock), ox=lerp(0,150,dock), oy=lerp(0,30,dock);
+  const cy=Math.cos(ry),sy=Math.sin(ry),cx=Math.cos(rx),sx=Math.sin(rx);
+  const pr=MOL.atoms.map(a=>{
+    const x=a.x*sc+ox,y=a.y*sc+oy,z=a.z*sc;
+    const x1=x*cy-z*sy, z1=x*sy+z*cy;
+    const y1=y*cx-z1*sx, z2=y*sx+z1*cx;
+    const p=620/(620+z2);
+    return {sx:CX+x1*p, sy:CY+y1*p, z:z2, p, a};
+  });
+  ctx.globalCompositeOperation="lighter";
+  // bonds
+  ctx.lineCap="round";
+  for(const [i,j] of MOL.bonds){
+    const A=pr[i],B=pr[j];
+    const dep=clamp((A.p+B.p)/2-0.55,0.2,1.3);
+    ctx.strokeStyle=rgba(mix(CYAN,HOT,.25), 0.30*alpha*dep);
+    ctx.lineWidth=2.4*dep;
+    ctx.beginPath();ctx.moveTo(A.sx,A.sy);ctx.lineTo(B.sx,B.sy);ctx.stroke();
+  }
+  // atoms back-to-front
+  const order=pr.map((p,i)=>i).sort((i,j)=>pr[i].z-pr[j].z);
+  for(const i of order){
+    const q=pr[i], dep=clamp(q.p-0.45,0.25,1.4);
+    const r=q.a.r*q.p*1.7;
+    const al=alpha*clamp(dep*0.9,0.2,1);
+    glowAB(ctx,q.sx,q.sy,r*2.1,q.a.c,al*0.55,AB);
+    glow(ctx,q.sx,q.sy,r*0.62,"w",al*0.9);
+  }
+  ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
+}
+/* receptor pocket — two glowing crescents the ligand docks into */
+function drawReceptor(ctx,t,alpha,lock){
+  if(alpha<=0.01) return;
+  const x=CX+150, y=CY+30, R=150;
+  ctx.globalCompositeOperation="lighter";
+  const pulse=0.6+0.4*Math.sin(t*3);
+  for(const sgn of [-1,1]){
+    ctx.strokeStyle=rgba(mix(MAG,CYAN,lock), (0.35+0.4*lock)*alpha*pulse);
+    ctx.lineWidth=5+3*lock;
+    ctx.beginPath();
+    ctx.arc(x,y,R, sgn>0? -0.9:Math.PI-0.9, sgn>0? 0.9:Math.PI+0.9, sgn<0);
+    ctx.stroke();
+  }
+  glow(ctx,x,y,R*1.5, lock>0.5?"w":"m", alpha*(0.10+0.35*lock));
+  ctx.globalAlpha=1;ctx.globalCompositeOperation="source-over";
+}
+let AB=0; // current aberration px, set each frame before draws
+/*__C2__*/
+</script>
+</body>
+</html>
