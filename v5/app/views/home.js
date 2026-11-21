@@ -105,7 +105,7 @@ export function render() {
         </div>
         <div class="home-brain-cap row between wrap" style="gap:8px">
           <span class="live-dot"><i></i> Живая модель · 28 регионов</span>
-          <a class="btn ghost xs" href="#/brain">Карта мозга ${icon("chevronRight", 13)}</a>
+          <a class="btn ghost sm" href="#/brain">Карта мозга ${icon("chevronRight", 13)}</a>
         </div>
       </div>
     </div>
