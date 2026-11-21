@@ -274,7 +274,7 @@ const PHRASES = {
   "Ключ PubMed удалён — анонимный лимит": "PubMed key removed — anonymous limit",
   "Плашка подписки возвращена": "Subscribe plate restored",
   "Плашка подписки скрыта": "Subscribe plate hidden",
-  "Введи hex-цвет, например #8b7bff": "Enter a hex colour, e.g. #8b7bff",
+  "Введи hex-цвет, например #3fb8a3": "Enter a hex colour, e.g. #3fb8a3",
   "Заменить все текущие данные этим бэкапом?": "Replace all current data with this backup?",
   "Удалить весь прогресс, заметки, стек и настройки на этом устройстве?":
     "Delete all progress, notes, stack and settings on this device?",
