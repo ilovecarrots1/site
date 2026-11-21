@@ -110,33 +110,6 @@ const TOPNAV = NAV.flatMap((g) => g.items).filter((it) => it.id !== "settings");
 const BRAND = `<span class="brand-mark">${icon("brain", 17)}</span>
   <span class="brand-text"><b>NeuroDifference</b><span>доказательность · препараты</span></span>`;
 
-function sidebarHtml() {
-  const s = store.data;
-  const lvl = levelFor(s.profile.xp || 0);
-  return `<aside class="sidebar" id="sidebar">
-    <a class="brand" href="#/">${BRAND}</a>
-    ${NAV.map(
-      (group) => `${group.section ? `<div class="side-label">${esc(group.section)}</div>` : `<div class="side-label">&nbsp;</div>`}
-        ${group.items
-          .map(
-            (it) => `<a class="side-item" href="${it.href}" data-nav="${it.id}">
-              ${icon(it.icon, 16)}<span>${esc(it.label)}</span>
-              ${it.count ? `<span class="pill-count" data-count="${it.id}">${it.count()}</span>` : ""}
-            </a>`
-          )
-          .join("")}`
-    ).join("")}
-    <div class="side-foot">
-      ${subscribePlate({ compact: true })}
-      <a class="side-xp" href="#/settings" style="text-decoration:none;color:inherit;display:block">
-        <div class="lv"><b>${lvl.level}</b><span>уровень · ${s.profile.xp || 0} XP</span></div>
-        <div class="meter"><i style="width:${Math.round((lvl.into / (lvl.need || 1)) * 100)}%"></i></div>
-        <div class="tiny dim" style="margin-top:6px">${s.profile.streak || 0} дн. подряд${s.profile.streak ? " 🔥" : ""}</div>
-      </a>
-    </div>
-  </aside>`;
-}
-
 function topbarHtml() {
   return `<header class="topbar">
     <button class="icon-btn menu-btn" id="btn-menu" aria-label="Открыть меню">${icon("menu", 20)}</button>
@@ -173,7 +146,6 @@ let shellScrollWired = false;
 function mountShell(root) {
   root.innerHTML = `<div class="bgfx" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="app">
-      ${sidebarHtml()}
       <div class="main">
         ${topbarHtml()}
         <div class="view" id="view"></div>
@@ -609,16 +581,6 @@ function paintCounts() {
   document.querySelectorAll("[data-due-dot]").forEach((el) => {
     el.style.display = due ? "block" : "none";
   });
-  const sidebar = document.getElementById("sidebar");
-  if (sidebar) {
-    const lvl = levelFor(store.data.profile.xp || 0);
-    const lv = sidebar.querySelector(".side-xp .lv b");
-    const xp = sidebar.querySelector(".side-xp .lv span");
-    const bar = sidebar.querySelector(".side-xp .meter i");
-    if (lv) lv.textContent = lvl.level;
-    if (xp) xp.textContent = `level · ${store.data.profile.xp || 0} XP`;
-    if (bar) bar.style.width = `${Math.round((lvl.into / (lvl.need || 1)) * 100)}%`;
-  }
 }
 
 function renderRoute() {
