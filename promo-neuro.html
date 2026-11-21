@@ -390,7 +390,7 @@ function drawOutro(ctx,t){
 const cv=document.getElementById("c");
 const ctx=cv.getContext("2d");
 function render(t){
-  const trail=(t>D+1&&t<D+17)?0.55:1;
+  const trail=(t>D+1&&t<D+17)?0.72:1;
   ctx.globalCompositeOperation="source-over";
   ctx.fillStyle=rgba([0,2,8],trail);ctx.fillRect(0,0,W,H);
   drawBloom(ctx,t);
