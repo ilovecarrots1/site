@@ -1322,20 +1322,20 @@ html[data-motion="off"] .bm-pulse { opacity: 0 !important; }
   margin-bottom: 5px;
   border: 1px solid var(--line-soft);
 }
-.skin-swatch[data-skin-swatch="aurora"] {
+.skin-swatch[data-skin-swatch="field"] {
   background:
-    radial-gradient(60% 120% at 18% 20%, rgba(139, 123, 255, 0.62), transparent 70%),
-    radial-gradient(70% 120% at 82% 78%, rgba(45, 212, 191, 0.42), transparent 70%),
-    #10141a;
+    radial-gradient(60% 120% at 18% 20%, rgba(63, 184, 163, 0.5), transparent 70%),
+    radial-gradient(70% 120% at 82% 78%, rgba(209, 122, 75, 0.34), transparent 70%),
+    #0c0e0c;
 }
-.skin-swatch[data-skin-swatch="scope"] {
+.skin-swatch[data-skin-swatch="slate"] {
   background:
-    repeating-linear-gradient(0deg, rgba(90, 255, 160, 0.16) 0 1px, transparent 1px 7px),
-    repeating-linear-gradient(90deg, rgba(90, 255, 160, 0.12) 0 1px, transparent 1px 9px),
-    #06120c;
+    repeating-linear-gradient(0deg, rgba(107, 163, 199, 0.16) 0 1px, transparent 1px 7px),
+    repeating-linear-gradient(90deg, rgba(107, 163, 199, 0.12) 0 1px, transparent 1px 9px),
+    #0e1216;
 }
-.skin-swatch[data-skin-swatch="prism"] {
-  background: linear-gradient(118deg, #7c3aed 0%, #2563eb 34%, #0ea5e9 56%, #f472b6 78%, #f59e0b 100%);
+.skin-swatch[data-skin-swatch="oxide"] {
+  background: linear-gradient(118deg, #d17a4b 0%, #b89b5e 40%, #c96f5a 70%, #7fae7a 100%);
 }
 .skin-name { font-size: 12.5px; font-weight: 600; overflow-wrap: anywhere; }
 .skin-sub { line-height: 1.35; }
