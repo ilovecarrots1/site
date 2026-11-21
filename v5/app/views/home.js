@@ -1,12 +1,17 @@
-/* Home / dashboard */
+/* Home / dashboard — v5 Field Lab.
+   The hero is a LIVE procedural 3D brain (same engine as #/brain): it
+   auto-rotates, sparks fire, and tapping a zone jumps straight to that
+   region's card. Everything below is the working dashboard. */
 
 import { esc, icon, store, levelFor, fmt, EVIDENCE, evidenceChip, emptyState } from "../core.js";
 import { COMPOUNDS, COMPOUND_BY_ID } from "../data/compounds.js";
 import { SYSTEMS, SYSTEM_BY_ID } from "../data/neuro.js";
 import { COURSES, TOTAL_LESSONS, LESSON_INDEX, FLASHCARDS } from "../data/learn.js";
 import { checkInteractions, worstSeverity } from "../data/interactions.js";
+import { REGIONS, regionColor } from "../data/brainmap.js";
+import { mountBrain3D } from "../lib/brain3d.js";
 import { deckStats } from "../srs.js";
-import { pageHead, statTile, compoundCard, classColor, metric, callout, subscribePlate, orb } from "./ui.js";
+import { pageHead, statTile, compoundCard, classColor, metric, callout, subscribePlate } from "./ui.js";
 
 function greeting() {
   const h = new Date().getHours();
@@ -69,52 +74,50 @@ export function render() {
   const accuracy = s.profile.quizzes ? Math.round((s.profile.correct / s.profile.quizzes) * 100) : 0;
 
   return `
-  ${pageHead(
-    `${greeting()}.`,
-    "Карта нейрофармакологии с градацией доказательности: препараты, рецепторные системы, взаимодействия и математика, которая за ними стоит.",
-    `<a class="btn primary sm" href="#/compounds">${icon("search", 15)} К препаратам</a>`,
-    "NeuroDifference"
-  )}
+  <section class="card hero-card home-hero spot">
+    <div class="home-hero-grid">
+      <div class="home-hero-copy">
+        <div class="eyebrow" style="margin-bottom:8px">${esc(greeting())} · NeuroDifference</div>
+        <h1 class="home-title gtext">Нейрофармакология, которую можно потрогать.</h1>
+        <p class="home-lede">
+          ${COMPOUNDS.length} препаратов, 28 регионов мозга и движок взаимодействий —
+          с честной градацией доказательности. Крути живую модель, нажимай на зоны,
+          проверяй свой стек.
+        </p>
+        <div class="row wrap" style="gap:6px;margin:2px 0 12px">
+          <span class="chip chip-accent">${icon("sparkles", 12)} Уровень ${lvl.level}</span>
+          ${s.profile.streak ? `<span class="chip">${icon("zap", 12)} ${s.profile.streak} дн. подряд</span>` : ""}
+          <span class="chip mono">${(s.profile.xp || 0).toLocaleString()} XP</span>
+        </div>
+        <div style="max-width:360px;margin-bottom:14px">${metric("Прогресс уровня", `${lvl.into} / ${lvl.need} XP`, lvl.progress)}</div>
+        <div class="row wrap" style="gap:8px">
+          <a class="btn primary" href="#/compounds">${icon("search", 15)} К препаратам</a>
+          <a class="btn ghost" href="${next ? `#/learn/${next.course.id}/${next.lesson.id}` : "#/cards"}">
+            ${icon(next ? "play" : "layers", 15)} ${next ? "Продолжить урок" : "Повторить карточки"}
+          </a>
+        </div>
+        ${next ? `<p class="tiny dim" style="margin-top:10px;line-height:1.4">Дальше: ${esc(next.lesson.title)} · ${esc(next.course.title)} · <span class="mono" style="color:var(--accent)">+${next.lesson.xp} XP</span></p>` : ""}
+      </div>
+
+      <div class="home-brain-stage">
+        <div class="home-brain-frame">
+          <canvas id="home-brain" aria-label="Живая 3D-модель мозга — нажми на зону, чтобы открыть её карточку"></canvas>
+        </div>
+        <div class="home-brain-cap row between wrap" style="gap:8px">
+          <span class="live-dot"><i></i> Живая модель · 28 регионов</span>
+          <a class="btn ghost xs" href="#/brain">Карта мозга ${icon("chevronRight", 13)}</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
   ${tickerHtml()}
 
-  <div class="grid" style="gap:14px;margin-bottom:26px">
-    <section class="card hero-card spot" style="padding:18px">
-      <div class="row between wrap" style="gap:14px;align-items:flex-start">
-        <div class="row" style="gap:13px;align-items:flex-start;min-width:0;flex:1 1 290px">
-          ${orb(52)}
-          <div class="stack" style="gap:8px;min-width:0">
-          <div class="row wrap" style="gap:6px">
-            <span class="chip chip-accent">${icon("sparkles", 12)} Уровень ${lvl.level}</span>
-            ${s.profile.streak ? `<span class="chip">${icon("zap", 12)} ${s.profile.streak} дн. подряд</span>` : ""}
-            <span class="chip">${(s.profile.xp || 0).toLocaleString()} XP</span>
-          </div>
-          <h2 style="font-size:19px;letter-spacing:-.025em">${next ? `${next.lesson.title}` : "Все уроки пройдены"}</h2>
-          <p class="small muted" style="line-height:1.55;max-width:56ch">
-            ${
-              next
-                ? `${esc(next.course.title)} · ${next.lesson.minutes} мин · <span class="mono" style="color:var(--accent)">+${next.lesson.xp} XP</span>`
-                : "Отлично. Повтори карточки, чтобы механизмы остались свежими."
-            }
-          </p>
-          <div style="max-width:340px">${metric("Прогресс уровня", `${lvl.into} / ${lvl.need} XP`, lvl.progress)}</div>
-          </div>
-        </div>
-        <div class="row wrap" style="gap:8px;flex:none">
-          <a class="btn primary" href="${next ? `#/learn/${next.course.id}/${next.lesson.id}` : "#/cards"}">
-            ${icon(next ? "play" : "layers", 15)} ${next ? "Продолжить" : "Повторить карточки"}
-          </a>
-          <a class="btn ghost" href="#/brain">${icon("brain", 15)} Карта мозга</a>
-        </div>
-      </div>
-    </section>
-
-    <div class="grid grid-4" style="gap:10px">
-      ${statTile({ label: "Препараты", value: COMPOUNDS.length, sub: `${new Set(COMPOUNDS.map((c) => c.cls)).size} классов`, iconName: "pill" })}
-      ${statTile({ label: "Системы", value: SYSTEMS.length, sub: "нейромедиаторные пути", iconName: "activity" })}
-      ${statTile({ label: "Уроки", value: `${lessonsDone}/${TOTAL_LESSONS}`, sub: accuracy ? `точность квизов ${accuracy}%` : "квизов ещё не было", iconName: "book" })}
-      ${statTile({ label: "Карточек к повторению", value: cards.due, sub: `${cards.mature} зрелых · ${cards.total} всего`, iconName: "layers" })}
-    </div>
+  <div class="grid grid-4" style="gap:10px;margin-bottom:22px">
+    ${statTile({ label: "Препараты", value: COMPOUNDS.length, sub: `${new Set(COMPOUNDS.map((c) => c.cls)).size} классов`, iconName: "pill" })}
+    ${statTile({ label: "Системы", value: SYSTEMS.length, sub: "нейромедиаторные пути", iconName: "activity" })}
+    ${statTile({ label: "Уроки", value: `${lessonsDone}/${TOTAL_LESSONS}`, sub: accuracy ? `точность квизов ${accuracy}%` : "квизов ещё не было", iconName: "book" })}
+    ${statTile({ label: "Карточек к повторению", value: cards.due, sub: `${cards.mature} зрелых · ${cards.total} всего`, iconName: "layers" })}
   </div>
 
   <div style="margin-bottom:22px">${subscribePlate()}</div>
@@ -127,13 +130,13 @@ export function render() {
           <div><h2>Быстрые действия</h2><p class="block-sub">Сразу к нужному инструменту</p></div>
         </div>
         <div class="grid grid-3" style="gap:10px">
-          ${actionCard("flask", "PK-симулятор", "Кривые концентрации, полувыведение и накопление", "#/lab", "violet")}
-          ${actionCard("shield", "Проверка взаимодействий", "Комбинации против базы правил", "#/lab/interactions", "green")}
-          ${actionCard("brain", "Проводник путей", "Синтез, рецепторы и мишени препаратов", "#/brain", "amber")}
-          ${actionCard("scale", "План снижения дозы", "Из полувыведения — в график снижения", "#/lab/taper", "blue")}
-          ${actionCard("grid", "Сравнение препаратов", "Две-три монографии, факт за фактом", "#/compare", "violet")}
-          ${actionCard("microscope", "Живые исследования", "Поиск PubMed по запросу — ничего не хранится", "#/research", "green")}
-          ${actionCard("message", "Спроси библиотеку", "Ответы простым языком из локальных данных", "#/ask", "blue")}
+          ${actionCard("flask", "PK-симулятор", "Кривые концентрации, полувыведение и накопление", "#/lab", "teal")}
+          ${actionCard("shield", "Проверка взаимодействий", "Комбинации против базы правил", "#/lab/interactions", "sage")}
+          ${actionCard("brain", "Проводник путей", "Синтез, рецепторы и мишени препаратов", "#/brain", "copper")}
+          ${actionCard("scale", "План снижения дозы", "Из полувыведения — в график снижения", "#/lab/taper", "slate")}
+          ${actionCard("grid", "Сравнение препаратов", "Две-три монографии, факт за фактом", "#/compare", "dune")}
+          ${actionCard("microscope", "Живые исследования", "Поиск PubMed по запросу — ничего не хранится", "#/research", "teal")}
+          ${actionCard("message", "Спроси библиотеку", "Ответы простым языком из локальных данных", "#/ask", "slate")}
         </div>
       </section>
 
@@ -249,14 +252,31 @@ export function render() {
   </div>`;
 }
 
+/* ---- live hero brain ---------------------------------------------------- */
+
+let liveHome = null;
+
+export function mount(root) {
+  const canvas = root.querySelector("#home-brain");
+  if (!canvas) return;
+  if (liveHome) { liveHome.destroy(); liveHome = null; }
+  liveHome = mountBrain3D(canvas, {
+    regions: REGIONS.map((r) => ({ ...r, color: regionColor(r) })),
+    palette: { cortex: "#c9a79b", cerebellum: "#b08a80", stem: "#cbb9a4" },
+    getLit: () => ({ lit: new Map(), focus: false }),
+    onSelect: (id) => { location.hash = `#/brain/${id}`; },
+  });
+}
+
 function actionCard(iconName, title, sub, href, accent) {
   const tones = {
-    violet: ["#8b7bff", "#5b8cff"],
-    green: ["#3fb950", "#2f9e6b"],
-    amber: ["#e3b341", "#f0883e"],
-    blue: ["#6fb3ff", "#8b7bff"],
+    teal: ["#3fb8a3", "#2f9e8b"],
+    copper: ["#d17a4b", "#b8653c"],
+    sage: ["#7fae7a", "#5f9160"],
+    slate: ["#6ba3c7", "#4f87ad"],
+    dune: ["#b89b5e", "#9a7f47"],
   };
-  const tone = tones[accent] || tones.violet;
+  const tone = tones[accent] || tones.teal;
   return `<a class="card hoverable" href="${href}" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:7px">
     <span class="brand-mark" style="background:linear-gradient(150deg, ${tone[0]}, ${tone[1]});box-shadow:none">${icon(iconName, 16)}</span>
     <div><div style="font-size:14px;font-weight:640">${esc(title)}</div>
