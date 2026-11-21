@@ -30,17 +30,17 @@ function mapHtml() {
   return `<svg class="brain-svg" viewBox="0 0 420 320" role="img" aria-label="Interactive sagittal brain map">
     <defs>
       <linearGradient id="cortexFill" x1="8%" y1="0%" x2="72%" y2="100%">
-        <stop offset="0%" stop-color="#9d8cff" stop-opacity="0.18"/>
-        <stop offset="46%" stop-color="#8b7bff" stop-opacity="0.075"/>
+        <stop offset="0%" stop-color="#5fb8a6" stop-opacity="0.18"/>
+        <stop offset="46%" stop-color="#3fb8a3" stop-opacity="0.075"/>
         <stop offset="100%" stop-color="#ffffff" stop-opacity="0.03"/>
       </linearGradient>
       <linearGradient id="stemFill" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stop-color="#f2b23e" stop-opacity="0.18"/>
-        <stop offset="100%" stop-color="#8b7bff" stop-opacity="0.05"/>
+        <stop offset="0%" stop-color="#d17a4b" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#b89b5e" stop-opacity="0.05"/>
       </linearGradient>
       <linearGradient id="cbFill" x1="0%" y1="0%" x2="70%" y2="100%">
-        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0.16"/>
-        <stop offset="100%" stop-color="#8b7bff" stop-opacity="0.04"/>
+        <stop offset="0%" stop-color="#7fae7a" stop-opacity="0.16"/>
+        <stop offset="100%" stop-color="#3fb8a3" stop-opacity="0.04"/>
       </linearGradient>
       <linearGradient id="sweepGrad" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
@@ -48,8 +48,8 @@ function mapHtml() {
         <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
       </linearGradient>
       <radialGradient id="deepFill" cx="50%" cy="45%" r="60%">
-        <stop offset="0%" stop-color="#8b7bff" stop-opacity="0.2"/>
-        <stop offset="100%" stop-color="#8b7bff" stop-opacity="0"/>
+        <stop offset="0%" stop-color="#3fb8a3" stop-opacity="0.2"/>
+        <stop offset="100%" stop-color="#3fb8a3" stop-opacity="0"/>
       </radialGradient>
       <filter id="dotGlow" x="-90%" y="-90%" width="280%" height="280%">
         <feGaussianBlur stdDeviation="2.2" result="blur"/>
