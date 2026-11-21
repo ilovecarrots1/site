@@ -186,47 +186,115 @@ function closeLayers(restoreFocus = true) {
   lastFocus = null;
 }
 
-function openDrawer() {
-  if (document.querySelector(".drawer-host")) return;
+/* Unified navigator: one overlay = spatial section index (empty query)
+   + universal command palette (typed query). Replaces the old drawer. */
+function openNavigator(focusSearch) {
+  const existing = document.querySelector(".navx-host");
+  if (existing) {
+    const box = existing.querySelector("#navx-input");
+    if (box && focusSearch) box.focus();
+    return;
+  }
   closeLayers(false);
   lastFocus = document.activeElement;
   const host = document.createElement("div");
-  host.className = "drawer-host";
-  host.innerHTML = `<div class="drawer-scrim" data-close></div>
-    <div class="drawer">
-      <a class="brand" href="#/" data-close>${BRAND}</a>
-      ${NAV.map(
-        (group) => `${group.section ? `<h4>${esc(group.section)}</h4>` : `<h4>Приложение</h4>`}
-          ${group.items
-            .map(
-              (it) => `<a class="d-item" href="${it.href}" data-nav="${it.id}" data-close>
-                ${icon(it.icon, 16)}<span>${esc(it.label)}</span>
-                ${it.count ? `<span class="pill-count" style="margin-left:auto">${it.count()}</span>` : ""}
-              </a>`
-            )
-            .join("")}`
-      ).join("")}
-      <div style="margin-top:auto;padding-top:14px;display:grid;gap:10px">
-        ${subscribePlate({ compact: true })}
-        <button class="btn ghost sm block" data-search>${icon("search", 14)} Искать везде</button>
+  host.className = "navx-host";
+  host.innerHTML = `<div class="navx-scrim" data-close></div>
+    <div class="navx-panel" role="dialog" aria-modal="true" aria-label="Навигация и поиск">
+      <div class="navx-search">
+        ${icon("search", 18)}
+        <input id="navx-input" type="text" placeholder="Препараты, регионы, уроки, действия…" autocomplete="off" spellcheck="false" aria-label="Поиск по всему приложению">
+        <kbd class="navx-kbd">⌘K</kbd>
+        <button class="icon-btn navx-x" data-close aria-label="Закрыть">${icon("x", 16)}</button>
+      </div>
+      <div class="navx-body">
+        <div class="navx-grid" id="navx-grid"></div>
+        <div class="navx-results" id="navx-results" hidden></div>
+      </div>
+      <div class="navx-foot">
+        <span class="navx-hint">свайп сверху вниз · / или ⌘K — поиск</span>
+        <span class="navx-hint navx-keys">↑↓ выбор · Enter открыть · Esc закрыть</span>
       </div>
     </div>`;
   document.body.appendChild(host);
-  wireSubscribe(host);
+
+  const grid = host.querySelector("#navx-grid");
+  let gi = 0;
+  grid.innerHTML = NAV.map((group) => {
+    const tiles = group.items.map((it) => {
+      const cnt = it.count ? it.count() : "";
+      const delay = gi++ * 22;
+      return `<a class="navx-tile" href="${it.href}" data-nav="${it.id}" data-close style="--d:${delay}ms">
+        <span class="navx-ico">${icon(it.icon, 20)}</span>
+        <span class="navx-label">${esc(it.label)}</span>
+        ${cnt ? `<span class="navx-count">${esc(cnt)}</span>` : ""}
+      </a>`;
+    }).join("");
+    return `<div class="navx-group"><div class="navx-glabel">${esc(group.section || "Приложение")}</div><div class="navx-tiles">${tiles}</div></div>`;
+  }).join("");
+
   applyI18n(host);
   lockScroll(true);
-  const close = () => closeLayers();
-  host.addEventListener("click", (ev) => {
-    if (ev.target.closest("[data-search]")) {
-      close();
-      openSearch();
-      return;
+  requestAnimationFrame(() => host.classList.add("open"));
+  paintNav(currentNavId);
+
+  const input = host.querySelector("#navx-input");
+  const results = host.querySelector("#navx-results");
+  let active = 0, current = [];
+
+  const paint = () => {
+    const q = input.value.trim();
+    if (!q) { grid.hidden = false; results.hidden = true; results.innerHTML = ""; current = []; return; }
+    grid.hidden = true; results.hidden = false;
+    current = searchAll(q);
+    active = 0;
+    if (!current.length) {
+      results.innerHTML = `<div class="navx-empty">Ничего не найдено. Попробуй название препарата, нейромедиатор или «взаимодействия».</div>`;
+      applyI18n(results); return;
     }
-    if (ev.target.closest("[data-close]") || ev.target.classList.contains("drawer-scrim")) close();
+    let html = "", lastKind = "";
+    current.forEach((item, i) => {
+      if (item.kind !== lastKind) { html += `<div class="navx-rgroup">${esc(item.kind === "Page" ? "Разделы и действия" : item.kind)}</div>`; lastKind = item.kind; }
+      html += `<a class="navx-item ${i === active ? "active" : ""}" href="${item.href}" data-i="${i}" data-close>
+        ${icon(item.icon, 16)}
+        <span class="navx-grow"><span class="t">${esc(item.title)}</span><span class="s">${esc(item.sub)}</span></span>
+        ${icon("chevronRight", 14)}
+      </a>`;
+    });
+    results.innerHTML = html;
+    applyI18n(results);
+  };
+
+  host.addEventListener("click", (ev) => {
+    if (ev.target.closest("[data-close]") || ev.target.classList.contains("navx-scrim")) closeLayers(false);
   });
-  const first = host.querySelector(".d-item");
-  if (first) setTimeout(() => first.focus({ preventScroll: true }), 30);
+  input.addEventListener("input", paint);
+  input.addEventListener("keydown", (ev) => {
+    if (ev.key === "ArrowDown" || ev.key === "ArrowUp") {
+      if (!current.length) return;
+      ev.preventDefault();
+      active = ev.key === "ArrowDown" ? Math.min(active + 1, current.length - 1) : Math.max(active - 1, 0);
+      results.querySelectorAll(".navx-item").forEach((el, i) => el.classList.toggle("active", i === active));
+      results.querySelectorAll(".navx-item")[active]?.scrollIntoView({ block: "nearest" });
+    } else if (ev.key === "Enter") {
+      const item = current[active];
+      if (item) { closeLayers(false); location.hash = item.href.replace(/^#/, ""); }
+    } else if (ev.key === "Escape") { closeLayers(); }
+  });
+  host.addEventListener("keydown", (ev) => {
+    if (ev.key !== "Tab") return;
+    const f = host.querySelectorAll('a[href], button, input, [tabindex]:not([tabindex="-1"])');
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+    else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+  });
+
+  if (focusSearch) setTimeout(() => input.focus(), 40);
+  else { const t = grid.querySelector(".navx-tile"); if (t) setTimeout(() => t.focus({ preventScroll: true }), 40); }
 }
+
+function openDrawer() { openNavigator(false); }
 
 /* ------------------------------------------------------------------ */
 /* Search overlay                                                      */
