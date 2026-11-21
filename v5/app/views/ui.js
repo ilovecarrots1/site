@@ -34,34 +34,34 @@ export function statTile({ label, value, sub = "", iconName = "", tone = "" }) {
 }
 
 const CLASS_HUES = {
-  Stimulant: "#f2b23e",
+  Stimulant: "#d9b36c",
   Nootropic: "#5fb8a6",
   Racetam: "#7fc9b8",
-  Peptide: "#6fb3ff",
-  Adaptogen: "#4ade80",
-  Herb: "#5ec98a",
-  Antidepressant: "#3edbd3",
-  Anxiolytic: "#77d26b",
-  Sedative: "#6ee7b7",
+  Peptide: "#6ba3c7",
+  Adaptogen: "#7fae7a",
+  Herb: "#8fbf8a",
+  Antidepressant: "#4fb3a0",
+  Anxiolytic: "#9bbf7a",
+  Sedative: "#79c2a8",
   Psychedelic: "#d17a4b",
-  Dissociative: "#6ba3c7",
-  Opioid: "#ff9f45",
-  Cannabinoid: "#84cc16",
+  Dissociative: "#8a9bb5",
+  Opioid: "#c96f5a",
+  Cannabinoid: "#9bbf6a",
   "Mood stabiliser": "#b89b5e",
   Supplement: "#9aa6b2",
-  Vitamin: "#a3e635",
-  Amino: "#60a5fa",
-  Hormone: "#fb923c",
+  Vitamin: "#b8c97a",
+  Amino: "#7fb8d8",
+  Hormone: "#d18a5a",
   Depressant: "#94a3b8",
-  Antipsychotic: "#f472b6",
-  "Wakefulness agent": "#fbbf24",
+  Antipsychotic: "#c08a7a",
+  "Wakefulness agent": "#e0c07a",
 };
 
 export function classColor(cls) {
   if (CLASS_HUES[cls]) return CLASS_HUES[cls];
   let h = 0;
   for (const ch of String(cls || "")) h = (h * 31 + ch.charCodeAt(0)) % 360;
-  return `hsl(${h} 62% 62%)`;
+  return `hsl(${h} 38% 64%)`;
 }
 
 export function compoundCard(c) {
