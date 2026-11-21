@@ -1,648 +1,210 @@
 /* ==========================================================================
-   NeuroDifference v5 — Field Lab skin
-   Loaded AFTER styles.css + clinic.css. Warm graphite, mineral accents,
-   matte surfaces, horizontal section strip instead of the desktop sidebar.
-   Budget: animate transform/opacity only. No blurred animated layers.
-   One grain tile (body::after). Honors data-motion="off" + reduced-motion.
+   NeuroDifference v5 — TERMINAL BRUTALISM / CRT skin
+   Loaded AFTER styles.css + clinic.css. Hard monochrome (deep black + burnt
+   bone) on a coarse pixel grid, ONE sharp red accent. Early-3D wireframe
+   motifs, dithering, scanlines, static grain, flicker, VHS tracking, glitch.
+   Blocky pixel type: Press Start 2P (display) + Handjet (body), both Cyrillic.
+   Budget: animate transform/opacity ONLY. One grain tile. Static overlays.
+   Honors prefers-reduced-motion + data-motion="off". Bars restored (no orb).
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   1. Tokens — forced with :root:root so stored v4 accents/skins can't leak
+   1. Tokens — :root:root so stored v4 accents/skins can't leak
    -------------------------------------------------------------------------- */
 
 :root:root {
   color-scheme: dark;
 
-  --bg: #0c0e0c;
-  --bg-1: #111411;
-  --bg-2: #161a16;
-  --bg-3: #1c211c;
-  --bg-elev: #1a1f1a;
-  --line: #272e27;
-  --line-soft: #1e241e;
+  --bg: #050505;
+  --bg-1: #0a0a0a;
+  --bg-2: #0f0f0f;
+  --bg-3: #161616;
+  --bg-elev: #0c0c0c;
+  --line: #2b2b2b;
+  --line-soft: #1c1c1c;
 
-  --text: #e9ebe6;
-  --text-2: #b2b9af;
-  --text-3: #838b80;
+  --text: #e8e4d8;
+  --text-2: #9c988c;
+  --text-3: #605c52;
 
-  --accent: #3fb8a3;
-  --accent-2: #2e9484;
-  --accent-ink: #05201c;
-  --accent-soft: rgba(63, 184, 163, 0.13);
-  --accent-line: rgba(63, 184, 163, 0.34);
+  --accent: #ff2a1f;
+  --accent-2: #c4160c;
+  --accent-ink: #0a0000;
+  --accent-soft: rgba(255, 42, 31, 0.12);
+  --accent-line: rgba(255, 42, 31, 0.45);
 
-  --good: #6fc793;
-  --ok: #82b4d9;
-  --warn: #d9b36c;
-  --bad: #e07a5f;
-  --critical: #e05252;
+  /* Monochrome semantics: grey mass, red for danger. */
+  --good: #9c988c;
+  --ok: #c8c4b8;
+  --warn: #e8e4d8;
+  --bad: #ff2a1f;
+  --critical: #ff2a1f;
 
-  --radius-s: 10px;
-  --radius: 14px;
-  --radius-l: 18px;
-  --radius-xl: 24px;
+  /* Brutalism: zero radius, hard offset shadows. */
+  --radius-s: 0px;
+  --radius: 0px;
+  --radius-l: 0px;
+  --radius-xl: 0px;
 
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.32);
-  --shadow-2: 0 10px 30px -18px rgba(0, 0, 0, 0.6);
-  --shadow-3: 0 24px 60px -32px rgba(0, 0, 0, 0.72);
+  --shadow-1: 0 0 0 1px var(--line);
+  --shadow-2: 4px 4px 0 rgba(0, 0, 0, 0.7);
+  --shadow-3: 7px 7px 0 rgba(0, 0, 0, 0.8);
 
-  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --e-out: cubic-bezier(0.22, 0.61, 0.36, 1);
-  --e-spring: cubic-bezier(0.2, 0.9, 0.25, 1.04);
-  --t-1: 120ms;
-  --t-2: 180ms;
-  --t-3: 280ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --e-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --e-spring: cubic-bezier(0.2, 0.9, 0.25, 1);
+  --t-1: 90ms;
+  --t-2: 130ms;
+  --t-3: 200ms;
 
-  --glass: color-mix(in srgb, var(--bg-2) 82%, transparent);
-  --glass-line: color-mix(in srgb, var(--text) 9%, transparent);
-  --accent-glow: color-mix(in srgb, var(--accent) 38%, transparent);
+  --glass: var(--bg-1);
+  --glass-line: var(--line);
+  --accent-glow: rgba(255, 42, 31, 0.4);
   --ring: 0 0 0 2px var(--bg);
 
-  /* v5 type system: distinctive display + humanist body + technical mono.
-     Overriding --sans/--mono re-fonts every existing rule that uses them. */
-  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --display: "Unbounded", "Manrope", system-ui, sans-serif;
+  /* Bar geometry restored (root defaults). */
+  --top-h: 56px;
+  --nav-h: 62px;
+  --sidebar-w: 258px;
+
+  /* Pixel type system — both faces cover Cyrillic. */
+  --sans: "Handjet", "Press Start 2P", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --mono: "Handjet", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --display: "Press Start 2P", "Handjet", ui-monospace, monospace;
 }
 
-/* Skin temperature variants (settings: field / slate / oxide). */
+/* Skin variants stay monochrome (cool / neutral / warm grey), red accent. */
 :root[data-skin="slate"]:root {
-  --bg: #0b0e11;
-  --bg-1: #101418;
-  --bg-2: #151a1f;
-  --bg-3: #1b2127;
-  --bg-elev: #191f25;
-  --line: #262e36;
-  --line-soft: #1d242b;
-  --text: #e7eaee;
-  --text-2: #aeb7c0;
-  --text-3: #7f8994;
+  --bg: #040506; --bg-1: #090a0c; --bg-2: #0e0f12; --bg-3: #15161a;
+  --bg-elev: #0b0c0e; --line: #2a2c31; --line-soft: #1b1d21;
+  --text: #e6e8ec; --text-2: #9a9ca2; --text-3: #5e6066;
 }
 :root[data-skin="oxide"]:root {
-  --bg: #100d0a;
-  --bg-1: #15110d;
-  --bg-2: #1b1611;
-  --bg-3: #221c15;
-  --bg-elev: #201a13;
-  --line: #32291e;
-  --line-soft: #261f16;
-  --text: #ece7df;
-  --text-2: #bcb2a4;
-  --text-3: #8d8375;
+  --bg: #060403; --bg-1: #0c0908; --bg-2: #120e0c; --bg-3: #1a1512;
+  --bg-elev: #0e0b09; --line: #322a26; --line-soft: #221c19;
+  --text: #ece6dc; --text-2: #a2988a; --text-3: #665c50;
 }
 
-/* Mineral accent set (settings picker). Custom hex still wins via inline. */
-:root[data-accent="moss"]:root {
-  --accent: #3fb8a3; --accent-2: #2e9484; --accent-ink: #05201c;
-  --accent-soft: rgba(63, 184, 163, 0.13); --accent-line: rgba(63, 184, 163, 0.34);
-}
-:root[data-accent="oxide"]:root {
-  --accent: #d17a4b; --accent-2: #b25e33; --accent-ink: #261006;
-  --accent-soft: rgba(209, 122, 75, 0.13); --accent-line: rgba(209, 122, 75, 0.34);
-}
-:root[data-accent="slate"]:root {
-  --accent: #6ba3c7; --accent-2: #4d84a8; --accent-ink: #081820;
-  --accent-soft: rgba(107, 163, 199, 0.13); --accent-line: rgba(107, 163, 199, 0.34);
-}
-:root[data-accent="dune"]:root {
-  --accent: #b89b5e; --accent-2: #9a7f45; --accent-ink: #221a08;
-  --accent-soft: rgba(184, 155, 94, 0.13); --accent-line: rgba(184, 155, 94, 0.34);
-}
+/* Accent picker stays inside the red / bone brutalist family. */
+:root[data-accent="moss"]:root,
 :root[data-accent="sage"]:root {
-  --accent: #7fae7a; --accent-2: #618f5c; --accent-ink: #0e1c0c;
-  --accent-soft: rgba(127, 174, 122, 0.13); --accent-line: rgba(127, 174, 122, 0.34);
+  --accent: #ff2a1f; --accent-2: #c4160c; --accent-ink: #0a0000;
+  --accent-soft: rgba(255, 42, 31, 0.12); --accent-line: rgba(255, 42, 31, 0.45);
+}
+:root[data-accent="oxide"]:root,
+:root[data-accent="dune"]:root {
+  --accent: #ff5a2a; --accent-2: #cc3a12; --accent-ink: #0a0200;
+  --accent-soft: rgba(255, 90, 42, 0.12); --accent-line: rgba(255, 90, 42, 0.45);
 }
 :root[data-accent="clay"]:root {
-  --accent: #c96f5a; --accent-2: #a95542; --accent-ink: #240d07;
-  --accent-soft: rgba(201, 111, 90, 0.13); --accent-line: rgba(201, 111, 90, 0.34);
+  --accent: #d42a1f; --accent-2: #a0160c; --accent-ink: #0a0000;
+  --accent-soft: rgba(212, 42, 31, 0.14); --accent-line: rgba(212, 42, 31, 0.5);
+}
+:root[data-accent="slate"]:root {
+  --accent: #e8e4d8; --accent-2: #b8b4a8; --accent-ink: #0a0a0a;
+  --accent-soft: rgba(232, 228, 216, 0.1); --accent-line: rgba(232, 228, 216, 0.4);
 }
 
 /* --------------------------------------------------------------------------
-   2. Ambient stage — soft radial light, no blurred animated divs
+   2. CRT stage — pixel grid, scanlines, vignette, ONE grain tile, flicker,
+      VHS tracking band, rolling sync line. Transform/opacity only.
    -------------------------------------------------------------------------- */
 
 body {
   background:
-    radial-gradient(120% 80% at 50% -10%, color-mix(in srgb, var(--accent) 7%, transparent), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(232, 228, 216, 0.022) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, rgba(232, 228, 216, 0.022) 0 1px, transparent 1px 8px),
     var(--bg);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.5;
+  letter-spacing: 0.015em;
+  -webkit-font-smoothing: none;
+  text-rendering: optimizeSpeed;
 }
 
+/* Scanlines + vignette (static overlay above everything, click-through). */
 body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9991;
+  pointer-events: none;
   background:
-    radial-gradient(34% 40% at 14% 8%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 72%),
-    radial-gradient(28% 32% at 86% 4%, color-mix(in srgb, var(--accent-2) 13%, transparent), transparent 72%),
-    radial-gradient(30% 30% at 52% 0%, rgba(255, 255, 255, 0.04), transparent 72%);
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.26) 0 1px, transparent 1px 3px),
+    radial-gradient(125% 105% at 50% 50%, transparent 52%, rgba(0, 0, 0, 0.6) 100%);
   filter: none;
-  animation: nd-ambient 30s ease-in-out infinite alternate;
-}
-@keyframes nd-ambient {
-  0% { transform: translate3d(-1.5%, -1%, 0) scale(1); opacity: 0.8; }
-  100% { transform: translate3d(1.5%, 1.5%, 0) scale(1.05); opacity: 1; }
+  animation: none;
 }
 
+/* Static grain — one tiled turbulence pattern. */
 body::after {
-  opacity: 0.34;
-  background-image: radial-gradient(color-mix(in srgb, var(--text) 9%, transparent) 1px, transparent 1px);
-  background-size: 28px 28px;
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9992;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
 }
 
-/* Shell ambient blobs (markup: .bgfx > i x3). Transform-only drift. */
-.bgfx { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.bgfx i {
-  position: absolute;
-  border-radius: 50%;
-  opacity: 0.5;
-  will-change: transform;
-}
+/* .bgfx > i x3 repurposed as CRT motion layers (markup already in shell). */
+.bgfx { position: fixed; inset: 0; z-index: 9990; pointer-events: none; overflow: hidden; }
+.bgfx i { position: absolute; inset: 0; border-radius: 0; opacity: 1; will-change: transform, opacity; }
+
+/* Flicker — subtle brightness instability. */
 .bgfx i:nth-child(1) {
-  width: 52vmax; height: 52vmax; left: -18vmax; top: -22vmax;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%);
-  animation: nd-drift-a 38s ease-in-out infinite alternate;
+  width: auto; height: auto; left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(232, 228, 216, 0.025);
+  animation: crt-flicker 5s steps(1, end) infinite;
 }
-.bgfx i:nth-child(2) {
-  width: 44vmax; height: 44vmax; right: -16vmax; top: -10vmax;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent-2) 10%, transparent), transparent 70%);
-  animation: nd-drift-b 46s ease-in-out infinite alternate;
-}
-.bgfx i:nth-child(3) {
-  width: 60vmax; height: 60vmax; left: 22vw; bottom: -34vmax;
-  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.03), transparent 70%);
-  animation: nd-drift-a 54s ease-in-out infinite alternate-reverse;
-}
-@keyframes nd-drift-a {
-  from { transform: translate3d(0, 0, 0) scale(1); }
-  to { transform: translate3d(4vw, 3vh, 0) scale(1.08); }
-}
-@keyframes nd-drift-b {
-  from { transform: translate3d(0, 0, 0) scale(1.04); }
-  to { transform: translate3d(-3vw, 4vh, 0) scale(1); }
+@keyframes crt-flicker {
+  0%, 100% { opacity: 0.2; }
+  7% { opacity: 0.55; }
+  9% { opacity: 0.1; }
+  31% { opacity: 0.4; }
+  33% { opacity: 0.15; }
+  58% { opacity: 0.6; }
+  60% { opacity: 0.2; }
+  81% { opacity: 0.45; }
+  83% { opacity: 0.1; }
 }
 
-::selection { background: color-mix(in srgb, var(--accent) 32%, transparent); color: var(--text); }
+/* VHS tracking band — a distorted horizontal sweep. */
+.bgfx i:nth-child(2) {
+  left: 0; right: 0; top: 0; bottom: auto;
+  width: auto; height: 14vh;
+  background: linear-gradient(180deg, transparent, rgba(255, 42, 31, 0.05) 38%, rgba(232, 228, 216, 0.07) 52%, rgba(255, 42, 31, 0.04) 64%, transparent);
+  animation: crt-track 11s linear infinite;
+}
+@keyframes crt-track {
+  0% { transform: translateY(-20vh); opacity: 0; }
+  6% { opacity: 0.9; }
+  94% { opacity: 0.9; }
+  100% { transform: translateY(120vh); opacity: 0; }
+}
+
+/* Rolling sync line — bright scan drift. */
+.bgfx i:nth-child(3) {
+  left: 0; right: 0; top: 0; bottom: auto;
+  width: auto; height: 2px;
+  background: rgba(232, 228, 216, 0.08);
+  animation: crt-roll 7.5s linear infinite;
+}
+@keyframes crt-roll {
+  0% { transform: translateY(-4vh); }
+  100% { transform: translateY(104vh); }
+}
+
+::selection { background: var(--accent); color: var(--accent-ink); }
 
 * { scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
 ::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-thumb { background: var(--line); border: 3px solid var(--bg); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--bg-3); }
+::-webkit-scrollbar-thumb { background: var(--line); border: 3px solid var(--bg); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-2); }
+::-webkit-scrollbar-corner { background: var(--bg); }
 
-:focus-visible { outline: 2px solid var(--accent-line); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* --------------------------------------------------------------------------
-   3. Typography + accent surfaces
-   -------------------------------------------------------------------------- */
-
-h1, h2, h3 { letter-spacing: -0.018em; }
-.eyebrow, .metric-label { letter-spacing: 0.09em; }
-
-.gtext {
-  background: linear-gradient(96deg, #fff 0%, var(--accent) 44%, var(--accent-2) 76%, #fff 100%);
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-.glow-text { text-shadow: 0 0 18px var(--accent-soft), 0 0 42px color-mix(in srgb, var(--accent) 20%, transparent); }
-
-.hero-card {
-  background:
-    radial-gradient(90% 120% at 100% 0%, var(--accent-soft), transparent 60%),
-    linear-gradient(170deg, var(--bg-2), var(--bg-1));
-  border-color: var(--accent-line);
-}
-
-.orb {
-  background:
-    radial-gradient(circle at 32% 28%, #fff 0%, rgba(255, 255, 255, 0.5) 12%, transparent 40%),
-    conic-gradient(from 0deg, var(--accent), var(--accent-2), color-mix(in srgb, var(--accent) 60%, #fff), var(--accent));
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14) inset, 0 10px 30px -10px var(--accent), 0 0 44px -12px var(--accent-2);
-}
-.orb::before { border-color: var(--accent-line); }
-
-.meter > i { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
-.bar-track > i { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
-.stat-value { background: linear-gradient(180deg, #fff, var(--text-2)); -webkit-background-clip: text; background-clip: text; }
-
-.brain-wrap {
-  background:
-    radial-gradient(closest-side at 46% 42%, var(--accent-soft), transparent 78%),
-    var(--bg-1);
-  border-color: var(--line-soft);
-}
-.chart-line { filter: drop-shadow(0 0 6px var(--accent-line)); }
-.paper-type.review { color: var(--accent); border-color: var(--accent-line); background: var(--accent-soft); }
-
-.sub-plate {
-  border-color: var(--accent-line);
-  background:
-    radial-gradient(90% 160% at 100% 0%, var(--accent-soft), transparent 62%),
-    linear-gradient(150deg, color-mix(in srgb, var(--accent) 10%, transparent), color-mix(in srgb, var(--bg) 40%, transparent));
-  box-shadow: var(--shadow-2), 0 0 0 1px color-mix(in srgb, var(--accent) 6%, transparent) inset;
-}
-
-/* Live dot ring pulse (styles.css leaves this to the skin). */
-.live-dot::after { animation: nd-pulse 2.4s var(--e-out) infinite; }
-@keyframes nd-pulse {
-  0% { transform: scale(1); opacity: 0.8; }
-  70% { transform: scale(2.6); opacity: 0; }
-  100% { transform: scale(2.6); opacity: 0; }
-}
-
-/* --------------------------------------------------------------------------
-   4. Cards, chips, buttons
-   -------------------------------------------------------------------------- */
-
-.card {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.022), transparent 42%),
-    linear-gradient(170deg, var(--bg-2), var(--bg-1));
-  border-color: var(--line-soft);
-  box-shadow: var(--shadow-1), 0 16px 38px -32px #000;
-}
-.card.hoverable {
-  transition: transform var(--t-2) var(--e-out), border-color var(--t-2) var(--e-out);
-}
-.card.hoverable:hover {
-  transform: translateY(-3px);
-  border-color: var(--accent-line);
-  box-shadow: var(--shadow-2), 0 0 0 1px var(--accent-line);
-}
-.card.hoverable:active { transform: translateY(-1px); }
-
-.compound-card { transition: transform var(--t-2) var(--e-out), border-color var(--t-2) var(--e-out); }
-.compound-card:hover { transform: translateY(-2px); border-color: var(--accent-line); }
-
-.chip {
-  background: var(--bg-2);
-  border-color: var(--line-soft);
-  border-radius: 999px;
-}
-.pill-count { background: var(--accent-soft); color: var(--accent); border-radius: 999px; }
-
-.btn { border-radius: var(--radius-s); transition: background var(--t-1), border-color var(--t-1), color var(--t-1), transform var(--t-1); }
-.btn:hover { background: var(--bg-3); border-color: var(--line); }
-.btn.primary {
-  background: linear-gradient(160deg, var(--accent), var(--accent-2));
-  color: var(--accent-ink);
-  box-shadow: 0 10px 26px -14px var(--accent-glow);
-}
-.btn.primary:hover { filter: none; transform: translateY(-1px); }
-.btn.primary:active { transform: translateY(0) scale(0.98); }
-.btn.ghost:hover { background: var(--bg-2); border-color: var(--line); }
-
-.list-row { transition: background var(--t-1); }
-.list-row:hover { background: color-mix(in srgb, var(--bg-2) 60%, transparent); }
-
-/* --------------------------------------------------------------------------
-   5. Navigation — horizontal section strip on desktop, floating pill on mobile
-   -------------------------------------------------------------------------- */
-
-.topbar {
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  border-bottom: 1px solid var(--line-soft);
-}
-.brand-mark {
-  background: linear-gradient(150deg, var(--accent), var(--accent-2));
-  color: var(--accent-ink);
-  box-shadow: 0 6px 18px -8px var(--accent-glow);
-}
-
-.topnav { display: none; }
-
-@media (min-width: 900px) {
-  /* v5 replaces the sidebar with the topbar strip. */
-  .app { grid-template-columns: minmax(0, 1fr); }
-  .sidebar { display: none !important; }
-  .topbar { gap: 14px; padding: 0 22px; padding-top: env(safe-area-inset-top, 0px); }
-  .topbar .brand { display: flex; }
-  .topbar-title { display: none; }
-  .menu-btn { display: grid !important; }
-
-  .topnav {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    flex: 1;
-    min-width: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 18px), transparent);
-    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 18px), transparent);
-    padding: 4px 2px;
-  }
-  .topnav::-webkit-scrollbar { display: none; }
-  .topnav a {
-    flex: none;
-    padding: 7px 12px;
-    border-radius: 999px;
-    font-size: 12.5px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-    color: var(--text-2);
-    text-decoration: none;
-    white-space: nowrap;
-    border: 1px solid transparent;
-    transition: color var(--t-1), background var(--t-1), border-color var(--t-1);
-  }
-  .topnav a:hover { color: var(--text); background: var(--bg-2); text-decoration: none; }
-  .topnav a.active {
-    color: var(--accent);
-    background: var(--accent-soft);
-    border-color: var(--accent-line);
-  }
-
-  .view { max-width: 1240px; padding: 26px 28px 60px; }
-  .bottom-nav { display: none; }
-}
-
-/* Mobile floating pill nav. */
-@media (max-width: 899px) {
-  .bottom-nav {
-    left: 10px;
-    right: 10px;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-    height: var(--nav-h);
-    padding-bottom: 0;
-    border-radius: var(--radius-l);
-    border: 1px solid var(--line);
-    background: color-mix(in srgb, var(--bg-1) 94%, transparent);
-    box-shadow: var(--shadow-3);
-  }
-  .nav-item { border-radius: var(--radius); }
-  .nav-item.active { color: var(--accent); }
-  .view { padding-bottom: calc(var(--nav-h) + 34px + env(safe-area-inset-bottom, 0px)); }
-}
-
-/* Drawer + overlays pick up tokens automatically; tighten the drawer head. */
-.drawer { background: var(--bg-1); border-right: 1px solid var(--line-soft); }
-.overlay { background: rgba(4, 6, 4, 0.62); }
-
-/* --------------------------------------------------------------------------
-   6. Scroll reveals (wireReveals in main.js adds .nd-reveal / .nd-in)
-   -------------------------------------------------------------------------- */
-
-.nd-reveal {
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.5s var(--e-out), transform 0.5s var(--e-out);
-}
-.nd-reveal.nd-in { opacity: 1; transform: none; }
-
-/* --------------------------------------------------------------------------
-   7. Motion guards — decorative animation off, content always visible
-   -------------------------------------------------------------------------- */
-
-[data-motion="off"] .bgfx i,
-[data-motion="off"] .live-dot::after,
-[data-motion="off"] body::before,
-[data-motion="off"] .gtext,
-[data-motion="off"] .orb::before,
-[data-motion="off"] .sub-plate::after,
-[data-motion="off"] .meter > i::after { animation: none !important; }
-
-[data-motion="off"] .nd-reveal { opacity: 1; transform: none; transition: none; }
-[data-motion="off"] .card.hoverable:hover,
-[data-motion="off"] .compound-card:hover,
-[data-motion="off"] .btn.primary:hover { transform: none; }
-
-@media (prefers-reduced-motion: reduce) {
-  .bgfx i, .live-dot::after, body::before, .gtext, .orb::before,
-  .sub-plate::after, .meter > i::after { animation: none !important; }
-  .nd-reveal { opacity: 1; transform: none; transition: none; }
-  .card.hoverable, .compound-card, .btn, .topnav a { transition: none; }
-  .card.hoverable:hover, .compound-card:hover, .btn.primary:hover { transform: none; }
-  .topnav { scroll-behavior: auto; }
-}
-
-/* --------------------------------------------------------------------------
-   8. Display typography + home hero (live 3D brain)
-   -------------------------------------------------------------------------- */
-
-body { font-family: var(--sans); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
-h1, h2, .home-title { font-family: var(--display); }
-h1, .home-title { font-weight: 700; letter-spacing: -0.025em; line-height: 1.05; }
-h2 { font-weight: 600; letter-spacing: -0.02em; }
-.eyebrow { font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.16em; font-weight: 500; }
-.stat-value { font-family: var(--mono); font-weight: 600; }
-
-.home-hero { padding: 24px; overflow: hidden; }
-.home-hero-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
-  gap: 24px;
-  align-items: center;
-}
-.home-hero-copy { min-width: 0; }
-.home-title {
-  font-size: clamp(23px, 3.2vw, 38px);
-  margin: 0 0 12px;
-  overflow-wrap: anywhere;
-}
-.home-lede {
-  color: var(--text-2);
-  font-size: 14.5px;
-  line-height: 1.62;
-  max-width: 52ch;
-  margin: 0 0 14px;
-}
-.home-brain-stage { display: flex; flex-direction: column; gap: 9px; min-width: 0; }
-.home-brain-frame {
-  position: relative;
-  height: clamp(240px, 30vw, 350px);
-  border-radius: var(--radius-l);
-  overflow: hidden;
-  border: 1px solid var(--line-soft);
-  background:
-    radial-gradient(120% 100% at 50% 0%, var(--accent-soft), transparent 62%),
-    var(--bg-1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), var(--shadow-2);
-}
-#home-brain { width: 100%; height: 100%; display: block; touch-action: pan-y; cursor: grab; }
-#home-brain:active { cursor: grabbing; }
-.home-brain-cap { padding: 0 2px; }
-.home-brain-cap .live-dot {
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--text-2);
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-
-@media (max-width: 900px) {
-  .home-hero { padding: 18px; }
-  .home-hero-grid { grid-template-columns: minmax(0, 1fr); gap: 16px; }
-  .home-brain-frame { height: clamp(230px, 56vw, 300px); }
-  .home-lede { font-size: 14px; }
-}
-
-/* Subscribe-plate icon badge: styles.css hardcodes a teal->violet gradient;
-   retone it to the active accent so no violet leaks into v5. */
-.sub-plate .sp-ico {
-  background: linear-gradient(150deg, var(--accent), var(--accent-2));
-  color: var(--accent-ink);
-  box-shadow: 0 8px 20px -10px var(--accent-glow);
-}
-
-/* ============================================================
-   NeuroDifference v5.2 — ORB NAVIGATION (zero bars)
-   One floating orb opens a unified navigator: a spatial section
-   index (empty query) + universal command palette (typed query).
-   Animations: transform/opacity only. Static blur on the scrim.
-   ============================================================ */
-
-/* Legacy chrome is gone for good. */
-.topbar, .bottom-nav, .topnav, .menu-btn, .drawer-host { display: none !important; }
-/* No topbar: reclaim its height so sticky columns sit under the safe area. */
-:root { --top-h: 0px; }
-
-/* Reclaim the space the bars used to occupy. */
-.view {
-  padding-top: calc(env(safe-area-inset-top, 0px) + 22px);
-  padding-bottom: 104px;
-}
-
-/* ---- the orb ---- */
-.nav-orb {
-  position: fixed;
-  left: 50%;
-  bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-  transform: translateX(-50%);
-  z-index: 110;
-  width: 58px; height: 58px;
-  border-radius: 50%;
-  display: grid; place-items: center;
-  cursor: pointer;
-  border: 1px solid color-mix(in srgb, var(--accent) 50%, var(--line));
-  background: radial-gradient(120% 120% at 30% 25%, var(--accent-2), var(--accent) 72%);
-  color: var(--accent-ink);
-  box-shadow: 0 12px 30px -10px var(--accent-glow), 0 2px 8px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.28);
-  transition: transform .25s var(--spring), opacity .2s var(--ease);
-  -webkit-tap-highlight-color: transparent;
-}
-.nav-orb:hover { transform: translateX(-50%) scale(1.07); }
-.nav-orb:active { transform: translateX(-50%) scale(.93); }
-.nav-orb:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.nav-orb-ico { display: grid; place-items: center; position: relative; z-index: 2; }
-.nav-orb-ring {
-  position: absolute; inset: -6px; border-radius: 50%;
-  border: 1.5px solid var(--accent); opacity: .5; pointer-events: none;
-  animation: orbRing 2.8s var(--ease) infinite;
-}
-@keyframes orbRing {
-  0% { transform: scale(.86); opacity: .5; }
-  70% { transform: scale(1.2); opacity: 0; }
-  100% { transform: scale(1.2); opacity: 0; }
-}
-.nav-orb-dot { position: absolute; top: 5px; right: 5px; z-index: 3; }
-.layer-open .nav-orb { opacity: 0; transform: translateX(-50%) scale(.7); pointer-events: none; }
-
-/* ---- navigator overlay ---- */
-.navx-host {
-  position: fixed; inset: 0; z-index: 150;
-  display: grid; place-items: center;
-  padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
-}
-.navx-scrim {
-  position: absolute; inset: 0;
-  background: rgba(6, 8, 7, .74);
-  backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
-  opacity: 0; transition: opacity .22s var(--ease);
-}
-.navx-host.open .navx-scrim { opacity: 1; }
-.navx-panel {
-  position: relative;
-  width: min(760px, 100%);
-  max-height: min(86dvh, 860px);
-  display: flex; flex-direction: column; overflow: hidden;
-  background: linear-gradient(180deg, var(--bg-2), var(--bg-1));
-  border: 1px solid color-mix(in srgb, var(--accent) 22%, var(--line));
-  border-radius: 24px;
-  box-shadow: var(--shadow-3), 0 40px 80px -44px var(--accent-glow);
-  opacity: 0; transform: scale(.96) translateY(8px);
-  transition: opacity .22s var(--ease), transform .26s var(--spring);
-}
-.navx-host.open .navx-panel { opacity: 1; transform: none; }
-
-.navx-search {
-  flex: none; display: flex; align-items: center; gap: 10px;
-  padding: 14px 16px; border-bottom: 1px solid var(--line-soft); color: var(--text-3);
-}
-.navx-search input {
-  flex: 1; min-width: 0; background: none; border: 0; outline: none;
-  color: var(--text); font: inherit; font-size: 16px;
-}
-.navx-search input::placeholder { color: var(--text-3); }
-.navx-kbd {
-  flex: none; font-family: var(--mono); font-size: 11px; color: var(--text-3);
-  border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px;
-}
-.navx-x { flex: none; }
-
-.navx-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 16px; }
-.navx-grid[hidden], .navx-results[hidden] { display: none; }
-.navx-group + .navx-group { margin-top: 18px; }
-.navx-glabel {
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em;
-  text-transform: uppercase; color: var(--accent-2); margin: 0 2px 10px;
-}
-.navx-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.navx-tile {
-  display: flex; align-items: center; gap: 11px; min-width: 0;
-  padding: 12px 13px; border-radius: 16px; text-decoration: none; color: var(--text);
-  background: var(--bg-2); border: 1px solid var(--line-soft);
-  opacity: 0; transform: translateY(8px) scale(.98);
-  transition: transform .18s var(--ease), border-color .15s, background .15s;
-}
-.navx-host.open .navx-tile {
-  opacity: 1; transform: none;
-  animation: tileBloom .34s var(--spring) backwards;
-  animation-delay: var(--d, 0ms);
-}
-@keyframes tileBloom { from { opacity: 0; transform: translateY(8px) scale(.98); } }
-.navx-tile:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); background: var(--bg-3); transform: translateY(-2px); text-decoration: none; }
-.navx-tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.navx-tile.active { border-color: var(--accent); background: var(--accent-soft); }
-.navx-ico {
-  flex: none; width: 40px; height: 40px; border-radius: 12px;
-  display: grid; place-items: center; color: var(--accent);
-  background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
-}
-.navx-label { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 650; letter-spacing: -.01em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.navx-count {
-  flex: none; font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--text-2);
-  background: var(--bg-3); border: 1px solid var(--line-soft); border-radius: 999px; padding: 2px 8px;
-}
-.navx-tile.active .navx-count { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
-
-.navx-rgroup { font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-3); padding: 10px 4px 5px; }
-.navx-item { display: flex; align-items: center; gap: 11px; padding: 10px 11px; border-radius: 12px; color: var(--text); text-decoration: none; }
-.navx-item:hover, .navx-item.active { background: var(--accent-soft); text-decoration: none; }
-.navx-item > svg:first-child { color: var(--accent); flex: none; }
-.navx-item > svg:last-child { color: var(--text-3); flex: none; }
-.navx-grow { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.navx-grow .t { font-size: 13.5px; font-weight: 600; }
-.navx-grow .s { font-size: 11.5px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.navx-empty { padding: 30px 14px; text-align: center; color: var(--text-3); font-size: 13px; }
-
-.navx-foot { flex: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--line-soft); }
-.navx-hint { font-family: var(--mono); font-size: 10.5px; color: var(--text-3); letter-spacing: .02em; }
-
-@media (max-width: 600px) {
-  .navx-host { padding: 0; place-items: stretch; }
-  .navx-panel { width: 100%; height: 100dvh; max-height: 100dvh; border-radius: 0; border: 0; }
-  .navx-search { padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
-  .navx-foot { padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); }
-  .navx-kbd, .navx-keys { display: none; }
-}
-@media (min-width: 760px) { .navx-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (min-width: 1000px) { .navx-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-
-@media (prefers-reduced-motion: reduce) {
-  .nav-orb-ring { animation: none; }
-  .navx-host.open .navx-tile { animation: none; }
-  .navx-panel, .navx-scrim { transition: none; }
-}
-[data-motion="off"] .nav-orb-ring { animation: none; }
-[data-motion="off"] .navx-host.open .navx-tile { animation: none; }
-[data-motion="off"] .navx-panel { transition: opacity .15s; transform: none; }
+/* @@PART2@@ */
