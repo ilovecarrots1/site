@@ -299,14 +299,9 @@ const PHRASES = {
   "твои заметки": "your notes",
   "вид и данные": "appearance and data",
 
-  /* --- v5.2 orb navigator --- */
-  "Навигация и поиск": "Navigation & search",
-  "Препараты, регионы, уроки, действия…": "Compounds, regions, lessons, actions…",
-  "Разделы и действия": "Sections & actions",
+  /* --- v5 search index / page subtitles --- */
   "Органы": "Organs",
   "Пути": "Pathways",
-  "свайп сверху вниз · / или ⌘K — поиск": "swipe down from top · / or ⌘K to search",
-  "↑↓ выбор · Enter открыть · Esc закрыть": "↑↓ select · Enter open · Esc close",
   "клиническое состояние": "clinical condition",
   "орган и система": "organ & system",
   "биохимический путь": "biochemical pathway",
@@ -344,7 +339,6 @@ const PATTERNS = [
   [/^(.+) убран из стека$/, "$1 removed from stack"],
   [/^Импорт не удался: (.+)$/, "Import failed: $1"],
   [/^Элемент$/, "Item"],
-  [/^Навигация и поиск · (.+)$/, "Navigation & search · $1"],
 ];
 
 function tr(value) {
