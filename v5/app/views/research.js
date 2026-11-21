@@ -39,7 +39,7 @@ function kindLabel(p) {
 }
 
 export function paperCard(p, i = 0) {
-  const hue = ["#8b7bff", "#3edbd3", "#6fb3ff", "#4ade80", "#e3b341"][i % 5];
+  const hue = ["#3fb8a3", "#d17a4b", "#6ba3c7", "#7fae7a", "#b89b5e"][i % 5];
   return `<article class="paper rise" style="--pc:${hue};--i:${Math.min(i, 8)}">
     <div class="row between top" style="gap:10px">
       <h3 class="paper-title grow"><a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(p.title)}</a></h3>
@@ -80,7 +80,7 @@ function yearBars(papers) {
     <div class="bars">
       ${rows
         .map(
-          ([y, n]) => `<div class="bar-row" style="--bc:#8b7bff">
+          ([y, n]) => `<div class="bar-row" style="--bc:#3fb8a3">
             <span class="mono dim">${y}</span>
             <div class="bar-track"><i style="width:${Math.round((n / max) * 100)}%"></i></div>
             <span class="mono">${n}</span>
