@@ -289,9 +289,9 @@ export function mountBrain3D(canvas, opts) {
   };
   /* One tissue base per part; lobe tones are subtle shifts of the cortex base. */
   const bases = [
-    rgb(pal.cortex, [201, 167, 155]),
-    rgb(pal.cerebellum, [176, 138, 128]),
-    rgb(pal.stem, [203, 185, 164]),
+    rgb(pal.cortex, [184, 180, 168]),
+    rgb(pal.cerebellum, [138, 134, 124]),
+    rgb(pal.stem, [156, 152, 140]),
   ];
   /* tone table: [source part, per-channel multiplier] — frontal a touch
      lighter/warmer, occipital cooler/darker, insula recessed, etc. */
@@ -311,8 +311,8 @@ export function mountBrain3D(canvas, opts) {
     return [clamp(b[0] * k[0], 0, 255), clamp(b[1] * k[1], 0, 255), clamp(b[2] * k[2], 0, 255)];
   });
 
-  /* selection follows the active skin's --accent (teal in Field Lab) */
-  let acc = [63, 184, 163];
+  /* selection follows the active skin's --accent (sharp red in brutalism) */
+  let acc = [255, 42, 31];
   try {
     const v = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
     acc = rgb(v, acc);
