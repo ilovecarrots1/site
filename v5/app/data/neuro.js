@@ -120,7 +120,7 @@ export const SYSTEMS = [
     id: "acetylcholine",
     name: "Acetylcholine",
     abbr: "ACh",
-    color: "#8B7BFF",
+    color: "#7fb8d8",
     tagline: "Attention, memory, muscle",
     summary:
       "Two subsystems: basal forebrain cholinergic neurons project to cortex and hippocampus for attention and memory, while brainstem and autonomic neurons handle arousal and muscle control.",
@@ -324,7 +324,7 @@ export const SYSTEMS = [
     id: "histamine",
     name: "Histamine",
     abbr: "His",
-    color: "#C084FC",
+    color: "#d17a4b",
     tagline: "Wakefulness, itch, gastric acid",
     summary:
       "Tuberomammillary nucleus histamine neurons fire only during waking and are a major wake-promoting force. This is why first-generation antihistamines make you sleepy and why H3 antagonists are studied as wake agents.",
