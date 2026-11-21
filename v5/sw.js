@@ -131,7 +131,7 @@ self.addEventListener("fetch", (event) => {
   }
 
   event.respondWith(
-    caches.match(req).then((cached) => {
+    caches.match(req, { ignoreSearch: true }).then((cached) => {
       const network = fetch(req)
         .then((res) => {
           if (res && res.ok && res.type === "basic") {
