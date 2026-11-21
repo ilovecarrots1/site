@@ -1419,6 +1419,27 @@ a.rf-flag:hover { color: var(--bad); }
   .rf-where { text-align: left; }
 }
 
+/* ==========================================================================
+   v5 Field Lab — anatomical SVG retone. The v4 pink brain becomes warm
+   mineral tissue that matches the 3D model; selection follows --accent.
+   Loaded last, so these win over the base clinic rules above.
+   ========================================================================== */
+.ba-outline { fill: #c9a79b; }
+.ba-cut { fill: #d8c0b4; }
+.ba-tone-0 { fill: #cdaa9e; }
+.ba-tone-1 { fill: #c19c90; }
+.ba-tone-2 { fill: #d4b3a7; }
+.ba-tone-3 { fill: #b78f83; }
+.ba-region { stroke: rgba(58, 38, 32, 0.4); }
+.ba-region.lit { fill: color-mix(in srgb, var(--accent) 42%, #d4b3a7); }
+.ba-region.on { fill: var(--accent); stroke: #ffffff; }
+.ba-label { fill: #2e1d18; }
+.ba-label.on { fill: #ffffff; }
+.ba-sulcus { stroke: rgba(74, 48, 40, 0.5); }
+.ba-folium { stroke: rgba(74, 48, 40, 0.45); }
+.ba-callosal { fill: #e6d6cc; stroke: rgba(74, 48, 40, 0.3); }
+
+
 
 
 
