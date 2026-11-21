@@ -62,11 +62,11 @@ function bodySvg(selected, sex) {
 function groupHue(group) {
   return (
     {
-      Neuro: "#a78bfa",
-      Endocrine: "#f2b23e",
-      Viscera: "#4ade80",
-      Cardiorespiratory: "#f472b6",
-      Reproductive: "#6fb3ff",
+      Neuro: "#5fb8a6",
+      Endocrine: "#b89b5e",
+      Viscera: "#7fae7a",
+      Cardiorespiratory: "#c96f5a",
+      Reproductive: "#6ba3c7",
       Structural: "#8fa3b8",
     }[group] || "var(--accent)"
   );
