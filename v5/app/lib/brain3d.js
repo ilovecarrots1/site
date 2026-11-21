@@ -465,7 +465,9 @@ export function mountBrain3D(canvas, opts) {
       const ny2 = fc.ny * cp - nz1 * sp;
       const nz2 = fc.ny * sp + nz1 * cp;
       if (nz2 >= 0) continue;                          /* back-face */
-      const key = Math.max(0, nx1 * LX + ny2 * LY + nz2 * LZ);
+      const kd = nx1 * LX + ny2 * LY + nz2 * LZ;
+      const key = Math.max(0, kd);
+      const wrap = Math.max(0, kd * 0.5 + 0.5);          /* half-lambert subsurface wrap */
       const fill = Math.max(0, nx1 * FX + ny2 * FY + nz2 * FZ);
       const cx1 = fc.cx * cy + fc.cz * sy;
       const cz1 = -fc.cx * sy + fc.cz * cy;
@@ -473,8 +475,11 @@ export function mountBrain3D(canvas, opts) {
       fdepth[i] = depth;
       /* baked AO + silhouette rim darkening + a whisper of depth cue */
       const rim = Math.pow(1 - Math.abs(nz2), 3);
+      const fres = Math.pow(1 - Math.abs(nz2), 5);        /* fresnel sheen at grazing angles */
       const dc = 1 - 0.10 * clamp((depth + 120) / 260, 0, 1);
-      fc._d = (0.16 + 0.88 * key + 0.20 * fill) * fc.ao * (1 - 0.20 * rim) * dc;
+      const sss = 0.10 * wrap * wrap * (1 - key);         /* warm scatter through shadowed turns */
+      fc._d = (0.15 + 0.80 * key + 0.22 * wrap * wrap + 0.18 * fill + sss) * fc.ao * (1 - 0.18 * rim) * dc;
+      fc._fres = fres;
       fc._nx = nx1; fc._ny = ny2; fc._nz = nz2;
       order[nv++] = i;
     }
@@ -514,10 +519,11 @@ export function mountBrain3D(canvas, opts) {
       /* specular sheen on faces angled toward the key light */
       if (!lowQ) {
         const hd = fc._nx * HX + fc._ny * HY + fc._nz * HZ;
-        if (hd > 0.6) {
-          const spec = Math.pow(hd, 24) * 0.35;
-          if (spec > 0.02) {
-            ctx.globalAlpha = Math.min(0.30, spec);
+        if (hd > 0.55) {
+          const spec = Math.pow(hd, 20) * 0.30 + Math.pow(hd, 64) * 0.30; /* broad + wet sharp lobe */
+          const a = Math.min(0.34, spec + (fc._fres || 0) * 0.10);
+          if (a > 0.02) {
+            ctx.globalAlpha = a;
             ctx.fillStyle = "#ffffff";
             ctx.fill();
           }
