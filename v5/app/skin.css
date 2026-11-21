@@ -475,3 +475,11 @@ h2 { font-weight: 600; letter-spacing: -0.02em; }
   .home-brain-frame { height: clamp(230px, 56vw, 300px); }
   .home-lede { font-size: 14px; }
 }
+
+/* Subscribe-plate icon badge: styles.css hardcodes a teal->violet gradient;
+   retone it to the active accent so no violet leaks into v5. */
+.sub-plate .sp-ico {
+  background: linear-gradient(150deg, var(--accent), var(--accent-2));
+  color: var(--accent-ink);
+  box-shadow: 0 8px 20px -10px var(--accent-glow);
+}
