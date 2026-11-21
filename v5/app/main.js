@@ -92,16 +92,9 @@ const NAV = [
   },
 ];
 
-const MOBILE_NAV = [
-  { id: "home", label: "Главная", href: "#/", icon: "home" },
-  { id: "compounds", label: "Препараты", href: "#/compounds", icon: "pill" },
-  { id: "brain", label: "Мозг", href: "#/brain", icon: "brain" },
-  { id: "learn", label: "Обучение", href: "#/learn", icon: "book" },
-  { id: "more", label: "Ещё", icon: "menu", more: true },
-];
-
-/* v5: horizontal section strip in the topbar replaces the desktop sidebar. */
-const TOPNAV = NAV.flatMap((g) => g.items).filter((it) => it.id !== "settings");
+/* v5.2: no navigation bars at all. One floating orb opens a unified
+   navigator (spatial section index + universal command palette). */
+let currentNavId = "home";
 
 /* ------------------------------------------------------------------ */
 /* Shell                                                               */
@@ -186,7 +179,7 @@ function lockScroll(on) {
  * @param {boolean} restoreFocus
  */
 function closeLayers(restoreFocus = true) {
-  document.querySelectorAll(".overlay, .drawer-host, .sheet-host").forEach((el) => el.remove());
+  document.querySelectorAll(".overlay, .drawer-host, .sheet-host, .navx-host").forEach((el) => el.remove());
   lockScroll(false);
   if (restoreFocus && lastFocus && document.contains(lastFocus)) {
     try {
@@ -290,6 +283,30 @@ function buildIndex() {
     ["Спроси индекс", "#/ask", "sparkles", "поисковый ассистент"],
     ["Блокнот", "#/notes", "edit", "твои заметки"],
     ["Настройки", "#/settings", "settings", "вид и данные"],
+  ]) {
+    items.push({ kind: "Page", title: label, sub, href, icon: ico, hay: `${label} ${sub}`.toLowerCase() });
+  }
+  for (const c of CONDITIONS) {
+    items.push({ kind: "Состояния", title: c.name || c.title || c.id, sub: c.tagline || c.summary || "клиническое состояние", href: `#/conditions/${c.id}`, icon: "shield", hay: `${c.name || ""} ${(c.aliases || []).join(" ")} ${c.tagline || ""}`.toLowerCase() });
+  }
+  for (const o of ORGANS) {
+    items.push({ kind: "Органы", title: o.name || o.id, sub: o.group || "орган и система", href: `#/organs/${o.id}`, icon: "body", hay: `${o.name || ""} ${o.group || ""}`.toLowerCase() });
+  }
+  for (const p of PATHWAYS) {
+    items.push({ kind: "Пути", title: p.name || p.id, sub: p.tagline || "биохимический путь", href: `#/atlas/${p.id}`, icon: "atom", hay: `${p.name || ""} ${p.tagline || ""}`.toLowerCase() });
+  }
+  for (const [label, href, ico, sub] of [
+    ["Препараты", "#/compounds", "pill", "все compounds"],
+    ["Обучение", "#/learn", "book", "курсы и уроки"],
+    ["Состояния", "#/conditions", "shield", "клинические состояния"],
+    ["Анализы", "#/bloodwork", "trend", "референсы и маркеры"],
+    ["PK-кривые", "#/pk", "activity", "фармакокинетика"],
+    ["Сборка стека", "#/stack", "layers", "конструктор комбинаций"],
+    ["Поиск по симптомам", "#/symptoms", "search", "дифференциал"],
+    ["Красные флаги", "#/emergency", "alert", "неотложные состояния"],
+    ["План снижения", "#/lab/taper", "scale", "тейперинг"],
+    ["Сравнение", "#/compare", "grid", "бок о бок"],
+    ["Исследования", "#/research", "microscope", "PubMed и доказательства"],
   ]) {
     items.push({ kind: "Page", title: label, sub, href, icon: ico, hay: `${label} ${sub}`.toLowerCase() });
   }
@@ -551,20 +568,16 @@ let currentCtx = null;
 let lastPath = null;
 
 function paintNav(navId) {
+  currentNavId = navId || "home";
   document.querySelectorAll("[data-nav]").forEach((el) => {
     el.classList.toggle("active", el.dataset.nav === navId);
   });
-  // The bottom bar has no Flashcards cell — light up Learn while browsing cards.
-  if (navId === "cards") {
-    const learn = document.querySelector('#bottom-nav [data-nav="learn"]');
-    if (learn) learn.classList.add("active");
-  }
-  // Keep the active chip centred in the desktop section strip.
-  const strip = document.querySelector(".topnav");
-  if (strip) {
-    const on = strip.querySelector("a.active");
-    if (on) strip.scrollTo({ left: on.offsetLeft - strip.clientWidth / 2 + on.offsetWidth / 2, behavior: "smooth" });
-  }
+  // The orb reflects the current section so you always know where you are.
+  const item = NAV.flatMap((g) => g.items).find((it) => it.id === navId);
+  const ico = document.getElementById("nav-orb-ico");
+  if (ico) ico.innerHTML = icon(item ? item.icon : "grid", 22);
+  const orb = document.getElementById("nav-orb");
+  if (orb) orb.setAttribute("aria-label", `Навигация и поиск${item ? " · " + item.label : ""}`);
 }
 
 function paintCounts() {
@@ -695,7 +708,7 @@ function wireKeys() {
       return;
     }
     if (ev.key === "Escape") {
-      if (document.querySelector(".overlay, .drawer-host, .sheet-host")) {
+      if (document.querySelector(".overlay, .drawer-host, .sheet-host, .navx-host")) {
         ev.preventDefault();
         closeLayers();
       }
