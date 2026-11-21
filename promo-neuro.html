@@ -192,10 +192,55 @@ const DOSES=[
  ["Creatine","5 г","ежедн.","g"],["Melatonin","0.5 мг","за 1 ч до сна","c"],
 ];
 const MECH=[["BDNF/TrkB","Семакс ↑ нейротрофику"],["ГАМК-ергический","Селанк ↓ тревожность"],["Аденозин A1/A2A","Кофеин ↑ бодрость"],["mTOR/креатинфосфат","Креатин ↑ энергия"]];
-const RISKS=[["Кофеин + сон","Пересечение с мелатонином","r"],["GH + AI","Метаболич. + костная нагрузка","o"],["Incretin + incretin","ЖКТ → дегидратация","r"],["Седация叠加","Селанк + мелатонин","o"]];
+const RISKS=[["Кофеин + сон","Пересечение с мелатонином","r"],["GH + AI","Метаболич. + костная нагрузка","o"],["Incretin + incretin","ЖКТ → дегидратация","r"],["Суммация седации","Селанк + мелатонин","o"]];
 const SHOP=[["Semax"],["Selank"],["Tirzepatide"],["Retatrutide"],["Somatropin"],["MK-677"]];
 const COACH=[["Bloodwork","Загрузи анализы — диапазоны универсальные, без sex-branching."],["X-ray / МРТ","Контекст снимков к дневнику и стеку."]];
-/*__C2__*/
+/* ---- screen builders ---- */
+const stars=s=>"★".repeat(s)+"☆".repeat(5-s);
+const rv=i=>`class="rv" style="--i:${i}"`;
+const thumb=i=>`<div class="rv" style="--i:${i};height:120px;border-radius:6px;background:linear-gradient(135deg,rgba(139,92,246,.35),rgba(6,182,212,.25))"></div>`;
+function scrIntro(){return `<div class="screen diss center" id="sc0">
+  <div class="logo rv" style="--i:0">Neuro<span>Difference</span></div>
+  <div class="tag1 rv" style="--i:2">Доказательная нейрофармакология.</div>
+  <div class="tag2 rv" style="--i:3">Для тех, кому нужна вся картина.</div></div>`;}
+function scrStudies(){return `<div class="screen push" id="sc1"><div class="h rv" style="--i:0"><span class="dot"></span>Исследования</div>
+  <div class="g g32">${STUDIES.map((s,i)=>`<div class="card rv" style="--i:${i+1}"><div class="t">${s.t}</div><div class="tags"><span class="tag ${s.tc}">${s.tag}</span></div><div class="stars">${stars(s.s)}</div></div>`).join("")}</div></div>`;}
+function scrTopic(){return `<div class="screen" id="sc2"><div class="h rv" style="--i:0"><span class="dot" style="background:var(--cyan)"></span>Тема дня</div>
+  <div class="g" style="grid-template-columns:repeat(3,1fr)">${TOPIC.map((s,i)=>`<div class="card rv" style="--i:${i+1}">${thumb(i+1)}<div class="t">${s.t}</div><div class="d">${s.d}</div></div>`).join("")}</div></div>`;}
+const GN=[[200,250,1,"NMDA"],[80,120,0,"Кетамин"],[320,120,0,"BDNF"],[80,380,0,"Синаптогенез"],[320,380,0,"Пластичность"],[200,60,0,"Глутамат"],[200,440,0,"mTOR"]];
+const GE=[[0,1],[0,2],[0,3],[0,4],[5,0],[0,6],[2,4]];
+function scrMap(){return `<div class="screen" id="sc3"><div class="mapwrap">
+  <div class="mapside">${["Рецепторы","Нейротрофика","Синапс","Метаболизм"].map((c,i)=>`<div class="li rv" style="--i:${i}"><span class="n">${c}</span></div>`).join("")}</div>
+  <svg class="graph" viewBox="0 0 400 500">${GE.map((e,i)=>`<line x1="${GN[e[0]][0]}" y1="${GN[e[0]][1]}" x2="${GN[e[1]][0]}" y2="${GN[e[1]][1]}" style="--i:${i}"/>`).join("")}${GN.map(n=>`<circle cx="${n[0]}" cy="${n[1]}" r="${n[2]?16:10}" class="${n[2]?"hub":""}"/><text x="${n[0]+18}" y="${n[1]+6}">${n[3]}</text>`).join("")}</svg>
+  <div class="mapside">${["Кетамин→NMDA","NMDA→BDNF","BDNF→TrkB","mTOR→рост"].map((c,i)=>`<div class="li rv" style="--i:${i+4}"><span class="n" style="color:var(--grn)">${c}</span></div>`).join("")}</div></div></div>`;}
+function scrCompounds(){return `<div class="screen push" id="sc4"><div class="h rv" style="--i:0"><span class="dot" style="background:var(--cyan)"></span>Соединения</div>
+  <div class="g g43">${COMPOUNDS.map((c,i)=>`<div class="card rv" style="--i:${i+1}"><div class="t" style="font-size:26px">${c[0]}</div><div class="tags"><span class="tag ${c[2]}">${c[1]}</span></div></div>`).join("")}</div></div>`;}
+function scrStack(){return `<div class="screen" id="sc5"><div class="cols">
+  <div class="col"><div class="h rv" style="--i:0" style="font-size:28px">Пресеты</div>${PRESETS.map((p,i)=>`<div class="li rv" style="--i:${i+1}"><span class="n">${p}</span></div>`).join("")}</div>
+  <div class="col"><div class="h rv" style="--i:0">Стек</div><div class="list scroll">${STACKLIST.map((s,i)=>`<div class="li rv" style="--i:${i+1}"><span class="n">${s[0]}</span><span class="v">${s[1]}</span></div>`).join("")}</div></div></div></div>`;}
+function scrDoses(){return `<div class="screen" id="sc6"><div class="h rv" style="--i:0"><span class="dot" style="background:var(--grn)"></span>Дозировки цикла</div>
+  <div class="tbl">${DOSES.map((d,i)=>`<div class="row ${d[3]} hl rv" style="--i:${i}"><span class="n">${d[0]}</span><span class="a">${d[1]}</span><span class="a">${d[2]}</span></div>`).join("")}</div></div>`;}
+function scrAnalysis(){return `<div class="screen" id="sc7"><div class="cols">
+  <div class="col"><div class="h rv" style="--i:0">Механизмы</div>${MECH.map((m,i)=>`<div class="card rv" style="--i:${i+1}"><div class="t" style="font-size:26px">${m[0]}</div><div class="d">${m[1]}</div></div>`).join("")}</div>
+  <div class="col"><div class="h rv" style="--i:0" ><span class="dot" style="background:var(--red)"></span>Риски</div>${RISKS.map((r,i)=>`<div class="card rv" style="--i:${i+1}"><div class="t" style="font-size:26px">${r[0]}</div><div class="tags"><span class="tag ${r[2]}">${r[2]==="r"?"major":"moderate"}</span></div><div class="d">${r[1]}</div></div>`).join("")}</div></div></div>`;}
+const STRUCT=`<svg class="struct" viewBox="0 0 200 120"><path d="M60 60 L80 30 L120 30 L140 60 L120 90 L80 90 Z"/><line x1="140" y1="60" x2="175" y2="45"/><line x1="60" y1="60" x2="25" y2="75"/><circle cx="175" cy="45" r="6"/></svg>`;
+function scrShop(){return `<div class="screen" id="sc8"><div class="h rv" style="--i:0"><span class="dot" style="background:var(--org)"></span>Каталог</div>
+  <div class="g g32">${SHOP.map((s,i)=>`<div class="card white rv" style="--i:${i+1}">${STRUCT}<div class="t" style="font-size:26px">${s[0]}</div><div class="d">справочник · структуры</div></div>`).join("")}</div></div>`;}
+const BODY=`<svg viewBox="0 0 200 400" fill="none" stroke="#06b6d4" stroke-width="8" stroke-linecap="round"><circle cx="100" cy="40" r="26"/><path d="M100 66 L100 200 M100 90 L40 150 M100 90 L160 150 M100 200 L60 330 M100 200 L140 330"/></svg>`;
+function scrLog(){return `<div class="screen push" id="sc9"><div class="cols">
+  <div class="col body3d rv" style="--i:0">${BODY}</div>
+  <div class="col form"><div class="h rv" style="--i:0">Дневник</div>
+    <div class="field rv" style="--i:1">Соединение…</div><div class="field rv" style="--i:2">Доза…</div><div class="field rv" style="--i:3">Время…</div>
+    <div class="btn rv" style="--i:4">Записать</div></div></div></div>`;}
+function scrCoach(){return `<div class="screen diss" id="sc10"><div class="g g2">${COACH.map((c,i)=>`<div class="card rv" style="--i:${i+1}"><div class="t">${c[0]}</div><div class="d">${c[1]}</div><div class="btn ghost">Upload</div></div>`).join("")}</div></div>`;}
+function scrFinal(){return `<div class="screen diss center" id="sc11">
+  <div class="logo rv" style="--i:0;font-size:88px">Neuro<span>Difference</span></div>
+  <div class="tag1 rv" style="--i:1">Одно пространство. Вся картина.</div>
+  <div class="feat rv" style="--i:2">исследования · механизмы · соединения · стеки · дневник</div>
+  <div class="cta rv" style="--i:3">Открыть бесплатно · neurodifference.ru</div></div>`;}
+const BUILD=[scrIntro,scrStudies,scrTopic,scrMap,scrCompounds,scrStack,scrDoses,scrAnalysis,scrShop,scrLog,scrCoach,scrFinal];
+document.getElementById("ui").innerHTML=BUILD.map(f=>f()).join("");
+/*__C3__*/
 </script>
 </body>
 </html>
