@@ -262,7 +262,7 @@ export const settings = {
             <p class="small muted" style="line-height:1.6">NeuroDifference — личный учебный инструмент: энциклопедия препаратов с градацией доказательности, атлас нейромедиаторов, песочница фармакокинетики и курсы с интервальным повторением. Это не медицинское изделие.</p>
             ${callout("danger", "Не медицинская рекомендация", "Ничто здесь не является рекомендацией принимать, комбинировать, снижать или отменять какое-либо вещество. Дозировки — справочные величины из литературы, не назначения. Поговори с врачом, который знает твою историю.")}
             <div class="row wrap" style="gap:5px;margin-top:2px">
-              <span class="chip">v5.0.0</span>
+              <span class="chip">v5.1.0</span>
               <span class="chip">${COMPOUNDS.length} препаратов</span>
               <span class="chip">${SYSTEMS.length} систем</span>
               <span class="chip">${TOTAL_LESSONS} уроков</span>
