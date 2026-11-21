@@ -262,7 +262,7 @@ export function mount(root) {
   if (liveHome) { liveHome.destroy(); liveHome = null; }
   liveHome = mountBrain3D(canvas, {
     regions: REGIONS.map((r) => ({ ...r, color: regionColor(r) })),
-    palette: { cortex: "#c9a79b", cerebellum: "#b08a80", stem: "#cbb9a4" },
+    palette: { cortex: "#b8b4a8", cerebellum: "#8a867c", stem: "#9c988c" },
     getLit: () => ({ lit: new Map(), focus: false }),
     onSelect: (id) => { location.hash = `#/brain/${id}`; },
   });
