@@ -1,9 +1,9 @@
-/* NeuroDifference v5 (Field Lab) service worker — scoped to /v5/.
+/* NeuroDifference v5 (Terminal Brutalism) service worker — scoped to /v5/.
    Cache names are prefixed nd-v5 so this worker can never evict the main
    site's shell cache (cache storage is shared per origin). */
 
-const VERSION = "nd-v5.2.0";
-const V = "5.2.0";
+const VERSION = "nd-v5.3.0";
+const V = "5.3.0";
 
 const SHELL = [
   "./",
