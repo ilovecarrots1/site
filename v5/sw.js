@@ -2,8 +2,8 @@
    Cache names are prefixed nd-v5 so this worker can never evict the main
    site's shell cache (cache storage is shared per origin). */
 
-const VERSION = "nd-v5.0.0";
-const V = "5.0.0";
+const VERSION = "nd-v5.1.0";
+const V = "5.1.0";
 
 const SHELL = [
   "./",
