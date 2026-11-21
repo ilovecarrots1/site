@@ -34,34 +34,34 @@ export function statTile({ label, value, sub = "", iconName = "", tone = "" }) {
 }
 
 const CLASS_HUES = {
-  Stimulant: "#d9b36c",
-  Nootropic: "#5fb8a6",
-  Racetam: "#7fc9b8",
-  Peptide: "#6ba3c7",
-  Adaptogen: "#7fae7a",
-  Herb: "#8fbf8a",
-  Antidepressant: "#4fb3a0",
-  Anxiolytic: "#9bbf7a",
-  Sedative: "#79c2a8",
-  Psychedelic: "#d17a4b",
-  Dissociative: "#8a9bb5",
-  Opioid: "#c96f5a",
-  Cannabinoid: "#9bbf6a",
-  "Mood stabiliser": "#b89b5e",
-  Supplement: "#9aa6b2",
-  Vitamin: "#b8c97a",
-  Amino: "#7fb8d8",
-  Hormone: "#d18a5a",
-  Depressant: "#94a3b8",
-  Antipsychotic: "#c08a7a",
-  "Wakefulness agent": "#e0c07a",
+  Stimulant: "#e8e4d8",
+  Nootropic: "#a8a498",
+  Racetam: "#c8c4b8",
+  Peptide: "#908c80",
+  Adaptogen: "#b8b4a8",
+  Herb: "#9c988c",
+  Antidepressant: "#d8d4c8",
+  Anxiolytic: "#b0aca0",
+  Sedative: "#807c72",
+  Psychedelic: "#ff5a2a",
+  Dissociative: "#ff2a1f",
+  Opioid: "#d42a1f",
+  Cannabinoid: "#a09c90",
+  "Mood stabiliser": "#c0bcb0",
+  Supplement: "#88847a",
+  Vitamin: "#d0ccc0",
+  Amino: "#989488",
+  Hormone: "#ff8a3a",
+  Depressant: "#706c62",
+  Antipsychotic: "#c4160c",
+  "Wakefulness agent": "#e0dcd0",
 };
 
 export function classColor(cls) {
   if (CLASS_HUES[cls]) return CLASS_HUES[cls];
   let h = 0;
   for (const ch of String(cls || "")) h = (h * 31 + ch.charCodeAt(0)) % 360;
-  return `hsl(${h} 38% 64%)`;
+  return `hsl(40 7% ${58 + (h % 26)}%)`;
 }
 
 export function compoundCard(c) {
