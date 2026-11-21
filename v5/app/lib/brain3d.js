@@ -399,5 +399,247 @@ export function mountBrain3D(canvas, opts) {
     kick();
   }
 
-  /* __CHUNK3__ */
+  function draw(now) {
+    const t0 = performance.now();
+    const cy = Math.cos(yaw), sy = Math.sin(yaw);
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const scale = (Math.min(W, H * 1.3) / 340) * zoom;
+    const cxp = W / 2, cyp = H / 2 + 8 * zoom;
+    const CAM = 560;
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    /* ambient vignette + soft ground shadow give the model a stage */
+    const amb = ctx.createRadialGradient(cxp, cyp * 0.86, 8, cxp, cyp, Math.max(W, H) * 0.78);
+    amb.addColorStop(0, "rgba(255,255,255,0.05)");
+    amb.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = amb;
+    ctx.fillRect(0, 0, W, H);
+    const gy = cyp + 122 * scale, grx = 150 * scale, gry = 24 * scale;
+    const gsh = ctx.createRadialGradient(cxp, gy, 1, cxp, gy, grx);
+    gsh.addColorStop(0, "rgba(0,0,0,0.34)");
+    gsh.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.save();
+    ctx.translate(cxp, gy);
+    ctx.scale(1, gry / grx);
+    ctx.translate(-cxp, -gy);
+    ctx.fillStyle = gsh;
+    ctx.beginPath();
+    ctx.arc(cxp, gy, grx, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+
+    /* project every vertex */
+    for (let i = 0; i < NV; i++) {
+      const p = geo.verts[i];
+      const x1 = p.x * cy + p.z * sy;
+      const z1 = -p.x * sy + p.z * cy;
+      const y2 = p.y * cp - z1 * sp;
+      const z2 = p.y * sp + z1 * cp;
+      const f = CAM / (CAM + z2);
+      const pr = proj[i];
+      pr.x = cxp + x1 * f * scale;
+      pr.y = cyp - y2 * f * scale;
+      pr.z = z2;
+    }
+
+    /* shade + cull faces, gather visible */
+    let nv = 0;
+    for (let i = 0; i < NF; i++) {
+      const fc = geo.faces[i];
+      const nx1 = fc.nx * cy + fc.nz * sy;
+      const nz1 = -fc.nx * sy + fc.nz * cy;
+      const ny2 = fc.ny * cp - nz1 * sp;
+      const nz2 = fc.ny * sp + nz1 * cp;
+      if (nz2 >= 0) continue;                          /* back-face */
+      const key = Math.max(0, nx1 * LX + ny2 * LY + nz2 * LZ);
+      const fill = Math.max(0, nx1 * FX + ny2 * FY + nz2 * FZ);
+      const cx1 = fc.cx * cy + fc.cz * sy;
+      const cz1 = -fc.cx * sy + fc.cz * cy;
+      const depth = fc.cy * sp + cz1 * cp;
+      fdepth[i] = depth;
+      /* baked AO + silhouette rim darkening + a whisper of depth cue */
+      const rim = Math.pow(1 - Math.abs(nz2), 3);
+      const dc = 1 - 0.10 * clamp((depth + 120) / 260, 0, 1);
+      fc._d = (0.16 + 0.88 * key + 0.20 * fill) * fc.ao * (1 - 0.20 * rim) * dc;
+      fc._nx = nx1; fc._ny = ny2; fc._nz = nz2;
+      order[nv++] = i;
+    }
+    const vis = order.slice(0, nv);
+    vis.sort((a, b) => fdepth[b] - fdepth[a]);
+
+    /* fill far -> near; focus mode ghosts unlit cortex (x-ray) */
+    hitFaces = [];
+    ctx.lineJoin = "round";
+    const edgeStyle = `rgba(${Math.round(accLight[0])},${Math.round(accLight[1])},${Math.round(accLight[2])},0.45)`;
+    for (let k = 0; k < nv; k++) {
+      const i = vis[k];
+      const fc = geo.faces[i];
+      const level = lit.get(fc.region) || 0;
+      const bucket = clamp(Math.round(fc._d * (BUCKETS - 1)), 0, BUCKETS - 1);
+      const A = proj[fc.a], B = proj[fc.b], Cc = proj[fc.c];
+      let col;
+      if (level === 0 && hoverRegion === fc.region) col = hoverCache[fc.tone][bucket];
+      else col = shadeCache[fc.tone][level][bucket];
+      ctx.globalAlpha = focus && level === 0 ? 0.30 : 1;
+      ctx.fillStyle = col;
+      ctx.strokeStyle = col;   /* hairline seam hides raster gaps */
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      ctx.moveTo(A.x, A.y);
+      ctx.lineTo(B.x, B.y);
+      ctx.lineTo(Cc.x, Cc.y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      /* crystalline edge on the selected region */
+      if (level === 2) {
+        ctx.strokeStyle = edgeStyle;
+        ctx.lineWidth = 0.9;
+        ctx.stroke();
+      }
+      /* specular sheen on faces angled toward the key light */
+      if (!lowQ) {
+        const hd = fc._nx * HX + fc._ny * HY + fc._nz * HZ;
+        if (hd > 0.6) {
+          const spec = Math.pow(hd, 24) * 0.35;
+          if (spec > 0.02) {
+            ctx.globalAlpha = Math.min(0.30, spec);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+          }
+        }
+      }
+      if (fc.region) hitFaces.push({ ax: A.x, ay: A.y, bx: B.x, by: B.y, cx: Cc.x, cy: Cc.y, d: fdepth[i], region: fc.region });
+    }
+    ctx.globalAlpha = 1;
+
+    /* synapse sparks */
+    const t = now * 0.001;
+    if (!motionOff() && !lowQ) {
+      ctx.fillStyle = "#eafff8";
+      for (const s of geo.sparks) {
+        s.t += s.v;
+        if (s.t > 1) s.t -= 1;
+        const A = proj[s.a], B = proj[s.b];
+        const x = A.x + (B.x - A.x) * s.t;
+        const y = A.y + (B.y - A.y) * s.t;
+        ctx.globalAlpha = 0.45 * Math.sin(s.t * Math.PI);
+        ctx.beginPath();
+        ctx.arc(x, y, 1.0 * scale, 0, TAU);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    /* project anchors once (used by pathway lines, hotspots, labels) */
+    anchorScreen.clear();
+    for (const a of anchors) {
+      const x1 = a.X * cy + a.Z * sy;
+      const z1 = -a.X * sy + a.Z * cy;
+      const y2 = a.Y * cp - z1 * sp;
+      const z2 = a.Y * sp + z1 * cp;
+      const f = CAM / (CAM + z2);
+      anchorScreen.set(a.id, { x: cxp + x1 * f * scale, y: cyp - y2 * f * scale, front: z2 < 6, a });
+    }
+
+    /* faint pathway lines between lit anchors in focus mode */
+    if (focus) {
+      const litPts = [];
+      for (const [id, p] of anchorScreen) if ((lit.get(id) || 0) > 0) litPts.push(p);
+      if (litPts.length > 1 && litPts.length <= 10) {
+        ctx.strokeStyle = edgeStyle;
+        ctx.globalAlpha = 0.16;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let i = 0; i < litPts.length; i++)
+          for (let j = i + 1; j < litPts.length; j++) {
+            ctx.moveTo(litPts[i].x, litPts[i].y);
+            ctx.lineTo(litPts[j].x, litPts[j].y);
+          }
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    /* region hotspots + labels (decluttered: text only when lit / zoomed) */
+    ctx.textAlign = "center";
+    ctx.font = "600 10px system-ui, sans-serif";
+    for (const [id, p] of anchorScreen) {
+      const a = p.a;
+      const level = lit.get(id) || 0;
+      const showDot = level > 0 || (a.surface && p.front);
+      if (!showDot) continue;
+      let alpha = level > 0 ? (p.front ? 0.9 : 0.25) : 0.5;
+      if (focus && !level) alpha *= 0.4;
+      if (level === 2) alpha = 1;
+      /* soft glow halo for lit nuclei (reads through the ghosted cortex) */
+      if (level > 0) {
+        ctx.globalAlpha = alpha * 0.18;
+        ctx.fillStyle = level === 2 ? "#ffffff" : a.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 8, 0, TAU);
+        ctx.fill();
+      }
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = level === 2 ? "#ffffff" : a.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, level === 2 ? 3.4 : 2.2, 0, TAU);
+      ctx.fill();
+      if (level > 0) {
+        const pulse = motionOff() ? 0.5 : (t * 1.4 + a.X * 0.01) % 1;
+        ctx.globalAlpha = alpha * (1 - pulse) * 0.7;
+        ctx.strokeStyle = level === 2 ? "#ffffff" : a.color;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 5 + pulse * 11, 0, TAU);
+        ctx.stroke();
+      }
+      const showLabel = level > 0 || (a.surface && p.front && zoom > 1.5 && !focus);
+      if (showLabel) {
+        ctx.globalAlpha = level > 0 ? 0.95 : 0.6;
+        ctx.fillStyle = level > 0 ? "#ffffff" : a.color;
+        ctx.fillText(a.short, p.x, p.y + 13);
+      }
+    }
+    ctx.globalAlpha = 1;
+
+    /* hover tooltip (mouse only) — drawn on canvas, never overlaps DOM text */
+    if (hoverRegion && !dragging) {
+      const a = anchorById.get(hoverRegion);
+      const label = a ? a.short : hoverRegion;
+      ctx.font = "600 11px system-ui, sans-serif";
+      const tw = ctx.measureText(label).width;
+      const bw = tw + 18, bh = 24;
+      let bx = hoverX + 14, by = hoverY - bh - 8;
+      bx = clamp(bx, 6, W - bw - 6);
+      by = clamp(by, 6, H - bh - 6);
+      ctx.beginPath();
+      const r = 7;
+      ctx.moveTo(bx + r, by);
+      ctx.arcTo(bx + bw, by, bx + bw, by + bh, r);
+      ctx.arcTo(bx + bw, by + bh, bx, by + bh, r);
+      ctx.arcTo(bx, by + bh, bx, by, r);
+      ctx.arcTo(bx, by, bx + bw, by, r);
+      ctx.closePath();
+      ctx.fillStyle = "rgba(12,14,12,0.92)";
+      ctx.fill();
+      ctx.strokeStyle = `rgba(${Math.round(acc[0])},${Math.round(acc[1])},${Math.round(acc[2])},0.55)`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = "#e9ebe6";
+      ctx.textAlign = "left";
+      ctx.fillText(label, bx + 9, by + 16);
+      ctx.textAlign = "center";
+    }
+
+    /* adaptive quality: sustained slow frames drop sheen / sparks / dpr */
+    const dt = performance.now() - t0;
+    emaMs = emaMs * 0.9 + dt * 0.1;
+    if (!lowQ && emaMs > 26) { lowQ = true; resize(); }
+    else if (lowQ && emaMs < 13) { lowQ = false; resize(); }
+  }
+
+  /* __CHUNK4__ */
 }
