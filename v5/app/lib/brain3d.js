@@ -185,5 +185,219 @@ export function buildGeometry() {
       }
   }
 
-  /* __CHUNK2__ */
+  /* ---- Cerebellum: under the occipital lobe, fine transverse folia ------- */
+  const cbR = 22, cbC = 36;
+  const cbGrid = [];
+  for (let i = 0; i <= cbR; i++) {
+    const t = (i / cbR) * Math.PI;
+    const row = [];
+    for (let j = 0; j < cbC; j++) {
+      const p = (j / cbC) * TAU;
+      const fol = Math.sin(10 * t);
+      const f = 1 + 0.05 * Math.sign(fol) * Math.pow(Math.abs(fol), 0.6) + 0.02 * Math.sin(7 * p);
+      const x = 48 * Math.sin(t) * Math.cos(p) * f - 104;
+      const y = 30 * Math.cos(t) * f - 76;
+      const z = 70 * Math.sin(t) * Math.sin(p) * f;
+      const ao = clamp(0.78 + (f - 1) * 3, 0.55, 1);
+      tag(x, y, z, 1);
+      row.push(V(x, y, z, ao));
+    }
+    cbGrid.push(row);
+  }
+  for (let i = 0; i < cbR; i++)
+    for (let j = 0; j < cbC; j++) {
+      const j1 = (j + 1) % cbC;
+      addFace(cbGrid[i][j], cbGrid[i + 1][j], cbGrid[i + 1][j1], 1);
+      addFace(cbGrid[i][j], cbGrid[i + 1][j1], cbGrid[i][j1], 1);
+    }
+
+  /* ---- Brainstem: midbrain -> pons bulge -> medulla -> cord -------------- */
+  const stR = 12, stC = 18;
+  const stGrid = [];
+  for (let k = 0; k <= stR; k++) {
+    const u = k / stR;
+    const cx = -22 - 18 * u;
+    const cy = -58 - 64 * u;
+    const r = 13 * (1 - u * 0.5) + 3.4 * Math.exp(-Math.pow((u - 0.32) / 0.18, 2));
+    const row = [];
+    for (let j = 0; j < stC; j++) {
+      const p = (j / stC) * TAU;
+      const x = cx + r * 0.62 * Math.cos(p);
+      const z = r * Math.sin(p);
+      tag(x, cy, z, 2);
+      row.push(V(x, cy, z, 0.92));
+    }
+    stGrid.push(row);
+  }
+  for (let k = 0; k < stR; k++)
+    for (let j = 0; j < stC; j++) {
+      const j1 = (j + 1) % stC;
+      addFace(stGrid[k][j], stGrid[k + 1][j], stGrid[k + 1][j1], 2);
+      addFace(stGrid[k][j], stGrid[k + 1][j1], stGrid[k][j1], 2);
+    }
+
+  /* ---- Synapse sparks (subtle, skipped in low-quality / reduced-motion) -- */
+  const sparks = [];
+  for (let k = 0; k < 28; k++) {
+    const a = Math.floor(hash(k * 3 + 1) * cortexCount);
+    const b = hash(k * 7 + 2) > 0.5 ? a + 1 : a + C;
+    if (b < cortexCount) sparks.push({ a, b, t: hash(k * 11 + 5), v: 0.004 + 0.007 * hash(k * 13 + 9) });
+  }
+
+  for (const id in centroids) {
+    const c = centroids[id];
+    centroids[id] = { x: c.x / c.n, y: c.y / c.n, z: c.z / c.n, n: c.n };
+  }
+
+  return { verts, faces, sparks, centroids };
+}
+
+/* --------------------------------------------------------------------------
+   Renderer
+   -------------------------------------------------------------------------- */
+
+export function mountBrain3D(canvas, opts) {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  const geo = buildGeometry();
+  const NV = geo.verts.length;
+  const NF = geo.faces.length;
+  const reduced =
+    window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const motionOff = () =>
+    reduced || document.documentElement.getAttribute("data-motion") === "off";
+
+  const pal = opts.palette || {};
+  const rgb = (c, fb) => {
+    const m = /^#?([0-9a-f]{6})$/i.exec(String(c || "").trim());
+    if (!m) return fb;
+    const n = parseInt(m[1], 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  };
+  /* One tissue base per part; lobe tones are subtle shifts of the cortex base. */
+  const bases = [
+    rgb(pal.cortex, [201, 167, 155]),
+    rgb(pal.cerebellum, [176, 138, 128]),
+    rgb(pal.stem, [203, 185, 164]),
+  ];
+  /* tone table: [source part, per-channel multiplier] — frontal a touch
+     lighter/warmer, occipital cooler/darker, insula recessed, etc. */
+  const TONE_DEF = [
+    [0, [1.05, 1.03, 1.00]],
+    [0, [1.00, 1.00, 1.00]],
+    [0, [0.97, 0.94, 0.93]],
+    [0, [0.90, 0.91, 0.95]],
+    [0, [0.84, 0.82, 0.82]],
+    [0, [1.02, 1.00, 0.99]],
+    [0, [1.08, 1.05, 1.00]],
+    [1, [1.00, 1.00, 1.00]],
+    [2, [1.00, 1.00, 1.00]],
+  ];
+  const tones = TONE_DEF.map(([src, k]) => {
+    const b = bases[src];
+    return [clamp(b[0] * k[0], 0, 255), clamp(b[1] * k[1], 0, 255), clamp(b[2] * k[2], 0, 255)];
+  });
+
+  /* selection follows the active skin's --accent (teal in Field Lab) */
+  let acc = [63, 184, 163];
+  try {
+    const v = getComputedStyle(document.documentElement).getPropertyValue("--accent").trim();
+    acc = rgb(v, acc);
+  } catch (e) { /* keep fallback */ }
+  const accLight = [clamp(acc[0] + 90, 0, 255), clamp(acc[1] + 90, 0, 255), clamp(acc[2] + 90, 0, 255)];
+
+  /* shade cache: [tone][litLevel][bucket] -> css rgb string.
+     Top buckets blend toward white for a glossy crest. */
+  const BUCKETS = 40;
+  const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  const WHITE = [255, 255, 255];
+  const shadeCache = tones.map((base) => {
+    const tints = [base, mix(base, acc, 0.30), mix(base, acc, 0.80)];
+    return tints.map((tc) => {
+      const arr = [];
+      for (let b = 0; b < BUCKETS; b++) {
+        const sh = 0.16 + 0.84 * (b / (BUCKETS - 1));
+        let c = [tc[0] * sh, tc[1] * sh, tc[2] * sh];
+        if (b > BUCKETS - 6) c = mix(c, WHITE, ((b - (BUCKETS - 6)) / 5) * 0.16);
+        arr.push(`rgb(${Math.round(clamp(c[0], 0, 255))},${Math.round(clamp(c[1], 0, 255))},${Math.round(clamp(c[2], 0, 255))})`);
+      }
+      return arr;
+    });
+  });
+  const hoverCache = tones.map((base) => {
+    const hc = mix(base, WHITE, 0.12);
+    const arr = [];
+    for (let b = 0; b < BUCKETS; b++) {
+      const sh = 0.16 + 0.84 * (b / (BUCKETS - 1));
+      arr.push(`rgb(${Math.round(clamp(hc[0] * sh, 0, 255))},${Math.round(clamp(hc[1] * sh, 0, 255))},${Math.round(clamp(hc[2] * sh, 0, 255))})`);
+    }
+    return arr;
+  });
+
+  /* Hotspot anchors: surface regions sit on their real centroid; deep / mid
+     nuclei keep the schematic inward projection and show only when lit. */
+  const anchors = (opts.regions || []).map((r) => {
+    const c = geo.centroids[r.id];
+    if (c && c.n > 0) {
+      return { id: r.id, short: r.short || r.name, X: c.x, Y: c.y, Z: c.z, color: r.color || "#3fb8a3", surface: true };
+    }
+    const X = (r.x - 210) * 0.66;
+    const Y = -(r.y - 152) * 0.66;
+    const q = Math.max(0, 1 - (X / 145) ** 2 - (Y / 82) ** 2);
+    let Z = 112 * Math.sqrt(q);
+    if (r.layer === "deep") Z *= 0.25;
+    else if (r.layer === "mid") Z *= 0.6;
+    return { id: r.id, short: r.short || r.name, X, Y, Z: Z + 8, color: r.color || "#3fb8a3", surface: false };
+  });
+  const anchorById = new Map(anchors.map((a) => [a.id, a]));
+
+  /* Camera state */
+  let yaw = 0.62, pitch = 0.16, zoom = 1;
+  let vyaw = 0, vpitch = 0;
+  let auto = !motionOff();
+  let lit = new Map();
+  let focus = false;
+  let dirty = true, raf = 0, visible = true;
+  let W = 0, H = 0, dpr = 1;
+  let hoverRegion = null, hoverX = 0, hoverY = 0, lastHoverPick = 0;
+  let lowQ = false, emaMs = 12;
+
+  const proj = new Array(NV);
+  for (let i = 0; i < NV; i++) proj[i] = { x: 0, y: 0, z: 0 };
+  const fdepth = new Float64Array(NF);
+  const order = new Array(NF);
+  for (let i = 0; i < NF; i++) order[i] = i;
+  const anchorScreen = new Map();
+  let hitFaces = [];
+
+  /* two-light rig: warm key upper-left-front, cool fill from the right */
+  const Ll = Math.hypot(-0.38, 0.60, -0.69);
+  const LX = -0.38 / Ll, LY = 0.60 / Ll, LZ = -0.69 / Ll;
+  const Fl = Math.hypot(0.55, 0.12, -0.82);
+  const FX = 0.55 / Fl, FY = 0.12 / Fl, FZ = -0.82 / Fl;
+  /* half-vector between key light and view (0,0,-1) for the specular sheen */
+  const Hl = Math.hypot(LX, LY, LZ - 1);
+  const HX = LX / Hl, HY = LY / Hl, HZ = (LZ - 1) / Hl;
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    dpr = Math.min(lowQ ? 1.5 : 2, window.devicePixelRatio || 1);
+    W = Math.max(80, rect.width);
+    H = Math.max(80, rect.height);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    dirty = true;
+    kick();
+  }
+
+  function sync() {
+    const st = (opts.getLit && opts.getLit()) || { lit: new Map(), focus: false };
+    lit = st.lit || new Map();
+    focus = !!st.focus;
+    dirty = true;
+    kick();
+  }
+
+  /* __CHUNK3__ */
 }
