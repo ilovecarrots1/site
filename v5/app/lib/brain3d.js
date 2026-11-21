@@ -120,7 +120,7 @@ export function buildGeometry() {
   }
 
   /* ---- Cerebrum: two shaped, gyrified, fissure-carved hemispheres -------- */
-  const R = 30, C = 42;
+  const R = 36, C = 48;
   const cortexCount = 2 * (R + 1) * C;
   for (const s of [-1, 1]) {
     const grid = [];
@@ -153,8 +153,9 @@ export function buildGeometry() {
         const w = (1 - vert) * h + vert * v;
         const g = Math.pow(Math.abs(w), 0.55);
         const fine = 0.30 * Math.sin(11.5 * p + 7.0 * t + 1.9 * Math.sin(4.2 * t));
+        const fine2 = 0.16 * Math.sin(19.0 * p + 13.0 * t + 2.4 * Math.sin(6.3 * p));
         const fade = clamp((z * s - 2) / 18, 0, 1) * clamp((y + 66) / 20, 0, 1);
-        const disp = (9.0 * (g - 0.55) + 1.6 * fine) * fade;
+        const disp = (9.4 * (g - 0.55) + 1.7 * fine + 0.9 * fine2) * fade;
         x += disp * ux; y += disp * uy; z += disp * uz;
         /* major fissures — narrow, deep clefts carved after the folds */
         const az = Math.abs(z);
@@ -169,8 +170,17 @@ export function buildGeometry() {
         groove += 5 * lat * pwin * Math.exp(-Math.pow((y - 46) / 4.5, 2));                /* intraparietal */
         const fwin = ss(58, 84, x) * (1 - ss(120, 140, y)) * ss(-6, 8, y);
         groove += 4.5 * lat * fwin * Math.exp(-Math.pow((y - 16) / 4.0, 2));              /* inferior frontal */
+        const sfwin = ss(46, 78, x) * (1 - ss(120, 140, x)) * ss(20, 36, y);
+        groove += 3.6 * lat * sfwin * Math.exp(-Math.pow((y - 34) / 3.6, 2));             /* superior frontal */
+        const prewin = ss(6, 22, y) * (1 - ss(70, 82, y));
+        groove += 3.2 * lat * prewin * Math.exp(-Math.pow((x - (36 - 0.26 * y)) / 3.4, 2)); /* precentral */
+        groove += 3.0 * lat * prewin * Math.exp(-Math.pow((x - (8 - 0.26 * y)) / 3.4, 2));  /* postcentral */
+        const powin = ss(-96, -70, x) * (1 - ss(-40, -18, x)) * ss(8, 30, y);
+        groove += 4.0 * lat * powin * Math.exp(-Math.pow((x + 72) / 4.0, 2));             /* parieto-occipital */
+        const colwin = ss(-50, -20, x) * (1 - ss(40, 70, x)) * (1 - ss(-44, -30, y));
+        groove += 3.0 * lat * colwin * Math.exp(-Math.pow((y + 52) / 3.6, 2));            /* collateral */
         if (groove > 0) { x -= groove * ux; y -= groove * uy; z -= groove * uz; }
-        const ao = clamp(1 - 0.05 * groove - 0.02 * Math.max(0, -disp), 0.45, 1);
+        const ao = clamp(1 - 0.055 * groove - 0.025 * Math.max(0, -disp), 0.40, 1);
         /* medial walls almost touch — thin longitudinal fissure (~5 units) */
         if (z * s < 2) z = s * (2 + (z * s - 2) * 0.18);
         z += s * 0.9;
