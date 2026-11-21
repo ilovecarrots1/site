@@ -609,7 +609,7 @@ export function mount(root) {
   if (canvas3d) {
     b3d = mountBrain3D(canvas3d, {
       regions: REGIONS.map((r) => ({ ...r, color: regionColor(r) })),
-      palette: { cortex: "#c9a79b", cerebellum: "#b08a80", stem: "#cbb9a4" },
+      palette: { cortex: "#b8b4a8", cerebellum: "#8a867c", stem: "#9c988c" },
       getLit: litState,
       onSelect: (id) => select("region", id),
     });
